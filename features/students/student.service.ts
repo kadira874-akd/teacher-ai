@@ -1,5 +1,5 @@
 import { getAllStudents } from "./student.repository";
 
-export function getStudents() {
-  return getAllStudents();
+export async function getStudents() {
+  return await getAllStudents();
 }

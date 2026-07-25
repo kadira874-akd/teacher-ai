@@ -1,5 +1,12 @@
-import { studentMock } from "./student.mock";
+import { supabase } from "@/lib/supabase";
 
-export function getAllStudents() {
-  return studentMock;
+export async function getAllStudents() {
+  const { data, error } = await supabase
+    .from("students")
+    .select("*");
+
+  console.log("DATA:", data);
+  console.log("ERROR:", error);
+
+  return data ?? [];
 }

@@ -1,7 +1,7 @@
 import { getStudents } from "@/features/students/student.service";
 
-export default function StudentsPage() {
-  const students = getStudents();
+export default async function StudentsPage() {
+  const students = await getStudents();
 
   return (
     <main className="p-8">
@@ -9,22 +9,24 @@ export default function StudentsPage() {
         Data Siswa
       </h1>
 
-      <ul className="space-y-3">
-        {students.map((student) => (
-          <li
+      <div className="space-y-4">
+        {students?.map((student) => (
+          <div
             key={student.id}
             className="border rounded-lg p-4"
           >
-            <h2 className="font-semibold">
+            <h2 className="font-bold">
               {student.name}
             </h2>
 
-            <p>NISN: {student.nisn}</p>
+            <p>NISN : {student.nisn}</p>
 
-            <p>Kelas: {student.classId}</p>
-          </li>
+            <p>Kelas : {student.class_id}</p>
+
+            <p>Status : {student.status}</p>
+          </div>
         ))}
-      </ul>
+      </div>
     </main>
   );
 }
