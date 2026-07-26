@@ -14,12 +14,25 @@ export interface StudentPerformance {
 
 
 
+
+export type AILevel =
+
+  | "GOOD"
+
+  | "REVIEW"
+
+  | "NEED_ATTENTION"
+
+  | "CRITICAL";
+
+
+
+
+
+
 export interface AIInsight {
 
-  level:
-  | "GOOD"
-  | "NEED_ATTENTION"
-  | "CRITICAL";
+  level: AILevel;
 
 
   summary:string;

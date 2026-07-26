@@ -7,6 +7,7 @@ from "@/lib/supabase";
 
 export async function saveLearningMemory({
 
+
 studentId,
 
 insightId,
@@ -20,6 +21,7 @@ subject,
 averageScore,
 
 attendancePercentage
+
 
 
 }:{
@@ -43,26 +45,114 @@ attendancePercentage?:number;
 
 
 
-console.log(
-"INSERT AI MEMORY",
-{
-studentId,
-insightId,
-feedback,
-rating
+
+
+const finalRating =
+
+rating ?? "APPROVED";
+
+
+
+
+
+
+const {
+
+data:existing,
+
+error:findError
+
 }
+
+=
+
+await supabase
+
+.from("ai_learning_memory")
+
+.select("*")
+
+.eq(
+"student_id",
+studentId
+)
+
+.eq(
+"teacher_feedback",
+feedback
+)
+
+.eq(
+"teacher_rating",
+finalRating
+)
+
+.limit(1)
+
+.single();
+
+
+
+
+
+
+
+if(findError && findError.code !== "PGRST116"){
+
+
+console.error(
+
+"AI MEMORY FIND ERROR",
+
+findError
+
 );
+
+
+return null;
+
+
+}
+
+
+
+
+
+
+
+
+if(existing){
+
+
+return existing;
+
+
+}
+
+
+
+
 
 
 
 
 
 const learningWeight =
-rating === "APPROVED"
+
+
+finalRating === "APPROVED"
+
 ?
+
 10
+
 :
+
 -5;
+
+
+
+
 
 
 
@@ -77,42 +167,53 @@ error
 }
 
 =
+
 await supabase
 
-.from(
-"ai_learning_memory"
-)
+.from("ai_learning_memory")
 
 .insert({
 
 student_id:
 studentId,
 
+
 insight_id:
-insightId,
+insightId ?? null,
+
 
 teacher_feedback:
 feedback,
 
+
 teacher_rating:
-rating,
+finalRating,
+
 
 learning_weight:
 learningWeight,
 
+
 subject:
 subject ?? "GENERAL",
+
 
 average_score:
 averageScore ?? 0,
 
+
 attendance_percentage:
 attendancePercentage ?? 0
+
 
 })
 
 .select()
+
 .single();
+
+
+
 
 
 
@@ -121,27 +222,30 @@ attendancePercentage ?? 0
 
 if(error){
 
+
 console.error(
+
 "AI MEMORY ERROR",
+
 error
+
 );
 
 
 return null;
+
 
 }
 
 
 
 
-console.log(
-"AI MEMORY SAVED",
-data
-);
+
 
 
 
 return data;
+
 
 
 }

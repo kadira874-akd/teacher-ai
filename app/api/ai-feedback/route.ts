@@ -1,165 +1,235 @@
 import { NextResponse } from "next/server";
 
-import { supabase } from "@/lib/supabase";
+
+import { supabase }
+from "@/lib/supabase";
+
 
 import {
- saveLearningMemory
+  processTeacherFeedback
 }
-from "@/features/ai/ai.learning.memory.repository";
+from "@/features/ai/ai.feedback.workflow.service";
+
+
+import {
+  runAIPatternPipeline
+}
+from "@/features/ai/ai.workflow.service";
+
 
 
 export async function POST(
-request: Request
+  request: Request
 ){
 
-try{
 
+  try{
 
-const body =
-await request.json();
 
+    const body =
+    await request.json();
 
-console.log(
-"AI FEEDBACK BODY:",
-body
-);
 
 
 
-const {
+    const {
 
-studentId,
+      studentId,
 
-insightId,
+      insightId,
 
-feedback,
+      feedback,
 
-rating
+      rating
 
 
-}=body;
+    } = body;
 
 
 
-if(
-!studentId ||
-!feedback
-){
+    if(
+      !studentId ||
+      !feedback
+    ){
 
-return NextResponse.json({
+      return NextResponse.json({
 
-message:"DATA KURANG"
+        message:
+        "DATA KURANG"
 
-},{
-status:400
-});
+      },{
+        status:400
+      });
 
-}
+    }
 
 
 
-const {
 
-data,
 
-error
+    const {
 
-}=
+      data,
 
-await supabase
+      error
 
-.from("ai_feedback")
+    } =
 
-.insert({
+    await supabase
 
-student_id: studentId,
+    .from("ai_feedback")
 
-insight_id: insightId,
+    .insert({
 
-feedback: feedback,
+      student_id:
+      studentId,
 
-rating: rating ?? "APPROVED"
 
-})
+      insight_id:
+      insightId,
 
-.select()
-.single();
 
+      feedback:
+      feedback,
 
 
+      rating:
+      rating ?? "APPROVED"
 
-if(error){
+    })
 
-console.error(
-"INSERT AI FEEDBACK ERROR",
-error
-);
+    .select()
 
+    .single();
 
-return NextResponse.json({
 
-error
 
-},{
-status:400
-});
 
 
-}
 
+    if(error){
 
 
+      console.error(
+        "INSERT AI FEEDBACK ERROR",
+        error
+      );
 
-console.log(
-"AI FEEDBACK INSERT SUCCESS",
-data
-);
 
-await saveLearningMemory({
 
-studentId,
+      return NextResponse.json({
 
-insightId,
+        error
 
-feedback,
+      },{
+        status:400
+      });
 
-rating: rating ?? "APPROVED"
 
-});
+    }
 
 
-return NextResponse.json({
 
-success:true,
 
-data
 
-});
 
 
+    const workflow =
 
-}
+    await processTeacherFeedback({
 
-catch(error){
 
+      studentId,
 
-console.error(
-"AI FEEDBACK ROUTE ERROR",
-error
-);
 
+      insightId,
 
 
-return NextResponse.json({
+      feedback,
 
-error:"SERVER ERROR"
 
-},{
-status:500
-});
+      rating:
 
+      rating ?? "APPROVED"
 
-}
+
+    });
+
+
+
+
+
+
+
+
+    const patternPipeline =
+
+    await runAIPatternPipeline();
+
+
+
+
+
+
+
+    return NextResponse.json({
+
+
+      success:true,
+
+
+      data,
+
+
+      workflow,
+
+
+      patternPipeline
+
+
+
+    });
+
+
+
+
+
+
+  }
+
+  catch(error){
+
+
+
+    console.error(
+
+      "AI FEEDBACK ROUTE ERROR",
+
+      error
+
+    );
+
+
+
+
+
+    return NextResponse.json({
+
+
+      error:
+      "SERVER ERROR"
+
+
+
+    },{
+
+      status:500
+
+    });
+
+
+
+  }
 
 
 }

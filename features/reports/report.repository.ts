@@ -1,124 +1,338 @@
-import { supabase } from "@/lib/supabase";
+import {
+  supabase
+}
+from "@/lib/supabase";
+
 
 
 export async function getReportSummary() {
 
-  const { data: reports, error } =
-    await supabase
-      .from("reports")
-      .select(`
+
+
+  const {
+
+    data: reports,
+
+    error
+
+  } =
+
+  await supabase
+
+    .from("reports")
+
+    .select(`
+
+      id,
+
+      semester,
+
+      academic_year,
+
+      teacher_note,
+
+      students (
+
         id,
-        semester,
-        academic_year,
-        teacher_note,
-        students (
-          id,
-          name,
-          class_id
-        )
-      `);
+
+        name,
+
+        class_id
+
+      )
+
+    `);
 
 
-  if (error) {
-    console.error(error);
+
+
+
+  if(error){
+
+    console.error(
+
+      "GET REPORT ERROR",
+
+      error
+
+    );
+
+
     return [];
+
   }
 
 
-  const result: any[] = [];
 
 
-  for (const report of reports ?? []) {
+
+
+
+  const result:any[] = [];
+
+
+
+
+
+
+  for(const report of reports ?? []) {
+
+
+
+
+    const student =
+
+      Array.isArray(report.students)
+
+      ?
+
+      report.students[0]
+
+      :
+
+      report.students;
+
+
+
+
+
+
+    if(!student){
+
+      console.error(
+
+        "REPORT STUDENT NOT FOUND",
+
+        report.id
+
+      );
+
+      continue;
+
+    }
+
+
+
+
+
+
 
     const studentId =
-      report.students.id;
+
+      student.id;
 
 
-    const { data: assessments } =
-      await supabase
-        .from("assessments")
-        .select("score")
-        .eq(
-          "student_id",
-          studentId
-        );
 
 
-    const { data: attendance } =
-      await supabase
-        .from("attendance")
-        .select("status")
-        .eq(
-          "student_id",
-          studentId
-        );
+
+
+
+    const {
+
+      data: assessments
+
+    } =
+
+    await supabase
+
+      .from("assessments")
+
+      .select("score")
+
+      .eq(
+
+        "student_id",
+
+        studentId
+
+      );
+
+
+
+
+
+
+
+
+    const {
+
+      data: attendance
+
+    } =
+
+    await supabase
+
+      .from("attendance")
+
+      .select("status")
+
+      .eq(
+
+        "student_id",
+
+        studentId
+
+      );
+
+
+
+
+
+
 
 
     const averageScore =
+
+
       assessments && assessments.length
+
       ?
+
       Math.round(
+
         assessments.reduce(
+
           (total,item)=>
+
             total + item.score,
+
           0
-        ) / assessments.length
+
+        )
+
+        /
+
+        assessments.length
+
       )
+
       :
+
       0;
+
+
+
+
+
+
 
 
     const totalAttendance =
+
       attendance?.length ?? 0;
 
 
+
+
+
+
+
     const hadir =
+
       attendance?.filter(
+
         item =>
+
         item.status === "PRESENT"
+
       ).length ?? 0;
 
 
+
+
+
+
+
     const attendancePercentage =
+
+
       totalAttendance
+
       ?
+
       Math.round(
+
         (hadir / totalAttendance)
-        * 100
+
+        *
+
+        100
+
       )
+
       :
+
       0;
+
+
+
+
+
+
 
 
 
     result.push({
 
-      id: report.id,
+
+
+      id:
+
+        report.id,
+
+
 
       student:
-        report.students.name,
+
+        student.name,
+
+
 
       class:
-        report.students.class_id,
+
+        student.class_id,
+
+
 
       semester:
+
         report.semester,
 
+
+
       academic_year:
+
         report.academic_year,
+
+
 
       averageScore,
 
+
+
       attendancePercentage,
 
+
+
       teacher_note:
-        report.teacher_note,
+
+        report.teacher_note
+
+
 
     });
+
+
 
   }
 
 
+
+
+
+
   return result;
+
+
 
 }

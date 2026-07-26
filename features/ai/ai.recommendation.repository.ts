@@ -1,5 +1,5 @@
 import {
-supabase
+  supabase
 }
 from "@/lib/supabase";
 
@@ -13,11 +13,41 @@ keyword
 
 }:{
 
-rating:string;
+rating?:string;
 
-keyword:string;
+keyword?:string;
 
 }){
+
+
+
+let query =
+
+supabase
+
+.from("ai_patterns")
+
+.select("*")
+
+.order(
+"success_rate",
+{
+ascending:false
+}
+);
+
+
+
+if(rating){
+
+query =
+query.eq(
+"condition->>rating",
+rating
+);
+
+}
+
 
 
 const {
@@ -29,25 +59,18 @@ error
 }
 
 =
-
-await supabase
-
-.from("ai_patterns")
-
-.select("*")
-
-.eq(
-"condition->>rating",
-rating
-);
+await query;
 
 
 
 if(error){
 
 console.error(
+
 "AI RECOMMENDATION SEARCH ERROR",
+
 error
+
 );
 
 return null;
@@ -56,14 +79,66 @@ return null;
 
 
 
+
+
+if(!data || data.length===0){
+
+return null;
+
+}
+
+
+
+
+
+if(!keyword){
+
+return data[0];
+
+}
+
+
+
+
+
 const pattern =
 
 data?.find(
-(item:any)=>
 
-item.condition.feedback
+(item:any)=>{
+
+
+const condition =
+item.condition ?? {};
+
+
+
+const feedbackText =
+
+condition.feedback
 ?.toLowerCase()
-.includes(
+?? "";
+
+
+
+const keywords =
+
+condition.keywords
+?.join(" ")
+.toLowerCase()
+?? "";
+
+
+
+return (
+
+feedbackText.includes(
+keyword.toLowerCase()
+)
+
+||
+
+keywords.includes(
 keyword.toLowerCase()
 )
 
@@ -71,7 +146,13 @@ keyword.toLowerCase()
 
 
 
-return pattern ?? null;
+}
+
+);
+
+
+
+return pattern ?? data[0];
 
 
 }

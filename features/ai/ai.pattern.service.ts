@@ -1,46 +1,58 @@
 import {
-savePattern
+  savePattern
 }
 from "./ai.pattern.repository";
+
+
+import {
+  getPatternCandidate
+}
+from "./ai.pattern.candidate.repository";
 
 
 
 export async function generateLearningPattern(){
 
 
+const candidate =
+await getPatternCandidate();
+
+
+
+if(!candidate){
+
+return null;
+
+}
+
+
+
 const pattern = {
 
 
 pattern_name:
-"Siswa membutuhkan latihan tambahan",
+candidate.pattern_name,
 
 
 condition:
-{
-
-feedback:
-"latihan tambahan",
-
-rating:
-"APPROVED"
-
-},
+candidate.condition,
 
 
 recommendation:
-
-"Berikan latihan bertahap sebelum materi lanjutan",
+candidate.recommendation,
 
 
 success_rate:
-0.8
+candidate.confidence ?? 0
 
 
 };
 
 
 
-return await savePattern(pattern);
+return await savePattern(
+pattern
+);
 
 
 }

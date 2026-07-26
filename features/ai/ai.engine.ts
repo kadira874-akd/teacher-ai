@@ -1,7 +1,13 @@
 import {
-getLearningPattern
+  getLearningPattern
 }
 from "./ai.learning.service";
+
+
+import type {
+  AILevel
+}
+from "./ai.types";
 
 
 
@@ -10,21 +16,33 @@ studentId:string
 ){
 
 
+
 const pattern =
+
 await getLearningPattern(
 studentId
 );
 
 
 
-let level="GOOD";
+
+
+let level:AILevel = "GOOD";
+
+
 
 let summary =
+
 "Siswa memiliki perkembangan akademik baik.";
 
 
+
 let recommendation =
+
 "Berikan materi pengayaan.";
+
+
+
 
 
 
@@ -34,14 +52,19 @@ pattern.score > 20
 
 
 summary =
+
 "AI menemukan pola belajar positif berdasarkan feedback guru.";
 
 
 recommendation =
+
 "Pertahankan strategi pembelajaran saat ini.";
 
 
 }
+
+
+
 
 
 
@@ -54,19 +77,23 @@ level="REVIEW";
 
 
 summary =
+
 "AI menemukan strategi sebelumnya perlu evaluasi.";
 
 
 recommendation =
+
 "Guru disarankan mencoba pendekatan berbeda.";
+
 
 }
 
 
 
 
-return {
 
+
+return {
 
 level,
 
@@ -74,8 +101,8 @@ summary,
 
 recommendation
 
-
 };
+
 
 
 }

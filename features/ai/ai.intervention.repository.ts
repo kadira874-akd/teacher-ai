@@ -4,13 +4,20 @@ import {
 from "@/lib/supabase";
 
 
-export async function getLearningMemory(){
+
+export async function getStudentLearningMemory(
+studentId:string
+){
 
 
 const {
+
 data,
+
 error
+
 }
+
 =
 await supabase
 
@@ -18,22 +25,24 @@ await supabase
 "ai_learning_memory"
 )
 
-.select(`
-id,
-student_id,
-teacher_feedback,
-teacher_rating,
-learning_weight
-`)
+.select("*")
+
+.eq(
+"student_id",
+studentId
+);
+
+
 
 
 
 if(error){
 
 console.error(
-"GET MEMORY ERROR",
+"INTERVENTION MEMORY ERROR",
 error
 );
+
 
 return [];
 
@@ -42,6 +51,5 @@ return [];
 
 
 return data ?? [];
-
 
 }

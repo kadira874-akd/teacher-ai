@@ -1,5 +1,5 @@
 import {
-supabase
+  supabase
 }
 from "@/lib/supabase";
 
@@ -7,11 +7,13 @@ from "@/lib/supabase";
 
 export async function updatePatternStatistic({
 
+
 patternId,
 
 usageCount,
 
 studentCount
+
 
 }:{
 
@@ -22,6 +24,31 @@ usageCount:number;
 studentCount:number;
 
 }){
+
+
+
+
+
+if(!patternId){
+
+
+console.error(
+
+"PATTERN STAT ERROR: MISSING ID"
+
+);
+
+
+return null;
+
+
+}
+
+
+
+
+
+
 
 
 const {
@@ -41,44 +68,67 @@ await supabase
 .update({
 
 usage_count:
-usageCount,
+
+usageCount ?? 0,
+
 
 student_count:
-studentCount
+
+studentCount ?? 0,
+
+
+updated_at:
+
+new Date()
 
 })
 
 .eq(
+
 "id",
+
 patternId
+
 )
 
 .select()
+
 .single();
+
+
+
+
+
+
 
 
 
 if(error){
 
+
 console.error(
+
 "UPDATE PATTERN STAT ERROR",
+
 error
+
 );
 
+
 return null;
+
 
 }
 
 
 
-console.log(
-"PATTERN STAT UPDATED",
-data
-);
+
+
 
 
 
 return data;
+
 
 
 }

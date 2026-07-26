@@ -30,7 +30,9 @@ export async function analyzeStudent(
 
 
   const adaptive =
-  await getAdaptiveRecommendation();
+  await getAdaptiveRecommendation(
+    insight.summary
+  );
 
 
 

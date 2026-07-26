@@ -3,16 +3,23 @@ import {
 }
 from "./ai.discovery.repository";
 
+
 import {
-savePatternCandidate
+  savePatternCandidate
 }
 from "./ai.pattern.candidate.repository";
+
+
 
 export async function discoverPattern(){
 
 
+
 const memories =
+
 await getLearningMemory();
+
+
 
 
 
@@ -26,21 +33,35 @@ return null;
 
 
 
+
+
+
 const feedbacks =
 
 memories.map(
 (item:any)=>
 ({
-id:item.id,
 
-student_id:item.student_id,
+id:
+item.id,
+
+
+student_id:
+item.student_id,
+
 
 text:
 item.teacher_feedback
-?.toLowerCase() ?? ""
+?.toLowerCase()
+?? ""
 
 })
+
 );
+
+
+
+
 
 
 
@@ -60,12 +81,19 @@ const keywords = [
 
 
 
+
+
+
+
+
 const matched =
 
 feedbacks.filter(
+
 (item)=>
 
 keywords.some(
+
 (keyword)=>
 
 item.text.includes(keyword)
@@ -73,6 +101,10 @@ item.text.includes(keyword)
 )
 
 );
+
+
+
+
 
 
 
@@ -86,20 +118,33 @@ return null;
 
 
 
+
+
+
+
+
 const students =
 
 new Set(
 
 matched.map(
+
 (item)=>
+
 item.student_id
+
 )
 
 );
 
 
 
+
+
+
+
 const candidate = {
+
 
 
 pattern_name:
@@ -108,18 +153,31 @@ pattern_name:
 
 
 
+
+
 condition:
 {
 
 source:
+
 "AI DISCOVERY",
 
+
 matched_feedback:
+
 matched.length,
 
-keywords
+
+keywords,
+
+
+rating:
+
+"APPROVED"
 
 },
+
+
 
 
 
@@ -129,15 +187,26 @@ recommendation:
 
 
 
+
+
+
 confidence:
 
 Number(
+
 (
 matched.length /
+
 memories.length
+
 )
+
 .toFixed(2)
+
 ),
+
+
+
 
 
 
@@ -146,8 +215,21 @@ student_count:
 students.size
 
 
+
 };
 
 
 
-return await savePatternCandidate(candidate);
+
+
+
+
+return await savePatternCandidate(
+
+candidate
+
+);
+
+
+
+}

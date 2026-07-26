@@ -2,51 +2,87 @@
 
 
 import {
-  analyzeStudent
+
+  runAIRecommendationWorkflow
+
 }
-from "@/features/ai/ai.service";
+
+from "@/features/ai/ai.recommendation.workflow.service";
+
+
+
 
 
 import {
+
   getAIHistory
+
 }
-from "@/features/ai/ai.memory.repository";
+
+from "@/features/ai/ai.insight.history.repository";
+
+
+
 
 
 import FeedbackForm
+
 from "@/components/ai/FeedbackForm";
+
+
+
+
 
 
 
 export default async function AIPage(){
 
 
+
+
+
 const studentId =
+
 "9a77db99-0624-4e44-b299-a5d153e5cc39";
 
 
 
-/*
-  Generate / ambil AI Insight terbaru
-*/
-const insight =
-await analyzeStudent(
-  studentId
+
+
+
+
+
+const recommendation =
+
+
+await runAIRecommendationWorkflow(
+
+studentId
+
 );
 
-console.log(
-"AI PAGE INSIGHT",
-insight
-);
 
 
-/*
-  Ambil history AI Memory
-*/
+
+
+
+
+
+
 const history =
+
+
 await getAIHistory(
-  studentId
+
+studentId
+
 );
+
+
+
+
+
+
 
 
 
@@ -54,31 +90,33 @@ await getAIHistory(
 
 return (
 
+
+
 <main className="space-y-6">
 
 
 
-{/* HEADER */}
+
+
+
 
 <section>
 
-<h1 className="
-text-3xl
-font-bold
-">
+
+<h1 className="text-3xl font-bold">
 
 AI Assistant
 
 </h1>
 
 
-<p className="
-text-gray-600
-">
 
-AI Student Intelligence & Learning Memory
+<p className="text-gray-600">
+
+Student Intelligence & Adaptive Learning System
 
 </p>
+
 
 
 </section>
@@ -87,47 +125,89 @@ AI Student Intelligence & Learning Memory
 
 
 
-{/* CURRENT AI INSIGHT */}
+
+
+
 
 <section
-className="
-rounded-xl
-border
-bg-white
-p-6
-space-y-4
-"
+
+className="rounded-xl border bg-white p-6 space-y-4"
+
 >
 
 
-<h2
-className="
-text-xl
-font-bold
-"
->
 
-Student Insight
+<h2 className="text-xl font-bold">
+
+AI Recommendation
 
 </h2>
 
 
 
+
+
+
+
+
 <div>
+
 
 <p>
 
-Status:
+Priority:
 
-<span className="
-font-bold
-ml-2
-">
+<span className="font-bold ml-2">
 
-{insight.level}
+{recommendation.priority}
 
 </span>
 
+
+</p>
+
+
+
+
+
+
+<p>
+
+Confidence:
+
+
+<span className="font-bold ml-2">
+
+{
+
+Math.round(
+
+recommendation.confidence
+
+)
+
+}%
+
+</span>
+
+
+</p>
+
+
+
+
+
+<p>
+
+AI Score:
+
+<span className="font-bold ml-2">
+
+{recommendation.score}
+
+</span>
+
+
 </p>
 
 
@@ -136,55 +216,31 @@ ml-2
 
 
 
-<p>
 
-{insight.summary}
-
-</p>
 
 
 
 
 <div>
 
-<p className="font-semibold">
 
-Rekomendasi AI:
+<h3 className="font-semibold">
 
-</p>
+
+Recommendation
+
+
+</h3>
+
 
 
 <p>
 
-{insight.recommendation}
+{recommendation.recommendation}
 
 </p>
 
-<p className="mt-3">
-Confidence:
-{" "}
-{
-insight.confidence
-?
-`${insight.confidence * 100}%`
-:
-"-"
-}
-</p>
 
-
-
-<p className="mt-3 text-gray-600">
-
-Dasar Rekomendasi:
-
-{" "}
-
-{
-insight.reason
-}
-
-</p>
 
 </div>
 
@@ -192,26 +248,46 @@ insight.reason
 
 
 
-{/* 
- Feedback hanya satu kali
- untuk insight terbaru
-*/}
 
 
-<div
-className="
-border-t
-pt-4
-"
->
 
 
-<h3
-className="
-font-semibold
-mb-3
-"
->
+<div className="bg-gray-50 rounded-lg p-4">
+
+
+<h3 className="font-semibold">
+
+
+Reasoning
+
+
+</h3>
+
+
+<p className="text-sm">
+
+
+{recommendation.reason}
+
+
+</p>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div className="border-t pt-4">
+
+
+<h3 className="font-semibold mb-3">
 
 Feedback Guru
 
@@ -219,20 +295,24 @@ Feedback Guru
 
 
 
+
+
 <FeedbackForm
 
-studentId={
-studentId
-}
 
-insightId={
-insight.id
-}
+studentId={studentId}
+
+
+insightId={studentId}
+
 
 />
 
 
+
 </div>
+
+
 
 
 
@@ -247,52 +327,40 @@ insight.id
 
 
 
-{/* AI MEMORY HISTORY */}
-
 <section
 
-className="
-rounded-xl
-border
-bg-white
-p-6
-"
+className="rounded-xl border bg-white p-6"
 
 >
 
 
-<h2
-className="
-text-xl
-font-bold
-"
->
+
+<h2 className="text-xl font-bold">
+
 
 AI Learning Memory
+
 
 </h2>
 
 
 
-<div
-className="
-mt-4
-space-y-4
-"
->
+
+
+
 
 
 {
 
-history.length === 0 && (
+history.length === 0
 
-<p
-className="
-text-gray-500
-"
->
+&&
 
-Belum ada pembelajaran AI dari feedback guru.
+(
+
+<p className="text-gray-500 mt-3">
+
+Belum ada pembelajaran AI.
 
 </p>
 
@@ -304,26 +372,33 @@ Belum ada pembelajaran AI dari feedback guru.
 
 
 
+
+
+
+
+<div className="space-y-4 mt-4">
+
+
+
+
+
 {
 
 history.map(
+
 (item:any)=>(
+
 
 
 <div
 
-key={
-item.id
-}
+key={item.id}
 
-className="
-border
-rounded-lg
-p-4
-space-y-2
-"
+className="border rounded-lg p-4"
+
 
 >
+
 
 
 <p>
@@ -338,7 +413,11 @@ Feedback:
 
 </strong>
 
+
 </p>
+
+
+
 
 
 
@@ -355,7 +434,11 @@ Rating:
 
 
 
+
+
+
 <p>
+
 
 Learning Weight:
 
@@ -363,40 +446,34 @@ Learning Weight:
 
 {item.learning_weight}
 
-</p>
-
-
-
-
-<p className="
-text-sm
-text-gray-500
-"
->
-
-Subject:
-
-{" "}
-
-{item.subject ?? "GENERAL"}
 
 </p>
+
+
+
+
 
 
 
 </div>
 
 
+
 )
 
 )
+
 
 
 }
 
 
 
+
+
 </div>
+
+
 
 
 
@@ -409,7 +486,9 @@ Subject:
 
 </main>
 
+
 );
+
 
 
 }

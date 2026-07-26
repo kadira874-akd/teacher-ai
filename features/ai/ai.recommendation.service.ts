@@ -1,11 +1,13 @@
 import {
-findRecommendation
+  findRecommendation
 }
 from "./ai.recommendation.repository";
 
 
 
-export async function getAdaptiveRecommendation(){
+export async function getAdaptiveRecommendation(
+keyword:string = "latihan"
+){
 
 
 
@@ -16,10 +18,11 @@ await findRecommendation({
 rating:
 "APPROVED",
 
-keyword:
-"latihan"
+keyword
 
 });
+
+
 
 
 
@@ -38,6 +41,8 @@ recommendation:
 
 
 
+
+
 return {
 
 
@@ -46,7 +51,12 @@ pattern.recommendation,
 
 
 confidence:
-pattern.success_rate
+pattern.success_rate,
+
+
+patternId:
+pattern.id
+
 
 
 };
