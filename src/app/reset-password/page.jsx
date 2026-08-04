@@ -16,14 +16,25 @@ function ResetPasswordContent() {
   const [success, setSuccess] = useState(false);
   const [tokenValid, setTokenValid] = useState(true);
 
-  useEffect(() => {
-    // Cek apakah ada token dari URL
-    const token = searchParams.get('token');
+    useEffect(() => {
+    // Cek apakah ada token dari URL (dari link email)
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token') || urlParams.get('access_token') || urlParams.get('code');
+    
     if (!token) {
-      setTokenValid(false);
-      setError('Link reset password tidak valid atau sudah kedaluwarsa.');
+        // Jika tidak ada token, cek apakah ada hash fragment (Supabase kadang pakai ini)
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const hashToken = hashParams.get('access_token');
+        
+        if (hashToken) {
+        // Redirect ke URL dengan token di query parameter
+        window.location.href = `/reset-password?token=${hashToken}`;
+        } else {
+        setTokenValid(false);
+        setError('Link reset password tidak valid atau sudah kedaluwarsa.');
+        }
     }
-  }, [searchParams]);
+    }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

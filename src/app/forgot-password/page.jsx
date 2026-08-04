@@ -9,28 +9,29 @@ export default function ForgotPasswordPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setError('');
 
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      });
-      
-      if (error) throw error;
-      setSuccess(true);
-    } catch (err) {
-      if (err.message.includes('User not found')) {
-        setError('Email tidak ditemukan. Silakan periksa kembali.');
-      } else {
-        setError('Gagal mengirim email. Silakan coba lagi.');
-      }
-    } finally {
-      setLoading(false);
+  try {
+    // PENTING: redirectTo harus mengarah ke /reset-password (bukan /auth/callback)
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    
+    if (error) throw error;
+    setSuccess(true);
+  } catch (err) {
+    if (err.message.includes('User not found')) {
+      setError('Email tidak ditemukan. Silakan periksa kembali.');
+    } else {
+      setError('Gagal mengirim email. Silakan coba lagi.');
     }
-  };
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#2D5BE3] via-[#4F46E5] to-[#7C3AED] flex items-center justify-center p-4">
