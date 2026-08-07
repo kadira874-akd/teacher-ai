@@ -1,1 +1,4 @@
-Nothing needs to be added to .gitignore since the changes only include source code files (.jsx) and no build artifacts, dependencies, or temporary files.
+```
+# Environment
+.env.local
+```
