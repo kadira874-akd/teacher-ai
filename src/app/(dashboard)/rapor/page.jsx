@@ -15,22 +15,24 @@ export default function RaporPage() {
   const [selectedSiswaId, setSelectedSiswaId] = useState('');
   const [raporData, setRaporData] = useState(null);
   const [sekolahData, setSekolahData] = useState(null);
-  
+  const [guruData, setGuruData] = useState(null);
+
   const [catatanWali, setCatatanWali] = useState('');
   const [statusKenaikan, setStatusKenaikan] = useState('');
   const [nomorRapor, setNomorRapor] = useState('');
   const [tanggalPenetapan, setTanggalPenetapan] = useState('');
   const [kotaPenetapan, setKotaPenetapan] = useState('');
+  const [tanggapanOrtu, setTanggapanOrtu] = useState('');
 
   useEffect(() => {
     const initData = async () => {
       if (!profile) await fetchSession();
       if (profile?.id) {
         setLoading(true);
-        const { data: kelasData } = await supabase.from('kelas').select('id').eq('guru_id', profile.id).limit(1);
+        const { data: kelasData } = await supabase.from('kelas').select('id, nama_kelas, fase').eq('guru_id', profile.id).limit(1);
         if (kelasData && kelasData.length > 0) {
           setKelasId(kelasData[0].id);
-          const { data: siswaData } = await supabase.from('siswa').select('*').eq('kelas_id', kelasData[0].id).order('nama', { ascending: true });
+          const { data: siswaData } = await supabase.from('siswa').select('*').eq('kelas_id', kelasData[0].id).order('nama');
           setSiswaList(siswaData || []);
           if (siswaData && siswaData.length > 0) setSelectedSiswaId(siswaData[0].id);
 
@@ -38,6 +40,9 @@ export default function RaporPage() {
             const { data: sekolah } = await supabase.from('sekolah').select('*').eq('id', profile.sekolah_id).single();
             setSekolahData(sekolah);
           }
+
+          const { data: guru } = await supabase.from('guru').select('*').eq('id', profile.id).single();
+          setGuruData(guru);
         }
         setLoading(false);
       }
@@ -45,71 +50,119 @@ export default function RaporPage() {
     initData();
   }, [profile, fetchSession]);
 
+  // ============================================================
+  // LOGIKA BARU: FETCH & HITUNG RAPOR BERDASARKAN STRUKTUR HIRARKIS
+  // ============================================================
   useEffect(() => {
     const fetchRapor = async () => {
       if (!selectedSiswaId || !kelasId) return;
 
-      const { data: mapelList } = await supabase.from('mapel').select('*').eq('kelas_id', kelasId).order('urutan', { ascending: true });
-      const { data: nilaiTPData } = await supabase.from('nilai_tp').select('*').eq('siswa_id', selectedSiswaId);
+      const siswa = siswaList.find(s => s.id === selectedSiswaId);
+      const agamaSiswa = siswa?.agama || 'Umum';
+
+      // 1. Ambil Mapel
+      const { data: mapelList } = await supabase.from('mapel').select('*').eq('kelas_id', kelasId).order('urutan');
+      
+      // 2. Ambil Data Nilai Baru
+      const { data: nilaiLMData } = await supabase.from('nilai_lingkup_materi').select('*').eq('siswa_id', selectedSiswaId);
+      const { data: nilaiSASData } = await supabase.from('nilai_sas').select('*').eq('siswa_id', selectedSiswaId);
       const { data: absensiData } = await supabase.from('absensi').select('*').eq('siswa_id', selectedSiswaId);
       const { data: pancasilaData } = await supabase.from('profil_pancasila').select('*').eq('siswa_id', selectedSiswaId);
       const { data: ekskulData } = await supabase.from('nilai_ekskul').select('*, ekskul:ekskul_id(nama, jenis)').eq('siswa_id', selectedSiswaId);
       const { data: raporExisting } = await supabase.from('rapor').select('*').eq('siswa_id', selectedSiswaId).eq('semester', 'Ganjil').limit(1);
 
-      // PROSES NILAI: 1 Nilai Akhir + 2 Deskripsi (Tertinggi & Terendah)
       const nilaiPerMapel = [];
-      mapelList?.forEach(mapel => {
-        const nilaiMapel = nilaiTPData?.filter(n => n.mapel_id === mapel.id) || [];
-        if (nilaiMapel.length > 0) {
-          // Group nilai per TP
-          const perTP = {};
-          nilaiMapel.forEach(nilai => {
-            if (!perTP[nilai.tp_index]) perTP[nilai.tp_index] = { tp_text: nilai.tp_text, scores: [] };
-            perTP[nilai.tp_index].scores.push(nilai.angka);
-          });
 
-          let totalNilai = 0;
-          let countTP = 0;
-          let highestTP = { tp_text: 'Materi umum', avg: -1 };
-          let lowestTP = { tp_text: 'Materi umum', avg: 101 };
+      // 3. Proses Per Mapel
+      for (const mapel of mapelList || []) {
+        // Ambil LM & TP untuk mapel ini
+        const { data: lmList } = await supabase.from('lingkup_materi').select('*').eq('mapel_id', mapel.id).order('urutan');
+        const { data: tpList } = await supabase.from('tujuan_pembelajaran').select('*').in('lingkup_materi_id', (lmList || []).map(l => l.id)).order('urutan');
 
-          Object.values(perTP).forEach(tpData => {
-            const avg = tpData.scores.reduce((a, b) => a + b, 0) / tpData.scores.length;
-            totalNilai += avg;
-            countTP++;
-
-            if (avg > highestTP.avg) highestTP = { tp_text: tpData.tp_text, avg };
-            if (avg < lowestTP.avg) lowestTP = { tp_text: tpData.tp_text, avg };
-          });
-
-          const nilaiAkhir = countTP > 0 ? totalNilai / countTP : 0;
-
-          // Generate 2 Deskripsi Resmi
-          const deskripsiTertinggi = `Menunjukkan pemahaman yang sangat baik pada materi ${highestTP.tp_text.toLowerCase()}.`;
-          const deskripsiTerendah = `Perlu bimbingan dan latihan lebih lanjut pada materi ${lowestTP.tp_text.toLowerCase()}.`;
-
-          nilaiPerMapel.push({
-            nama: mapel.nama,
-            nilaiAkhir: parseFloat(nilaiAkhir.toFixed(1)),
-            deskripsiTertinggi,
-            deskripsiTerendah
-          });
-        }
-      });
-
-      // PROSES ABSENSI
-      const rekapTotal = { H: 0, S: 0, I: 0, A: 0 };
-      const rekapPerMapel = {};
-      
-      absensiData?.forEach(absen => {
-        const mapelName = mapelList?.find(m => m.id === absen.mapel_id)?.nama || 'Lainnya';
-        if (!rekapPerMapel[mapelName]) rekapPerMapel[mapelName] = { H: 0, S: 0, I: 0, A: 0 };
+        // Filter LM sesuai agama siswa
+        const relevantLMs = (lmList || []).filter(lm => lm.kategori === agamaSiswa || lm.kategori === 'Umum');
         
-        rekapPerMapel[mapelName][absen.status]++;
-        rekapTotal[absen.status]++;
-      });
+        if (relevantLMs.length === 0) continue; // Skip jika tidak ada LM yang relevan
 
-      setRaporData({ nilaiPerMapel, rekapTotal, rekapPerMapel, pancasilaData: pancasilaData || [], ekskulData: ekskulData || [] });
+        let sumLM = 0;
+        let countLM = 0;
+        let highestLM = null;
+        let lowestLM = null;
+
+        // Hitung rata-rata LM & cari LM tertinggi/terendah
+        relevantLMs.forEach(lm => {
+          const nilai = nilaiLMData?.find(n => n.lingkup_materi_id === lm.id)?.angka || 0;
+          if (nilai > 0) {
+            sumLM += nilai;
+            countLM++;
+            
+            if (!highestLM || nilai > highestLM.nilai) highestLM = { ...lm, nilai };
+            if (!lowestLM || nilai < lowestLM.nilai) lowestLM = { ...lm, nilai };
+          }
+        });
+
+        const avgLM = countLM > 0 ? (sumLM / countLM) : 0;
+        const nilaiSAS = nilaiSASData?.find(n => n.mapel_id === mapel.id)?.angka || 0;
+
+        // Rumus Final: (Rata-rata LM + SAS) / 2
+        let nilaiAkhir = 0;
+        if (countLM > 0 && nilaiSAS > 0) {
+          nilaiAkhir = Math.round((avgLM + nilaiSAS) / 2);
+        } else if (countLM > 0) {
+          nilaiAkhir = Math.round(avgLM); // Fallback jika SAS belum ada
+        }
+
+        // 4. Generate Deskripsi Otomatis (Mengambil teks TP dari LM tertinggi/terendah)
+        const namaDepan = siswa.nama.split(' ')[0];
+        let deskripsiTertinggi = '';
+        let deskripsiTerendah = '';
+
+        if (highestLM) {
+          // Ambil TP pertama dari LM tertinggi sebagai representasi
+          const tpRep = tpList?.find(tp => tp.lingkup_materi_id === highestLM.id);
+          const teksTP = tpRep ? tpRep.teks.toLowerCase() : highestLM.nama.toLowerCase();
+          const templates = [
+            `Ananda ${namaDepan} menunjukkan penguasaan dalam ${teksTP}.`,
+            `Ananda ${namaDepan} menunjukkan pemahaman yang sangat baik dalam ${teksTP}.`,
+            `Ananda ${namaDepan} sudah mahir dalam ${teksTP}.`
+          ];
+          deskripsiTertinggi = templates[Math.floor(Math.random() * templates.length)];
+        }
+
+        if (lowestLM) {
+          // Ambil TP pertama dari LM terendah sebagai representasi area perbaikan
+          const tpRep = tpList?.find(tp => tp.lingkup_materi_id === lowestLM.id);
+          const teksTP = tpRep ? tpRep.teks.toLowerCase() : lowestLM.nama.toLowerCase();
+          const templates = [
+            `Ananda ${namaDepan} membutuhkan bimbingan dalam ${teksTP}.`,
+            `Ananda ${namaDepan} perlu penguatan lebih lanjut dalam ${teksTP}.`,
+            `Ananda ${namaDepan} sudah berkembang, namun perlu latihan lebih dalam ${teksTP}.`
+          ];
+          deskripsiTerendah = templates[Math.floor(Math.random() * templates.length)];
+        }
+
+        nilaiPerMapel.push({
+          nama: mapel.nama,
+          nilaiAkhir,
+          deskripsi: `${deskripsiTertinggi} ${deskripsiTerendah}`, // Digabung jadi 1 paragraf utuh seperti contoh rapor
+          deskripsiTertinggi,
+          deskripsiTerendah
+        });
+      }
+
+      // 5. Rekap Kehadiran
+      const rekapTotal = { H: 0, S: 0, I: 0, A: 0 };
+      absensiData?.forEach(absen => { rekapTotal[absen.status] = (rekapTotal[absen.status] || 0) + 1; });
+
+      // 6. Generate Narasi Kokurikuler (Profil Pancasila)
+      let narasiKokurikuler = '';
+      if (pancasilaData && pancasilaData.length > 0) {
+        const tertinggi = pancasilaData.find(p => p.predikat === 'SB') || pancasilaData[0];
+        const terendah = pancasilaData.find(p => p.predikat === 'BB' || p.predikat === 'MB') || pancasilaData[pancasilaData.length - 1];
+        narasiKokurikuler = `Ananda ${namaDepan} sudah mahir dalam penerapan subdimensi ${tertinggi?.subdimensi?.toLowerCase() || 'Profil Pelajar Pancasila'}, hal tersebut terlihat pada kegiatan ${tertinggi?.kegiatan?.toLowerCase() || 'pembelajaran sehari-hari'} dan sudah mulai berkembang dalam penerapan subdimensi ${terendah?.subdimensi?.toLowerCase() || 'dimensi lainnya'}, hal tersebut terlihat pada kegiatan ${terendah?.kegiatan?.toLowerCase() || 'aktivitas kelas'}.`;
+      }
+
+      setRaporData({ nilaiPerMapel, rekapTotal, pancasilaData: pancasilaData || [], ekskulData: ekskulData || [], narasiKokurikuler });
 
       if (raporExisting && raporExisting.length > 0) {
         const r = raporExisting[0];
@@ -118,10 +171,11 @@ export default function RaporPage() {
         setNomorRapor(r.nomor_rapor || '');
         setTanggalPenetapan(r.tanggal_penetapan || '');
         setKotaPenetapan(r.kota_penetapan || '');
+        setTanggapanOrtu(r.tanggapan_ortu || '');
       }
     };
     fetchRapor();
-  }, [selectedSiswaId, kelasId]);
+  }, [selectedSiswaId, kelasId, siswaList]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -129,7 +183,8 @@ export default function RaporPage() {
     const { error } = await supabase.from('rapor').insert({
       siswa_id: selectedSiswaId, semester: 'Ganjil', status: 'Draft',
       catatan_wali: catatanWali, status_kenaikan: statusKenaikan,
-      nomor_rapor: nomorRapor, tanggal_penetapan: tanggalPenetapan || null, kota_penetapan: kotaPenetapan,
+      nomor_rapor: nomorRapor, tanggal_penetapan: tanggalPenetapan || null,
+      kota_penetapan: kotaPenetapan, tanggapan_ortu: tanggapanOrtu
     });
     if (error) alert('Gagal: ' + error.message);
     else alert('✅ Data rapor berhasil disimpan!');
@@ -153,17 +208,17 @@ export default function RaporPage() {
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[#0F172A]">Preview Rapor</h1>
-          <p className="text-[#64748B] mt-1">Format resmi: 1 Nilai Akhir + 2 Deskripsi (Tertinggi & Terendah).</p>
+          <p className="text-[#64748B] mt-1">Format resmi Kurikulum Merdeka (Nilai = (Rata-rata LM + SAS) / 2)</p>
         </div>
-        <div className="flex gap-3">
-          <Button onClick={handleSave} disabled={saving}>{saving ? 'Menyimpan...' : '💾 Simpan Data'}</Button>
+        <div className="flex gap-3 flex-wrap">
+          <Button onClick={handleSave} disabled={saving}>{saving ? 'Menyimpan...' : '💾 Simpan'}</Button>
           {selectedSiswa && raporData && (
             <PDFDownloadLink
-              document={<RaporPDF siswa={selectedSiswa} raporData={raporData} raporInfo={{ catatan_wali: catatanWali, status_kenaikan: statusKenaikan, nomor_rapor: nomorRapor, tanggal_penetapan: tanggalPenetapan, kota_penetapan: kotaPenetapan }} sekolah={sekolahData} getPredikat={getPredikat} />}
+              document={<RaporPDF siswa={selectedSiswa} raporData={raporData} raporInfo={{ catatan_wali: catatanWali, status_kenaikan: statusKenaikan, nomor_rapor: nomorRapor, tanggal_penetapan: tanggalPenetapan, kota_penetapan: kotaPenetapan, tanggapan_ortu: tanggapanOrtu }} sekolah={sekolahData} guru={guruData} getPredikat={getPredikat} />}
               fileName={`Rapor-${selectedSiswa.nama.replace(/\s+/g, '_')}.pdf`}
-              className="px-6 py-2.5 bg-[#059669] text-white rounded-lg font-medium hover:bg-[#047857] transition-all inline-flex items-center gap-2"
+              className="px-6 py-2.5 bg-[#2D5BE3] text-white rounded-lg font-medium hover:bg-[#1E40AF] transition-all inline-flex items-center gap-2"
             >
-              {({ loading }) => loading ? 'Menyiapkan PDF...' : '📥 Download PDF'}
+              {({ loading }) => loading ? 'Menyiapkan...' : '📥 Download PDF'}
             </PDFDownloadLink>
           )}
         </div>
@@ -171,95 +226,152 @@ export default function RaporPage() {
 
       <div className="bg-white p-4 rounded-xl border border-[#E2E8F0] shadow-sm">
         <select value={selectedSiswaId} onChange={(e) => setSelectedSiswaId(e.target.value)} className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg">
-          {siswaList.map(s => <option key={s.id} value={s.id}>{s.nama}</option>)}
+          {siswaList.map(s => <option key={s.id} value={s.id}>{s.nama} ({s.agama || 'Umum'}) - NISN: {s.nisn || '-'}</option>)}
         </select>
       </div>
 
       {selectedSiswa && raporData && (
         <div className="bg-white rounded-xl border-2 border-[#E2E8F0] shadow-sm overflow-hidden">
+          {/* HEADER */}
           <div className="bg-gradient-to-r from-[#2D5BE3] to-[#7C3AED] text-white p-8 text-center">
-            {sekolahData ? (
-              <>
-                <h3 className="text-xl font-bold mb-2">{sekolahData.nama}</h3>
-                <p className="text-sm opacity-90">{sekolahData.alamat} • NPSN: {sekolahData.npsn || '-'}</p>
-                <div className="mt-4 pt-4 border-t border-white/20">
-                  <h2 className="text-3xl font-bold">RAPOR PESERTA DIDIK</h2>
-                  <p className="text-sm mt-2 opacity-90">Tahun Pelajaran 2025/2026 • Semester Ganjil</p>
-                </div>
-              </>
-            ) : <h2 className="text-3xl font-bold">RAPOR PESERTA DIDIK</h2>}
-          </div>
-
-          <div className="p-8 border-b border-[#E2E8F0]">
-            <h3 className="text-sm font-bold text-[#2D5BE3] uppercase tracking-wide mb-4">A. Identitas</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div><span className="text-[#64748B]">Nama:</span> <span className="font-semibold">{selectedSiswa.nama}</span></div>
-              <div><span className="text-[#64748B]">NISN:</span> <span className="font-semibold">{selectedSiswa.nisn || '-'}</span></div>
-              <div><span className="text-[#64748B]">TTL:</span> <span className="font-semibold">{selectedSiswa.tempat_lahir || '-'}, {selectedSiswa.tanggal_lahir || '-'}</span></div>
-              <div><span className="text-[#64748B]">JK:</span> <span className="font-semibold">{selectedSiswa.jenis_kelamin || '-'}</span></div>
+            {sekolahData && <><h3 className="text-xl font-bold mb-1">{sekolahData.nama}</h3><p className="text-sm opacity-90">{sekolahData.alamat}</p></>}
+            <div className="mt-4 pt-4 border-t border-white/20">
+              <h2 className="text-3xl font-bold">LAPORAN HASIL BELAJAR (RAPOR)</h2>
             </div>
           </div>
 
+          {/* IDENTITAS */}
           <div className="p-8 border-b border-[#E2E8F0]">
-            <h3 className="text-sm font-bold text-[#2D5BE3] uppercase tracking-wide mb-4">B. Nilai Akademik</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+              <div><span className="text-[#64748B]">Nama Peserta Didik</span> <span className="font-semibold">: {selectedSiswa.nama}</span></div>
+              <div><span className="text-[#64748B]">NISN</span> <span className="font-semibold">: {selectedSiswa.nisn || '-'}</span></div>
+              <div><span className="text-[#64748B]">Kelas</span> <span className="font-semibold">: {kelasId ? 'Kelas' : '-'}</span></div>
+              <div><span className="text-[#64748B]">Tahun Pelajaran</span> <span className="font-semibold">: 2025/2026</span></div>
+            </div>
+          </div>
+
+          {/* NILAI AKADEMIK */}
+          <div className="p-8 border-b border-[#E2E8F0]">
+            <h3 className="text-sm font-bold text-[#2D5BE3] uppercase tracking-wide mb-4">Nilai Akademik</h3>
             {raporData.nilaiPerMapel.length === 0 ? (
-              <p className="text-center text-[#64748B] py-8">Belum ada nilai.</p>
+              <p className="text-center text-[#64748B] py-8">Belum ada data nilai untuk siswa ini.</p>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead className="bg-[#F8FAFC]">
-                    <tr>
-                      <th className="px-4 py-3 text-left w-8">No</th>
-                      <th className="px-4 py-3 text-left">Mata Pelajaran</th>
-                      <th className="px-4 py-3 text-center w-20">Nilai</th>
-                      <th className="px-4 py-3 text-center w-32">Predikat</th>
-                      <th className="px-4 py-3 text-left">Deskripsi</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#E2E8F0]">
-                    {raporData.nilaiPerMapel.map((mapel, idx) => {
-                      const pred = getPredikat(mapel.nilaiAkhir);
-                      return (
-                        <tr key={idx} className="hover:bg-[#F8FAFC]">
-                          <td className="px-4 py-4">{idx + 1}</td>
-                          <td className="px-4 py-4 font-medium">{mapel.nama}</td>
-                          <td className="px-4 py-4 text-center font-bold">{mapel.nilaiAkhir}</td>
-                          <td className="px-4 py-4 text-center"><span className={`px-2 py-1 rounded text-xs font-bold ${pred.color}`}>{pred.label}</span></td>
-                          <td className="px-4 py-4 text-xs leading-relaxed text-[#334155]">
-                            <p className="mb-1"><span className="font-semibold text-[#059669]">• Tertinggi:</span> {mapel.deskripsiTertinggi}</p>
-                            <p><span className="font-semibold text-[#D97706]">• Terendah:</span> {mapel.deskripsiTerendah}</p>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+              <table className="w-full text-sm border border-[#E2E8F0]">
+                <thead className="bg-[#F8FAFC]">
+                  <tr className="border-b border-[#E2E8F0]">
+                    <th className="px-4 py-3 text-left w-10 border-r border-[#E2E8F0]">No</th>
+                    <th className="px-4 py-3 text-left border-r border-[#E2E8F0]">Mata Pelajaran</th>
+                    <th className="px-4 py-3 text-center w-24 border-r border-[#E2E8F0]">Nilai Akhir</th>
+                    <th className="px-4 py-3 text-left">Capaian Kompetensi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {raporData.nilaiPerMapel.map((mapel, idx) => {
+                    const pred = getPredikat(mapel.nilaiAkhir);
+                    return (
+                      <tr key={idx} className="border-b border-[#E2E8F0]">
+                        <td className="px-4 py-4 border-r border-[#E2E8F0] text-center">{idx + 1}</td>
+                        <td className="px-4 py-4 font-medium border-r border-[#E2E8F0]">{mapel.nama}</td>
+                        <td className="px-4 py-4 text-center font-bold border-r border-[#E2E8F0]">{mapel.nilaiAkhir || '-'}</td>
+                        <td className="px-4 py-4 text-xs leading-relaxed text-[#334155]">
+                          {mapel.deskripsi || 'Belum ada data penilaian.'}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             )}
           </div>
 
-          {/* Bagian Pancasila, Ekskul, Absensi, dan Catatan Wali tetap sama seperti sebelumnya, pastikan tidak dihapus */}
+          {/* EKSTRAKURIKULER */}
+          {raporData.ekskulData.length > 0 && (
+            <div className="p-8 border-b border-[#E2E8F0]">
+              <h3 className="text-sm font-bold text-[#2D5BE3] uppercase tracking-wide mb-4">Ekstrakurikuler</h3>
+              <table className="w-full text-sm border border-[#E2E8F0]">
+                <thead className="bg-[#F8FAFC]">
+                  <tr className="border-b border-[#E2E8F0]">
+                    <th className="px-4 py-3 text-left w-10 border-r border-[#E2E8F0]">No</th>
+                    <th className="px-4 py-3 text-left border-r border-[#E2E8F0]">Ekstrakurikuler</th>
+                    <th className="px-4 py-3 text-left">Keterangan</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {raporData.ekskulData.map((item, idx) => (
+                    <tr key={item.id} className="border-b border-[#E2E8F0]">
+                      <td className="px-4 py-4 border-r border-[#E2E8F0] text-center">{idx + 1}</td>
+                      <td className="px-4 py-4 font-medium border-r border-[#E2E8F0]">{item.ekskul?.nama}</td>
+                      <td className="px-4 py-4 text-xs leading-relaxed text-[#334155]">({item.predikat}): {item.deskripsi}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* KOKURIKULER */}
+          {raporData.narasiKokurikuler && (
+            <div className="p-8 border-b border-[#E2E8F0]">
+              <h3 className="text-sm font-bold text-[#2D5BE3] uppercase tracking-wide mb-4">Kokurikuler</h3>
+              <p className="text-sm text-[#334155] leading-relaxed">{raporData.narasiKokurikuler}</p>
+            </div>
+          )}
+
+          {/* KEPUTUSAN */}
           <div className="p-8 border-b border-[#E2E8F0]">
-             <h3 className="text-sm font-bold text-[#2D5BE3] uppercase tracking-wide mb-4">C. Rekap Kehadiran</h3>
-             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-               <div className="bg-[#F0FDF4] p-4 rounded-lg text-center"><p className="text-3xl font-bold text-[#059669]">{raporData.rekapTotal?.H || 0}</p><p className="text-xs text-[#64748B] mt-1">Hadir</p></div>
-               <div className="bg-[#FFFBEB] p-4 rounded-lg text-center"><p className="text-3xl font-bold text-[#D97706]">{raporData.rekapTotal?.S || 0}</p><p className="text-xs text-[#64748B] mt-1">Sakit</p></div>
-               <div className="bg-[#EFF6FF] p-4 rounded-lg text-center"><p className="text-3xl font-bold text-[#0369A1]">{raporData.rekapTotal?.I || 0}</p><p className="text-xs text-[#64748B] mt-1">Izin</p></div>
-               <div className="bg-[#FEF2F2] p-4 rounded-lg text-center"><p className="text-3xl font-bold text-[#DC2626]">{raporData.rekapTotal?.A || 0}</p><p className="text-xs text-[#64748B] mt-1">Alpha</p></div>
-             </div>
+            <h3 className="text-sm font-bold text-[#2D5BE3] uppercase tracking-wide mb-4">Keputusan</h3>
+            <p className="text-sm text-[#334155]">Berdasarkan pencapaian seluruh kompetensi peserta didik dinyatakan: <strong>{statusKenaikan || 'Naik/ Tinggal *'}</strong> kelas</p>
+            <p className="text-xs text-[#64748B] mt-1">(*) coret yang tidak perlu</p>
           </div>
 
+          {/* TANGGAPAN ORANG TUA */}
+          <div className="p-8 border-b border-[#E2E8F0]">
+            <h3 className="text-sm font-bold text-[#2D5BE3] uppercase tracking-wide mb-4">Tanggapan Orang Tua/ Wali Murid</h3>
+            <textarea value={tanggapanOrtu} onChange={(e) => setTanggapanOrtu(e.target.value)} rows="3" className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg text-sm" placeholder="(Diisi oleh orang tua/wali murid)" />
+          </div>
+
+          {/* CATATAN WALI KELAS */}
+          <div className="p-8 border-b border-[#E2E8F0]">
+            <h3 className="text-sm font-bold text-[#2D5BE3] uppercase tracking-wide mb-4">Catatan Wali Kelas</h3>
+            <textarea value={catatanWali} onChange={(e) => setCatatanWali(e.target.value)} rows="3" className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg text-sm" placeholder="Catatan perkembangan siswa..." />
+          </div>
+
+          {/* KETIDAKHADIRAN */}
+          <div className="p-8 border-b border-[#E2E8F0]">
+            <h3 className="text-sm font-bold text-[#2D5BE3] uppercase tracking-wide mb-4">Ketidakhadiran</h3>
+            <div className="grid grid-cols-3 gap-4 text-sm">
+              <div className="bg-[#FFFBEB] p-4 rounded-lg text-center">
+                <p className="text-2xl font-bold text-[#D97706]">{raporData.rekapTotal?.S || 0}</p>
+                <p className="text-xs text-[#64748B] mt-1">Sakit (hari)</p>
+              </div>
+              <div className="bg-[#EFF6FF] p-4 rounded-lg text-center">
+                <p className="text-2xl font-bold text-[#0369A1]">{raporData.rekapTotal?.I || 0}</p>
+                <p className="text-xs text-[#64748B] mt-1">Izin (hari)</p>
+              </div>
+              <div className="bg-[#FEF2F2] p-4 rounded-lg text-center">
+                <p className="text-2xl font-bold text-[#DC2626]">{raporData.rekapTotal?.A || 0}</p>
+                <p className="text-xs text-[#64748B] mt-1">Tanpa Keterangan (hari)</p>
+              </div>
+            </div>
+          </div>
+
+          {/* TANDA TANGAN */}
           <div className="p-8">
-            <h3 className="text-sm font-bold text-[#2D5BE3] uppercase tracking-wide mb-4">D. Catatan Wali Kelas & Kenaikan</h3>
-            <textarea value={catatanWali} onChange={(e) => setCatatanWali(e.target.value)} rows="3" className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg mb-4" placeholder="Catatan perkembangan..." />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <select value={statusKenaikan} onChange={(e) => setStatusKenaikan(e.target.value)} className="px-4 py-2.5 border border-[#E2E8F0] rounded-lg">
-                <option value="">-- Status Kenaikan --</option>
-                <option value="Naik Kelas">Naik Kelas</option>
-                <option value="Tidak Naik">Tidak Naik</option>
-                <option value="Lulus">Lulus</option>
-              </select>
-              <input type="text" value={nomorRapor} onChange={(e) => setNomorRapor(e.target.value)} placeholder="Nomor Rapor" className="px-4 py-2.5 border border-[#E2E8F0] rounded-lg" />
+            <div className="grid grid-cols-2 gap-8 text-sm text-center">
+              <div>
+                <p>Mengetahui,</p>
+                <p className="font-semibold">Kepala Sekolah</p>
+                <div className="h-20"></div>
+                <p className="font-bold border-b border-black inline-block px-4">{sekolahData?.kepala_sekolah_nama || 'Nama Kepala Sekolah'}</p>
+                <p className="text-xs text-[#64748B]">NIP. {sekolahData?.kepala_sekolah_nip || '-'}</p>
+              </div>
+              <div>
+                <p>{kotaPenetapan || 'Kota'}, {tanggalPenetapan || '___ ___ 2026'}</p>
+                <p className="font-semibold">Wali Kelas</p>
+                <div className="h-20"></div>
+                <p className="font-bold border-b border-black inline-block px-4">{guruData?.nama || 'Nama Wali Kelas'}</p>
+                <p className="text-xs text-[#64748B]">NIP. {guruData?.nip || '-'}</p>
+              </div>
             </div>
           </div>
         </div>

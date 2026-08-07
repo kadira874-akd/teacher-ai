@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { useAuthStore } from '@/stores/authStore'; // <-- PASTIKAN BARIS INI ADA DI SINI
+import { useAuthStore } from '@/stores/authStore';
 
 export default function DashboardLayout({ children }) {
   const router = useRouter();
@@ -11,13 +11,12 @@ export default function DashboardLayout({ children }) {
 
   useEffect(() => {
     const initAuth = async () => {
-      // Panggil fungsi fetchSession dari store saat layout dimuat
       await useAuthStore.getState().fetchSession();
       
-      // Setelah store terisi, kita update state lokal komponen
       const currentState = useAuthStore.getState();
       if (!currentState.user) {
-        router.push('/login');
+        // ✅ DIPERBAIKI: Arahkan ke root '/'
+        router.push('/');
       } else {
         setProfile(currentState.profile);
       }
@@ -28,15 +27,19 @@ export default function DashboardLayout({ children }) {
 
   const handleLogout = async () => {
     await useAuthStore.getState().signOut();
-    router.push('/login');
+    // ✅ DIPERBAIKI: Arahkan ke root '/'
+    router.push('/');
     router.refresh();
   };
 
   const menuItems = [
     { name: 'Dashboard', href: '/dashboard', icon: '🏠' },
-    { name: 'Pengaturan', href: '/pengaturan', icon: '⚙️' },
-    { name: 'Manajemen Kelas', href: '/manajemen', icon: '📚' },
-    { name: 'Rapor', href: '/rapor', icon: '📄' },
+    { name: 'Input Data', href: '/pengaturan', icon: '⚙️' }, // Sudah dibersihkan
+    { name: 'Manajemen Kelas', href: '/manajemen', icon: '🏫' },
+    { name: 'Kurikulum', href: '/kurikulum', icon: '📖' },         // BARU
+    { name: 'Modul & Bahan Ajar', href: '/bahan-ajar', icon: '📚' },       // BARU
+    { name: 'Riwayat & Rekap Nilai', href: '/riwayat-rekap', icon: '📊' }, // ← MENU BARU
+    { name: 'Cetak Rapor', href: '/rapor', icon: '📄' },
   ];
 
   if (!profile) {
