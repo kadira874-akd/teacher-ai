@@ -8,17 +8,17 @@ import * as XLSX from 'xlsx';
 
 const InputField = ({ label, value, onChange, type = 'text', placeholder = '', required = false, options = [], rows }) => (
   <div>
-    <label className="block text-sm font-medium text-[#334155] mb-1.5">
+    <label className="block text-sm font-medium text-[#334155] dark:text-[#CBD5E1] mb-1.5">
       {label} {required && <span className="text-[#DC2626]">*</span>}
     </label>
     {options.length > 0 ? (
-      <select value={value || ''} onChange={(e) => onChange(e.target.value)} className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-sm">
+      <select value={value || ''} onChange={(e) => onChange(e.target.value)} className="w-full px-4 py-2.5 border border-[#E2E8F0] dark:border-[#475569] bg-white dark:bg-[#1E293B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-sm text-[#0F172A] dark:text-[#F1F5F9]">
         {options.map(o => <option key={o} value={o}>{o}</option>)}
       </select>
     ) : rows ? (
-      <textarea value={value || ''} onChange={(e) => onChange(e.target.value)} rows={rows} placeholder={placeholder} className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-sm" />
+      <textarea value={value || ''} onChange={(e) => onChange(e.target.value)} rows={rows} placeholder={placeholder} className="w-full px-4 py-2.5 border border-[#E2E8F0] dark:border-[#475569] bg-white dark:bg-[#1E293B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-sm text-[#0F172A] dark:text-[#F1F5F9] placeholder-[#64748B] dark:placeholder-[#94A3B8]" />
     ) : (
-      <input type={type} value={value || ''} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-sm" />
+      <input type={type} value={value || ''} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="w-full px-4 py-2.5 border border-[#E2E8F0] dark:border-[#475569] bg-white dark:bg-[#1E293B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-sm text-[#0F172A] dark:text-[#F1F5F9] placeholder-[#64748B] dark:placeholder-[#94A3B8]" />
     )}
   </div>
 );
@@ -363,9 +363,9 @@ export default function PengaturanPage() {
             <h3 className="text-sm font-bold text-[#2D5BE3] uppercase tracking-wide mb-6">🏫 Identitas Kelas</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-[#334155] mb-1.5">Nama Kelas <span className="text-[#DC2626]">*</span></label>
+                <label className="block text-sm font-medium text-[#334155] dark:text-[#CBD5E1] mb-1.5">Nama Kelas <span className="text-[#DC2626]">*</span></label>
                 <div className="flex gap-2">
-                  <input type="text" value={kelasNama} onChange={(e) => setKelasNama(e.target.value)} placeholder="Contoh: Kelas 3A" className="flex-1 px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3]" />
+                  <input type="text" value={kelasNama} onChange={(e) => setKelasNama(e.target.value)} placeholder="Contoh: Kelas 3A" className="flex-1 px-4 py-2.5 border border-[#E2E8F0] dark:border-[#475569] bg-white dark:bg-[#1E293B] text-[#0F172A] dark:text-[#F1F5F9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3]" />
                   <Button onClick={handleSaveNamaKelas}>💾 Simpan</Button>
                 </div>
               </div>
@@ -481,17 +481,17 @@ export default function PengaturanPage() {
             <Button onClick={() => setShowAddJadwal(!showAddJadwal)}>{showAddJadwal ? '✕ Tutup' : '+ Tambah Jadwal'}</Button>
           </div>
           {showAddJadwal && (
-            <div className="bg-[#F8FAFC] p-4 rounded-lg mb-4 border border-[#E2E8F0]">
+            <div className="bg-[#F8FAFC] dark:bg-[#1E293B] p-4 rounded-lg mb-4 border border-[#E2E8F0] dark:border-[#475569]">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
-                <select value={newJadwal.mapel_id} onChange={(e) => setNewJadwal({...newJadwal, mapel_id: e.target.value})} className="px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-sm">
+                <select value={newJadwal.mapel_id} onChange={(e) => setNewJadwal({...newJadwal, mapel_id: e.target.value})} className="px-3 py-2.5 border border-[#E2E8F0] dark:border-[#475569] bg-white dark:bg-[#1E293B] text-[#0F172A] dark:text-[#F1F5F9] rounded-lg text-sm">
                   <option value="">Pilih Mapel</option>
                   {mapelList.map(m => <option key={m.id} value={m.id}>{m.nama}</option>)}
                 </select>
-                <select value={newJadwal.hari} onChange={(e) => setNewJadwal({...newJadwal, hari: e.target.value})} className="px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-sm">
+                <select value={newJadwal.hari} onChange={(e) => setNewJadwal({...newJadwal, hari: e.target.value})} className="px-3 py-2.5 border border-[#E2E8F0] dark:border-[#475569] bg-white dark:bg-[#1E293B] text-[#0F172A] dark:text-[#F1F5F9] rounded-lg text-sm">
                   {['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'].map(h => <option key={h} value={h}>{h}</option>)}
                 </select>
-                <input type="time" value={newJadwal.jam_mulai} onChange={(e) => setNewJadwal({...newJadwal, jam_mulai: e.target.value})} className="px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-sm" />
-                <input type="time" value={newJadwal.jam_selesai} onChange={(e) => setNewJadwal({...newJadwal, jam_selesai: e.target.value})} className="px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-sm" />
+                <input type="time" value={newJadwal.jam_mulai} onChange={(e) => setNewJadwal({...newJadwal, jam_mulai: e.target.value})} className="px-3 py-2.5 border border-[#E2E8F0] dark:border-[#475569] bg-white dark:bg-[#1E293B] text-[#0F172A] dark:text-[#F1F5F9] rounded-lg text-sm" />
+                <input type="time" value={newJadwal.jam_selesai} onChange={(e) => setNewJadwal({...newJadwal, jam_selesai: e.target.value})} className="px-3 py-2.5 border border-[#E2E8F0] dark:border-[#475569] bg-white dark:bg-[#1E293B] text-[#0F172A] dark:text-[#F1F5F9] rounded-lg text-sm" />
               </div>
               <div className="flex gap-2"><Button onClick={handleSaveJadwal}>Simpan</Button><Button variant="secondary" onClick={() => setShowAddJadwal(false)}>Batal</Button></div>
             </div>

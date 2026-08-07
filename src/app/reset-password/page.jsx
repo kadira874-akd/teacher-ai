@@ -164,7 +164,7 @@ function ResetPasswordContent() {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Minimal 6 karakter"
                     required
-                    className="w-full px-4 py-3 pr-12 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 pr-12 border border-[#E2E8F0] dark:border-[#475569] bg-white dark:bg-[#1E293B] text-[#0F172A] dark:text-[#F1F5F9] placeholder-[#64748B] dark:placeholder-[#94A3B8] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] focus:border-transparent transition-all"
                   />
                   <button
                     type="button"
@@ -196,7 +196,7 @@ function ResetPasswordContent() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Ulangi password di atas"
                   required
-                  className="w-full px-4 py-3 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-[#E2E8F0] dark:border-[#475569] bg-white dark:bg-[#1E293B] text-[#0F172A] dark:text-[#F1F5F9] placeholder-[#64748B] dark:placeholder-[#94A3B8] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] focus:border-transparent transition-all"
                 />
               </div>
 
