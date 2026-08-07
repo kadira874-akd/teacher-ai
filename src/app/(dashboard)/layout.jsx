@@ -8,6 +8,7 @@ export default function DashboardLayout({ children }) {
   const router = useRouter();
   const pathname = usePathname();
   const [profile, setProfile] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const initAuth = async () => {
@@ -15,7 +16,6 @@ export default function DashboardLayout({ children }) {
       
       const currentState = useAuthStore.getState();
       if (!currentState.user) {
-        // ✅ DIPERBAIKI: Arahkan ke root '/'
         router.push('/');
       } else {
         setProfile(currentState.profile);
@@ -27,18 +27,17 @@ export default function DashboardLayout({ children }) {
 
   const handleLogout = async () => {
     await useAuthStore.getState().signOut();
-    // ✅ DIPERBAIKI: Arahkan ke root '/'
     router.push('/');
     router.refresh();
   };
 
   const menuItems = [
     { name: 'Dashboard', href: '/dashboard', icon: '🏠' },
-    { name: 'Input Data', href: '/pengaturan', icon: '⚙️' }, // Sudah dibersihkan
+    { name: 'Input Data', href: '/pengaturan', icon: '⚙️' },
     { name: 'Manajemen Kelas', href: '/manajemen', icon: '🏫' },
-    { name: 'Kurikulum', href: '/kurikulum', icon: '📖' },         // BARU
-    { name: 'Modul & Bahan Ajar', href: '/bahan-ajar', icon: '📚' },       // BARU
-    { name: 'Riwayat & Rekap Nilai', href: '/riwayat-rekap', icon: '📊' }, // ← MENU BARU
+    { name: 'Kurikulum', href: '/kurikulum', icon: '📖' },
+    { name: 'Modul & Bahan Ajar', href: '/bahan-ajar', icon: '📚' },
+    { name: 'Riwayat & Rekap Nilai', href: '/riwayat-rekap', icon: '📊' },
     { name: 'Cetak Rapor', href: '/rapor', icon: '📄' },
   ];
 
@@ -55,18 +54,29 @@ export default function DashboardLayout({ children }) {
 
   return (
     <div className="min-h-screen bg-[#F1F5F9] flex">
+      {/* OVERLAY untuk mobile */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* SIDEBAR */}
-      <aside className="w-64 bg-white border-r border-[#E2E8F0] flex flex-col fixed h-full">
+      <aside className={`w-64 bg-white border-r border-[#E2E8F0] flex flex-col fixed h-full transition-transform duration-300 ease-in-out z-50 ${
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      }`}>
         <div className="p-6 border-b border-[#E2E8F0]">
           <h1 className="text-2xl font-bold text-[#2D5BE3] font-['Plus_Jakarta_Sans']">TeacherAI</h1>
           <p className="text-xs text-[#64748B] mt-1">Panel Wali Kelas</p>
         </div>
         
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {menuItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
+              onClick={() => setSidebarOpen(false)}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
                 pathname === item.href 
                   ? 'bg-[#EFF6FF] text-[#2D5BE3]' 
@@ -94,14 +104,30 @@ export default function DashboardLayout({ children }) {
       </aside>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 ml-64">
+      <main className="flex-1 lg:ml-64 min-h-screen">
         {/* TOPBAR */}
-        <header className="bg-white border-b border-[#E2E8F0] h-16 flex items-center justify-between px-8 sticky top-0 z-10">
-          <h2 className="text-lg font-semibold text-[#0F172A]">
-            {menuItems.find(m => m.href === pathname)?.name || 'Dashboard'}
-          </h2>
+        <header className="bg-white border-b border-[#E2E8F0] h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 sticky top-0 z-30">
           <div className="flex items-center gap-4">
-            <span className="text-sm text-[#64748B]">Tahun Ajaran: 2025/2026</span>
+            {/* Mobile Menu Button */}
+            <button 
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="lg:hidden p-2 rounded-lg hover:bg-[#F1F5F9] transition-colors"
+              aria-label="Toggle menu"
+            >
+              <svg className="w-6 h-6 text-[#334155]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {sidebarOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
+            <h2 className="text-base sm:text-lg font-semibold text-[#0F172A]">
+              {menuItems.find(m => m.href === pathname)?.name || 'Dashboard'}
+            </h2>
+          </div>
+          <div className="flex items-center gap-3 sm:gap-4">
+            <span className="hidden sm:inline text-sm text-[#64748B]">Tahun Ajaran: 2025/2026</span>
             <div className="w-8 h-8 rounded-full bg-[#2D5BE3] text-white flex items-center justify-center font-bold text-sm">
               {profile?.nama?.charAt(0) || 'G'}
             </div>
@@ -109,7 +135,7 @@ export default function DashboardLayout({ children }) {
         </header>
 
         {/* PAGE CONTENT */}
-        <div className="p-8">
+        <div className="p-4 sm:p-6 lg:p-8">
           {children}
         </div>
       </main>
