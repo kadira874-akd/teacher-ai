@@ -1,8 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
-import { useAuthStore } from '@/stores/authStore';
-import { getFaseByKelas, getFaseLabel } from '@/data/curriculumDatabase';
+import { supabase } from '@/config/supabase';
+import { useAuthStore } from '@/hooks/useAuthStore';
+import { getFaseByKelas, getFaseLabel } from '@/config/curriculumDatabase';
 import Button from '@/components/ui/Button';
 import * as XLSX from 'xlsx';
 

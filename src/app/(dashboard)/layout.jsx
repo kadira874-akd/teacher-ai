@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/hooks/useAuthStore';
 
 export default function DashboardLayout({ children }) {
   const router = useRouter();

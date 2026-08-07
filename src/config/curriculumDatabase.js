@@ -18,9 +18,9 @@ import { faseB } from './phases/faseB';
 import { faseC } from './phases/faseC';
 import { faseD } from './phases/faseD';
 
-// 2. Import data pendukung dari folder pendukung (agar tidak duplikat)
-import { PROFIL_PANCASILA } from './pendukung/profilPancasila';
-import { templateEkskul } from './pendukung/templateEkskul';
+// 2. Import data pendukung dari folder constants (agar tidak duplikat)
+import { PROFIL_PANCASILA } from '@/constants/pendukung/profilPancasila';
+import { templateEkskul } from '@/constants/pendukung/templateEkskul';
 
 // 3. Re-export agar bisa diimport langsung dari file ini oleh komponen lain
 export { PROFIL_PANCASILA, TEMPLATE_EKSKUL };
