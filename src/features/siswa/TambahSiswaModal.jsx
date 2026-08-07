@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { supabase } from '@/config/supabase';
+import { supabase } from '@/lib/supabase';
 import Button from '@/components/ui/Button';
 
 export default function TambahSiswaModal({ isOpen, onClose, onSuccess, kelasId }) {

@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { supabase } from '@/config/supabase';
-import { useAuthStore } from '@/hooks/useAuthStore';
+import { supabase } from '@/lib/supabase';
+import { useAuthStore } from '@/stores/authStore';
 import Button from '@/components/ui/Button';
 
 export default function PancasilaPage() {

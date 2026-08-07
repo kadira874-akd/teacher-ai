@@ -1,8 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { supabase } from '@/config/supabase';
-import { useAuthStore } from '@/hooks/useAuthStore';
-import { getFaseByKelas, getFaseLabel, getElemenCP } from '@/config/curriculumDatabase';
+import { supabase } from '@/lib/supabase';
+import { useAuthStore } from '@/stores/authStore';
+import { getFaseByKelas, getFaseLabel, getElemenCP } from '@/data/curriculumDatabase';
 import Button from '@/components/ui/Button';
 
 // ===== DATA PROFIL PANCASILA (6 DIMENSI + ELEMEN) =====
@@ -108,7 +108,6 @@ export default function KurikulumPage() {
   const [selectedMapelObj, setSelectedMapelObj] = useState(null);
   const [showAddMapelInKurikulum, setShowAddMapelInKurikulum] = useState(false);
   const [newMapelNameInKurikulum, setNewMapelNameInKurikulum] = useState('');
-  const [collectedMapel, setCollectedMapel] = useState([]); // Track mapel yang sudah dipilih/dikoleksi
   
   const [elemenList, setElemenList] = useState([]); 
   const [tpList, setTpList] = useState([]);
@@ -588,35 +587,8 @@ export default function KurikulumPage() {
       setTpList([]); 
       return; 
     }
-    
-    // Tambahkan mapel yang dipilih ke collectedMapel jika belum ada
-    const selectedMapel = mapelList.find(m => m.id === selectedMapelForKurikulum);
-    if (selectedMapel && !collectedMapel.some(m => m.id === selectedMapel.id)) {
-      setCollectedMapel(prev => [...prev, selectedMapel]);
-    }
-    
     reloadKurikulum();
-  }, [selectedMapelForKurikulum, mapelList]);
-  
-  // Load collectedMapel from localStorage on mount
-  useEffect(() => {
-    const saved = localStorage.getItem('collectedMapel');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          setCollectedMapel(parsed);
-        }
-      } catch (e) {
-        console.error('Failed to parse collectedMapel from localStorage', e);
-      }
-    }
-  }, []);
-
-  // Save collectedMapel to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('collectedMapel', JSON.stringify(collectedMapel));
-  }, [collectedMapel]);
+  }, [selectedMapelForKurikulum]);
 
   useEffect(() => {
     if (kelasId && activeTab === 'pancasila') {
@@ -671,41 +643,6 @@ export default function KurikulumPage() {
       {/* ==================== TAB: KURIKULUM ==================== */}
       {activeTab === 'kurikulum' && (
         <div className="space-y-6">
-          {/* Tombol Mapel yang Sudah Dikoleksi */}
-          {collectedMapel.length > 0 && (
-            <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-bold text-[#2D5BE3] uppercase tracking-wide">
-                  📚 Mapel yang Sudah Dipilih ({collectedMapel.length})
-                </h3>
-                <button 
-                  onClick={() => setCollectedMapel([])}
-                  className="text-xs text-[#64748B] hover:text-[#DC2626] underline"
-                >
-                  Reset Semua
-                </button>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {collectedMapel.map((mapel) => (
-                  <button
-                    key={mapel.id}
-                    onClick={() => {
-                      setSelectedMapelForKurikulum(mapel.id);
-                      setSelectedMapelObj(mapel);
-                    }}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      selectedMapelForKurikulum === mapel.id
-                        ? 'bg-[#2D5BE3] text-white shadow-md scale-105'
-                        : 'bg-[#EFF6FF] text-[#2D5BE3] hover:bg-[#DBEAFE] border border-[#BFDBFE]'
-                    }`}
-                  >
-                    {mapel.nama}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
           <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
               <h3 className="text-sm font-bold text-[#2D5BE3] uppercase tracking-wide">Pilih Mata Pelajaran</h3>
