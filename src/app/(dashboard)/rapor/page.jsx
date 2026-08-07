@@ -3,8 +3,13 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/config/supabase';
 import { useAuthStore } from '@/hooks/useAuthStore';
 import { PDFDownloadLink } from '@react-pdf/renderer';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 import RaporPDF from '@/components/RaporPDF';
+import RaporPDFTemplate from '@/components/RaporPDFTemplate';
 import Button from '@/components/ui/Button';
+import ImportSiswaModal from '@/features/siswa/ImportSiswaModal';
+import TambahSiswaModal from '@/features/siswa/TambahSiswaModal';
 
 export default function RaporPage() {
   const { profile, fetchSession } = useAuthStore();
@@ -16,6 +21,14 @@ export default function RaporPage() {
   const [raporData, setRaporData] = useState(null);
   const [sekolahData, setSekolahData] = useState(null);
   const [guruData, setGuruData] = useState(null);
+  
+  // Modal states
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [showTambahModal, setShowTambahModal] = useState(false);
+  
+  // Bulk export state
+  const [bulkExporting, setBulkExporting] = useState(false);
+  const [bulkProgress, setBulkProgress] = useState({ current: 0, total: 0 });
 
   const [catatanWali, setCatatanWali] = useState('');
   const [statusKenaikan, setStatusKenaikan] = useState('');
@@ -198,37 +211,214 @@ export default function RaporPage() {
     return { label: 'D', text: 'Perlu Bimbingan', color: 'bg-[#FEF2F2] text-[#DC2626]' };
   };
 
-  if (loading || !profile || !kelasId) return <div className="flex items-center justify-center h-[60vh]"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#2D5BE3]"></div></div>;
-  if (siswaList.length === 0) return <div className="text-center p-12"><p className="text-4xl mb-3">📄</p><p>Belum ada data siswa.</p></div>;
-
+    if (loading || !profile || !kelasId) return <div className="flex items-center justify-center h-[60vh]"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#2D5BE3]"></div></div>;
+  
   const selectedSiswa = siswaList.find(s => s.id === selectedSiswaId);
+
+  // Fungsi Bulk Export PDF
+  const handleBulkExport = async () => {
+    if (siswaList.length === 0) {
+      alert('Tidak ada siswa untuk diekspor.');
+      return;
+    }
+
+    setBulkExporting(true);
+    setBulkProgress({ current: 0, total: siswaList.length });
+
+    try {
+      const zip = new JSZip();
+      const raporFolder = zip.folder('Rapor_Semua_Siswa');
+
+      for (let i = 0; i < siswaList.length; i++) {
+        const siswa = siswaList[i];
+        setBulkProgress({ current: i + 1, total: siswaList.length });
+
+        // Fetch data rapor untuk siswa ini (sama seperti useEffect fetchRapor)
+        const agamaSiswa = siswa.agama || 'Umum';
+        const { data: mapelList } = await supabase.from('mapel').select('*').eq('kelas_id', kelasId).order('urutan');
+        const { data: nilaiLMData } = await supabase.from('nilai_lingkup_materi').select('*').eq('siswa_id', siswa.id);
+        const { data: nilaiSASData } = await supabase.from('nilai_sas').select('*').eq('siswa_id', siswa.id);
+        const { data: absensiData } = await supabase.from('absensi').select('*').eq('siswa_id', siswa.id);
+        const { data: pancasilaData } = await supabase.from('profil_pancasila').select('*').eq('siswa_id', siswa.id);
+        const { data: ekskulData } = await supabase.from('nilai_ekskul').select('*, ekskul:ekskul_id(nama, jenis)').eq('siswa_id', siswa.id);
+        const { data: raporExisting } = await supabase.from('rapor').select('*').eq('siswa_id', siswa.id).eq('semester', 'Ganjil').limit(1);
+
+        const nilaiPerMapel = [];
+        const namaDepan = siswa.nama.split(' ')[0];
+
+        for (const mapel of mapelList || []) {
+          const { data: lmList } = await supabase.from('lingkup_materi').select('*').eq('mapel_id', mapel.id).order('urutan');
+          const { data: tpList } = await supabase.from('tujuan_pembelajaran').select('*').in('lingkup_materi_id', (lmList || []).map(l => l.id)).order('urutan');
+          const relevantLMs = (lmList || []).filter(lm => lm.kategori === agamaSiswa || lm.kategori === 'Umum');
+          
+          if (relevantLMs.length === 0) continue;
+
+          let sumLM = 0, countLM = 0, highestLM = null, lowestLM = null;
+
+          relevantLMs.forEach(lm => {
+            const nilai = nilaiLMData?.find(n => n.lingkup_materi_id === lm.id)?.angka || 0;
+            if (nilai > 0) {
+              sumLM += nilai;
+              countLM++;
+              if (!highestLM || nilai > highestLM.nilai) highestLM = { ...lm, nilai };
+              if (!lowestLM || nilai < lowestLM.nilai) lowestLM = { ...lm, nilai };
+            }
+          });
+
+          const avgLM = countLM > 0 ? (sumLM / countLM) : 0;
+          const nilaiSAS = nilaiSASData?.find(n => n.mapel_id === mapel.id)?.angka || 0;
+          let nilaiAkhir = 0;
+          if (countLM > 0 && nilaiSAS > 0) {
+            nilaiAkhir = Math.round((avgLM + nilaiSAS) / 2);
+          } else if (countLM > 0) {
+            nilaiAkhir = Math.round(avgLM);
+          }
+
+          let deskripsiTertinggi = '', deskripsiTerendah = '';
+          if (highestLM) {
+            const tpRep = tpList?.find(tp => tp.lingkup_materi_id === highestLM.id);
+            const teksTP = tpRep ? tpRep.teks.toLowerCase() : highestLM.nama.toLowerCase();
+            deskripsiTertinggi = `Ananda ${namaDepan} menunjukkan penguasaan dalam ${teksTP}.`;
+          }
+          if (lowestLM) {
+            const tpRep = tpList?.find(tp => tp.lingkup_materi_id === lowestLM.id);
+            const teksTP = tpRep ? tpRep.teks.toLowerCase() : lowestLM.nama.toLowerCase();
+            deskripsiTerendah = `Ananda ${namaDepan} membutuhkan bimbingan dalam ${teksTP}.`;
+          }
+
+          nilaiPerMapel.push({ nama: mapel.nama, nilaiAkhir, deskripsiTertinggi, deskripsiTerendah, deskripsi: `${deskripsiTertinggi} ${deskripsiTerendah}` });
+        }
+
+        const rekapTotal = { H: 0, S: 0, I: 0, A: 0 };
+        absensiData?.forEach(absen => { rekapTotal[absen.status] = (rekapTotal[absen.status] || 0) + 1; });
+
+        let narasiKokurikuler = '';
+        if (pancasilaData && pancasilaData.length > 0) {
+          const tertinggi = pancasilaData.find(p => p.predikat === 'SB') || pancasilaData[0];
+          const terendah = pancasilaData.find(p => p.predikat === 'BB' || p.predikat === 'MB') || pancasilaData[pancasilaData.length - 1];
+          narasiKokurikuler = `Ananda ${namaDepan} sudah mahir dalam penerapan subdimensi ${tertinggi?.subdimensi?.toLowerCase() || 'Profil Pelajar Pancasila'}, hal tersebut terlihat pada kegiatan ${tertinggi?.kegiatan?.toLowerCase() || 'pembelajaran sehari-hari'} dan sudah mulai berkembang dalam penerapan subdimensi ${terendah?.subdimensi?.toLowerCase() || 'dimensi lainnya'}, hal tersebut terlihat pada kegiatan ${terendah?.kegiatan?.toLowerCase() || 'aktivitas kelas'}.`;
+        }
+
+        const siswaRaporData = { nilaiPerMapel, rekapTotal, pancasilaData: pancasilaData || [], ekskulData: ekskulData || [], narasiKokurikuler };
+        const raporInfo = raporExisting && raporExisting.length > 0 ? raporExisting[0] : { catatan_wali: '', status_kenaikan: '', nomor_rapor: '', tanggal_penetapan: '', kota_penetapan: '', tanggapan_ortu: '' };
+
+        // Generate PDF blob
+        const pdfBlob = await RaporPDFTemplate({ 
+          siswa, 
+          raporData: siswaRaporData, 
+          raporInfo, 
+          sekolah: sekolahData, 
+          guru: guruData 
+        }).toBlob();
+
+        const fileName = `Rapor-${siswa.nama.replace(/\s+/g, '_')}.pdf`;
+        raporFolder.file(fileName, pdfBlob);
+      }
+
+      // Generate ZIP
+      const content = await zip.generateAsync({ type: 'blob' });
+      saveAs(content, `Rapor_Semua_Siswa_${new Date().toISOString().split('T')[0]}.zip`);
+      alert(`✅ Berhasil mengekspor ${siswaList.length} rapor!`);
+    } catch (err) {
+      console.error('Error bulk export:', err);
+      alert('❌ Gagal mengekspor rapor: ' + err.message);
+    } finally {
+      setBulkExporting(false);
+      setBulkProgress({ current: 0, total: 0 });
+    }
+  };
+
+  // Fungsi kirim via WhatsApp
+  const handleKirimWA = () => {
+    if (!selectedSiswa || !raporData) return;
+    
+    const namaSiswa = selectedSiswa.nama;
+    const pesan = `Yth. Orang Tua/Wali Murid,\n\nBerikut adalah rapor ananda ${namaSiswa} untuk semester Ganjil Tahun Pelajaran 2025/2026.\n\nSilakan hubungi wali kelas jika ada yang perlu didiskusikan.\n\nTerima kasih.`;
+    
+    const encodedPesan = encodeURIComponent(pesan);
+    const waLink = `https://wa.me/?text=${encodedPesan}`;
+    
+    window.open(waLink, '_blank');
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#0F172A]">Preview Rapor</h1>
-          <p className="text-[#64748B] mt-1">Format resmi Kurikulum Merdeka (Nilai = (Rata-rata LM + SAS) / 2)</p>
+          <h1 className="text-2xl font-bold text-[#0F172A]">📋 Preview & Cetak Rapor</h1>
+          <p className="text-[#64748B] mt-1">Format resmi Kurikulum Merdeka - Siap cetak dan dikirim ke orang tua</p>
         </div>
         <div className="flex gap-3 flex-wrap">
+          <Button variant="secondary" onClick={() => setShowImportModal(true)}>📥 Import Excel</Button>
+          <Button variant="secondary" onClick={() => setShowTambahModal(true)}>➕ Tambah Siswa</Button>
           <Button onClick={handleSave} disabled={saving}>{saving ? 'Menyimpan...' : '💾 Simpan'}</Button>
+          <Button onClick={handleBulkExport} disabled={bulkExporting || siswaList.length === 0}>
+            {bulkExporting ? `⏳ ${bulkProgress.current}/${bulkProgress.total}` : '📦 Download Semua Rapor'}
+          </Button>
           {selectedSiswa && raporData && (
-            <PDFDownloadLink
-              document={<RaporPDF siswa={selectedSiswa} raporData={raporData} raporInfo={{ catatan_wali: catatanWali, status_kenaikan: statusKenaikan, nomor_rapor: nomorRapor, tanggal_penetapan: tanggalPenetapan, kota_penetapan: kotaPenetapan, tanggapan_ortu: tanggapanOrtu }} sekolah={sekolahData} guru={guruData} getPredikat={getPredikat} />}
-              fileName={`Rapor-${selectedSiswa.nama.replace(/\s+/g, '_')}.pdf`}
-              className="px-6 py-2.5 bg-[#2D5BE3] text-white rounded-lg font-medium hover:bg-[#1E40AF] transition-all inline-flex items-center gap-2"
-            >
-              {({ loading }) => loading ? 'Menyiapkan...' : '📥 Download PDF'}
-            </PDFDownloadLink>
+            <>
+              <Button variant="secondary" onClick={handleKirimWA}>💬 Kirim WA</Button>
+              <PDFDownloadLink
+                document={<RaporPDF siswa={selectedSiswa} raporData={raporData} raporInfo={{ catatan_wali: catatanWali, status_kenaikan: statusKenaikan, nomor_rapor: nomorRapor, tanggal_penetapan: tanggalPenetapan, kota_penetapan: kotaPenetapan, tanggapan_ortu: tanggapanOrtu }} sekolah={sekolahData} guru={guruData} getPredikat={getPredikat} />}
+                fileName={`Rapor-${selectedSiswa.nama.replace(/\s+/g, '_')}.pdf`}
+                className="px-6 py-2.5 bg-[#2D5BE3] text-white rounded-lg font-medium hover:bg-[#1E40AF] transition-all inline-flex items-center gap-2"
+              >
+                {({ loading }) => loading ? 'Menyiapkan...' : '📥 Download PDF'}
+              </PDFDownloadLink>
+            </>
           )}
         </div>
       </div>
+
+      {/* Progress Bar Bulk Export */}
+      {bulkExporting && (
+        <div className="bg-white p-4 rounded-xl border border-[#E2E8F0] shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="flex-1 bg-[#E2E8F0] rounded-full h-2 overflow-hidden">
+              <div 
+                className="bg-[#2D5BE3] h-full transition-all duration-300"
+                style={{ width: `${(bulkProgress.current / bulkProgress.total) * 100}%` }}
+              ></div>
+            </div>
+            <span className="text-sm text-[#64748B] whitespace-nowrap">
+              {bulkProgress.current} dari {bulkProgress.total} siswa
+            </span>
+          </div>
+          <p className="text-xs text-[#64748B] mt-2">⏳ Mohon tunggu, sedang membuat PDF untuk semua siswa...</p>
+        </div>
+      )}
 
       <div className="bg-white p-4 rounded-xl border border-[#E2E8F0] shadow-sm">
         <select value={selectedSiswaId} onChange={(e) => setSelectedSiswaId(e.target.value)} className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg">
           {siswaList.map(s => <option key={s.id} value={s.id}>{s.nama} ({s.agama || 'Umum'}) - NISN: {s.nisn || '-'}</option>)}
         </select>
       </div>
+
+      {/* Modals */}
+      <ImportSiswaModal 
+        isOpen={showImportModal} 
+        onClose={() => setShowImportModal(false)} 
+        onSuccess={() => {
+          // Refresh siswa list
+          supabase.from('siswa').select('*').eq('kelas_id', kelasId).order('nama').then(({ data }) => {
+            if (data) setSiswaList(data);
+          });
+          setShowImportModal(false);
+        }}
+        kelasId={kelasId}
+      />
+      
+      <TambahSiswaModal
+        isOpen={showTambahModal}
+        onClose={() => setShowTambahModal(false)}
+        onSuccess={() => {
+          supabase.from('siswa').select('*').eq('kelas_id', kelasId).order('nama').then(({ data }) => {
+            if (data) setSiswaList(data);
+          });
+          setShowTambahModal(false);
+        }}
+        kelasId={kelasId}
+      />
 
       {selectedSiswa && raporData && (
         <div className="bg-white rounded-xl border-2 border-[#E2E8F0] shadow-sm overflow-hidden">
