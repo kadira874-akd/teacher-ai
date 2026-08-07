@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
-import { useAuthStore } from '@/stores/authStore';
+import { supabase } from '@/config/supabase';
+import { useAuthStore } from '@/hooks/useAuthStore';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import RaporPDF from '@/components/RaporPDF';
 import Button from '@/components/ui/Button';

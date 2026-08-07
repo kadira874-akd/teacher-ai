@@ -1,4 +1,4 @@
-import { templateKalimat, getPredikat, getPredikatLabel } from '@/data/templateKalimat';
+import { templateKalimat, getPredikat, getPredikatLabel } from '@/constants/pendukung/templateKalimat';
 
 /**
  * Generate deskripsi otomatis berdasarkan nama siswa, mapel, dan nilai
