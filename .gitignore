@@ -13,15 +13,17 @@ out/
 .env.local
 *.env.*
 
-# IDE specific
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS generated
-.DS_Store
-Thumbs.db
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-selfcheck.json
 
 # Logs
 *.log
@@ -31,20 +33,16 @@ coverage/
 htmlcov/
 .coverage
 
-# Python specific
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-*.so
-*.egg-info/
-.eggs/
-
-# Temporary files
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
 *.tmp
-*.temp
-*.bak
+
+# OS
+.DS_Store
+Thumbs.db
 
 # Compressed files
 *.zip
