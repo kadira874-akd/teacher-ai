@@ -324,25 +324,57 @@ export default function PengaturanPage() {
         </div>
       </div>
 
-      {/* TABS - Mobile Scrollable with Sticky Positioning */}
-      <div className="sticky top-16 sm:top-20 z-20 bg-gradient-to-br from-[#F8FAFC] via-[#F1F5F9] to-transparent pt-2 pb-1 -mx-3 sm:-mx-6 px-3 sm:px-6 backdrop-blur-sm">
-        <div className="flex gap-1.5 border-b border-[#E2E8F0] overflow-x-auto scrollbar-hide pb-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-          {tabs.map(tab => (
-            <button 
-              key={tab.id} 
-              onClick={() => setActiveTab(tab.id)} 
-              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium rounded-t-lg transition-all whitespace-nowrap border-b-2 flex-shrink-0 ${
-                activeTab === tab.id 
-                  ? 'border-[#2D5BE3] text-[#2D5BE3] bg-white shadow-sm' 
-                  : 'border-transparent text-[#64748B] hover:text-[#334155] hover:bg-[#F8FAFC]'
-              }`}
-            >
-              <span className="text-sm sm:text-base">{tab.icon}</span>
-              <span className="hidden xs:inline">{tab.label.split(' ')[0]}</span>
-              <span className="xs:hidden">{tab.label.split(' ')[0]}</span>
-              {tab.done && <span className="text-[#059669] text-sm">✓</span>}
-            </button>
-          ))}
+      {/* TABS - Mobile: Dropdown, Desktop: Horizontal Scroll */}
+      <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-4 sm:p-0 sm:bg-transparent sm:border-0 sm:shadow-none">
+        {/* Mobile: Dropdown Selector */}
+        <div className="sm:hidden">
+          <label htmlFor="tab-select" className="sr-only">Pilih Menu</label>
+          <select
+            id="tab-select"
+            value={activeTab}
+            onChange={(e) => setActiveTab(e.target.value)}
+            className="w-full px-4 py-3 border border-[#E2E8F0] rounded-lg bg-white text-sm font-medium text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] cursor-pointer"
+          >
+            {tabs.map(tab => (
+              <option key={tab.id} value={tab.id}>
+                {tab.icon} {tab.label.split(' ')[0]} {tab.done ? '✓' : ''}
+              </option>
+            ))}
+          </select>
+          {/* Progress indicator */}
+          <div className="mt-3 flex items-center justify-between text-xs text-[#64748B]">
+            <span>Progress: {tabs.filter(t => t.done).length}/{tabs.length}</span>
+            <div className="flex gap-1">
+              {tabs.map(tab => (
+                <div 
+                  key={tab.id} 
+                  className={`w-6 h-2 rounded-full transition-colors ${tab.done ? 'bg-[#059669]' : 'bg-[#E2E8F0]'}`}
+                  title={tab.label}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop: Horizontal Tabs */}
+        <div className="hidden sm:block sticky top-20 z-20 bg-gradient-to-br from-[#F8FAFC] via-[#F1F5F9] to-transparent pt-2 pb-1 -mx-6 px-6 backdrop-blur-sm">
+          <div className="flex gap-2 border-b border-[#E2E8F0] overflow-x-auto scrollbar-hide pb-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            {tabs.map(tab => (
+              <button 
+                key={tab.id} 
+                onClick={() => setActiveTab(tab.id)} 
+                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium rounded-t-lg transition-all whitespace-nowrap border-b-2 flex-shrink-0 ${
+                  activeTab === tab.id 
+                    ? 'border-[#2D5BE3] text-[#2D5BE3] bg-white shadow-sm' 
+                    : 'border-transparent text-[#64748B] hover:text-[#334155] hover:bg-[#F8FAFC]'
+                }`}
+              >
+                <span className="text-base">{tab.icon}</span>
+                <span>{tab.label.split(' ')[0]}</span>
+                {tab.done && <span className="text-[#059669] text-sm">✓</span>}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
