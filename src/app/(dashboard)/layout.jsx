@@ -9,7 +9,7 @@ export default function DashboardLayout({ children }) {
   const pathname = usePathname();
   const [profile, setProfile] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
+  
   useEffect(() => {
     const initAuth = async () => {
       await useAuthStore.getState().fetchSession();
@@ -43,99 +43,142 @@ export default function DashboardLayout({ children }) {
 
   if (!profile) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F1F5F9]">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-[#2D5BE3] mb-3"></div>
-          <p className="text-[#64748B]">Memuat data guru...</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F8FAFC] to-[#F1F5F9]">
+        <div className="text-center animate-fade-in-up">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#2D5BE3] to-[#7C3AED] rounded-2xl mb-4 shadow-lg animate-pulse">
+            <span className="text-3xl">📚</span>
+          </div>
+          <p className="text-slate-500 font-medium">Memuat data guru...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F1F5F9] flex">
-      {/* OVERLAY untuk mobile */}
+    <div className="min-h-screen bg-gradient-to-br from-[#F8FAFC] via-[#F1F5F9] to-[#E0E7FF] flex">
+      {/* OVERLAY untuk mobile dengan blur */}
       {sidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* SIDEBAR */}
-      <aside className={`w-64 bg-white border-r border-[#E2E8F0] flex flex-col fixed h-full transition-transform duration-300 ease-in-out z-50 ${
+      {/* SIDEBAR - Enhanced Mobile Design */}
+      <aside className={`w-72 bg-white/80 backdrop-blur-xl border-r border-white/20 flex flex-col fixed h-full transition-all duration-500 ease-out z-50 shadow-2xl lg:shadow-none ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       }`}>
-        <div className="p-6 border-b border-[#E2E8F0]">
-          <h1 className="text-2xl font-bold text-[#2D5BE3] font-['Plus_Jakarta_Sans']">TeacherAI</h1>
-          <p className="text-xs text-[#64748B] mt-1">Panel Wali Kelas</p>
+        {/* Logo Section */}
+        <div className="relative p-6 border-b border-slate-200/50 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#2D5BE3]/5 to-[#7C3AED]/5"></div>
+          <div className="relative flex items-center gap-3">
+            <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-[#2D5BE3] to-[#7C3AED] rounded-xl shadow-lg shadow-blue-500/30">
+              <span className="text-2xl">📚</span>
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold gradient-text font-['Plus_Jakarta_Sans']">TeacherAI</h1>
+              <p className="text-xs text-slate-500 font-medium">Panel Wali Kelas</p>
+            </div>
+          </div>
         </div>
         
-        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          {menuItems.map((item) => (
+        {/* Navigation */}
+        <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto">
+          {menuItems.map((item, index) => (
             <Link
               key={item.href}
               href={item.href}
               onClick={() => setSidebarOpen(false)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+              className={`group relative flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
                 pathname === item.href 
-                  ? 'bg-[#EFF6FF] text-[#2D5BE3]' 
-                  : 'text-[#334155] hover:bg-[#F1F5F9]'
+                  ? 'bg-gradient-to-r from-[#2D5BE3] to-[#7C3AED] text-white shadow-lg shadow-blue-500/30 scale-[1.02]' 
+                  : 'text-slate-600 hover:bg-white hover:shadow-md hover:scale-[1.02]'
               }`}
+              style={{ animationDelay: `${index * 0.05}s` }}
             >
-              <span>{item.icon}</span>
+              <span className="text-lg">{item.icon}</span>
               {item.name}
+              {pathname === item.href && (
+                <div className="absolute right-3 w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
+              )}
             </Link>
           ))}
         </nav>
 
-        <div className="p-4 border-t border-[#E2E8F0]">
-          <div className="mb-3 px-2">
-            <p className="text-sm font-semibold text-[#0F172A] truncate">{profile?.nama || 'Guru'}</p>
-            <p className="text-xs text-[#64748B] truncate">{profile?.email}</p>
+        {/* User Profile Section */}
+        <div className="p-4 border-t border-slate-200/50 bg-gradient-to-t from-slate-50/50 to-transparent">
+          <div className="mb-3 p-3 bg-white/60 rounded-xl border border-slate-200/50">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#2D5BE3] to-[#7C3AED] text-white flex items-center justify-center font-bold shadow-md">
+                {profile?.nama?.charAt(0) || 'G'}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-slate-800 truncate">{profile?.nama || 'Guru'}</p>
+                <p className="text-xs text-slate-500 truncate">{profile?.email}</p>
+              </div>
+            </div>
           </div>
           <button 
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[#FEF2F2] text-[#DC2626] rounded-lg text-sm font-medium hover:bg-[#FEE2E2] transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-red-50 to-red-100 text-red-600 rounded-xl text-sm font-semibold hover:from-red-100 hover:to-red-200 transition-all duration-300 shadow-sm hover:shadow-md"
           >
-            🚪 Keluar
+            <span className="text-lg">🚪</span>
+            Keluar
           </button>
         </div>
       </aside>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 lg:ml-64 min-h-screen">
-        {/* TOPBAR */}
-        <header className="bg-white border-b border-[#E2E8F0] h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 sticky top-0 z-30">
-          <div className="flex items-center gap-4">
-            {/* Mobile Menu Button */}
-            <button 
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden p-2 rounded-lg hover:bg-[#F1F5F9] transition-colors"
-              aria-label="Toggle menu"
-            >
-              <svg className="w-6 h-6 text-[#334155]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                {sidebarOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
-            </button>
-            <h2 className="text-base sm:text-lg font-semibold text-[#0F172A]">
-              {menuItems.find(m => m.href === pathname)?.name || 'Dashboard'}
-            </h2>
-          </div>
-          <div className="flex items-center gap-3 sm:gap-4">
-            <span className="hidden sm:inline text-sm text-[#64748B]">Tahun Ajaran: 2025/2026</span>
-            <div className="w-8 h-8 rounded-full bg-[#2D5BE3] text-white flex items-center justify-center font-bold text-sm">
-              {profile?.nama?.charAt(0) || 'G'}
+      <main className="flex-1 lg:ml-72 min-h-screen">
+        {/* TOPBAR - Enhanced Mobile Design */}
+        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
+          <div className="h-16 sm:h-20 flex items-center justify-between px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center gap-3 sm:gap-4">
+              {/* Mobile Menu Button - Enhanced */}
+              <button 
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="lg:hidden relative p-2.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 hover:border-blue-300 transition-all duration-300 shadow-sm hover:shadow-md active:scale-95"
+                aria-label="Toggle menu"
+              >
+                <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {sidebarOpen ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  )}
+                </svg>
+              </button>
+              
+              {/* Page Title */}
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="hidden sm:flex items-center justify-center w-8 h-8 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg">
+                  <span className="text-base">{menuItems.find(m => m.href === pathname)?.icon}</span>
+                </div>
+                <div>
+                  <h2 className="text-base sm:text-lg font-bold text-slate-800">
+                    {menuItems.find(m => m.href === pathname)?.name || 'Dashboard'}
+                  </h2>
+                  <p className="text-xs text-slate-500 hidden sm:block">Kelola data kelas dengan mudah</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Right Section */}
+            <div className="flex items-center gap-2 sm:gap-4">
+              <div className="hidden sm:flex flex-col items-end">
+                <span className="text-xs font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full">
+                  📅 2025/2026
+                </span>
+              </div>
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#2D5BE3] to-[#7C3AED] text-white flex items-center justify-center font-bold shadow-lg shadow-blue-500/30 ring-2 ring-white">
+                {profile?.nama?.charAt(0) || 'G'}
+              </div>
             </div>
           </div>
         </header>
 
-        {/* PAGE CONTENT */}
-        <div className="p-4 sm:p-6 lg:p-8">
+        {/* PAGE CONTENT - Optimized for Mobile */}
+        <div className="p-3 sm:p-6 lg:p-8 animate-fade-in-up">
           {children}
         </div>
       </main>
