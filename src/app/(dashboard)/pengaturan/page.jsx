@@ -313,43 +313,56 @@ export default function PengaturanPage() {
   ];
 
   return (
-    <div className="space-y-6">
-      {/* HEADER */}
-      <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-6">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div className="space-y-4 sm:space-y-6">
+      {/* HEADER - Mobile Optimized */}
+      <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-4 sm:p-6">
+        <div className="flex flex-col gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-[#0F172A]">⚙️ Setup Kelas</h1>
-            <p className="text-[#64748B] mt-1">Lengkapi data dasar untuk kelas <strong>{kelasNama}</strong> ({getFaseLabel(faseKelas)})</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-[#0F172A]">⚙️ Setup Kelas</h1>
+            <p className="text-sm sm:text-base text-[#64748B] mt-1">Lengkapi data dasar untuk kelas <strong>{kelasNama}</strong> ({getFaseLabel(faseKelas)})</p>
           </div>
         </div>
       </div>
 
-      {/* TABS */}
-      <div className="flex gap-1 border-b border-[#E2E8F0] overflow-x-auto">
-        {tabs.map(tab => (
-          <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-5 py-3 text-sm font-medium rounded-t-lg transition-colors whitespace-nowrap border-b-2 ${
-            activeTab === tab.id ? 'border-[#2D5BE3] text-[#2D5BE3] bg-[#EFF6FF]' : 'border-transparent text-[#64748B] hover:text-[#334155] hover:bg-[#F8FAFC]'
-          }`}>
-            <span>{tab.icon}</span>
-            <span>{tab.label}</span>
-            {tab.done && <span className="text-[#059669]">✓</span>}
-          </button>
-        ))}
+      {/* TABS - Mobile Scrollable with Sticky Positioning */}
+      <div className="sticky top-16 sm:top-20 z-20 bg-gradient-to-br from-[#F8FAFC] via-[#F1F5F9] to-transparent pt-2 pb-1 -mx-3 sm:-mx-6 px-3 sm:px-6 backdrop-blur-sm">
+        <div className="flex gap-1.5 border-b border-[#E2E8F0] overflow-x-auto scrollbar-hide pb-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          {tabs.map(tab => (
+            <button 
+              key={tab.id} 
+              onClick={() => setActiveTab(tab.id)} 
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium rounded-t-lg transition-all whitespace-nowrap border-b-2 flex-shrink-0 ${
+                activeTab === tab.id 
+                  ? 'border-[#2D5BE3] text-[#2D5BE3] bg-white shadow-sm' 
+                  : 'border-transparent text-[#64748B] hover:text-[#334155] hover:bg-[#F8FAFC]'
+              }`}
+            >
+              <span className="text-sm sm:text-base">{tab.icon}</span>
+              <span className="hidden xs:inline">{tab.label.split(' ')[0]}</span>
+              <span className="xs:hidden">{tab.label.split(' ')[0]}</span>
+              {tab.done && <span className="text-[#059669] text-sm">✓</span>}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* TAB: SEKOLAH */}
       {activeTab === 'sekolah' && (
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-6">
-            <h3 className="text-sm font-bold text-[#2D5BE3] uppercase tracking-wide mb-6">Informasi Utama Sekolah</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="md:col-span-2"><InputField label="Nama Sekolah" value={sekolahData.nama} onChange={(v) => setSekolahData({...sekolahData, nama: v})} placeholder="SDN 01 Jakarta" required /></div>
-              <InputField label="NPSN" value={sekolahData.npsn} onChange={(v) => setSekolahData({...sekolahData, npsn: v})} placeholder="20123456" />
-              <InputField label="Jenjang" value={sekolahData.jenjang} onChange={(v) => setSekolahData({...sekolahData, jenjang: v})} options={['SD', 'SMP', 'SMA', 'MI', 'MTs', 'MA']} />
-              <InputField label="Akreditasi" value={sekolahData.akreditasi} onChange={(v) => setSekolahData({...sekolahData, akreditasi: v})} options={['A', 'B', 'C', 'Belum Terakreditasi']} />
-              <InputField label="Telepon" value={sekolahData.telepon} onChange={(v) => setSekolahData({...sekolahData, telepon: v})} placeholder="(021) 1234567" />
-              <InputField label="Email Sekolah" value={sekolahData.email} onChange={(v) => setSekolahData({...sekolahData, email: v})} placeholder="sdn01@sekolah.id" />
-              <div className="md:col-span-2"><InputField label="Alamat Lengkap" value={sekolahData.alamat} onChange={(v) => setSekolahData({...sekolahData, alamat: v})} placeholder="Jl. Merdeka No. 1" required /></div>
+        <div className="space-y-4 sm:space-y-6">
+          <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-4 sm:p-6">
+            <h3 className="text-xs sm:text-sm font-bold text-[#2D5BE3] uppercase tracking-wide mb-4 sm:mb-6">Informasi Utama Sekolah</h3>
+            <div className="grid grid-cols-1 gap-3 sm:gap-4">
+              <div><InputField label="Nama Sekolah" value={sekolahData.nama} onChange={(v) => setSekolahData({...sekolahData, nama: v})} placeholder="SDN 01 Jakarta" required /></div>
+              <div className="grid grid-cols-2 gap-2 sm:gap-4">
+                <InputField label="NPSN" value={sekolahData.npsn} onChange={(v) => setSekolahData({...sekolahData, npsn: v})} placeholder="20123456" />
+                <InputField label="Jenjang" value={sekolahData.jenjang} onChange={(v) => setSekolahData({...sekolahData, jenjang: v})} options={['SD', 'SMP', 'SMA', 'MI', 'MTs', 'MA']} />
+              </div>
+              <div className="grid grid-cols-2 gap-2 sm:gap-4">
+                <InputField label="Akreditasi" value={sekolahData.akreditasi} onChange={(v) => setSekolahData({...sekolahData, akreditasi: v})} options={['A', 'B', 'C', 'Belum Terakreditasi']} />
+                <InputField label="Telepon" value={sekolahData.telepon} onChange={(v) => setSekolahData({...sekolahData, telepon: v})} placeholder="(021) 1234567" />
+              </div>
+              <div><InputField label="Email Sekolah" value={sekolahData.email} onChange={(v) => setSekolahData({...sekolahData, email: v})} placeholder="sdn01@sekolah.id" /></div>
+              <div><InputField label="Alamat Lengkap" value={sekolahData.alamat} onChange={(v) => setSekolahData({...sekolahData, alamat: v})} placeholder="Jl. Merdeka No. 1" required rows={2} /></div>
             </div>
           </div>
           <div className="flex justify-end"><Button onClick={handleSaveSekolah}>💾 Simpan Data Sekolah</Button></div>
@@ -358,33 +371,33 @@ export default function PengaturanPage() {
 
       {/* TAB: GURU / WALI KELAS */}
       {activeTab === 'guru' && (
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-6">
-            <h3 className="text-sm font-bold text-[#2D5BE3] uppercase tracking-wide mb-6">🏫 Identitas Kelas</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-4 sm:space-y-6">
+          <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-4 sm:p-6">
+            <h3 className="text-xs sm:text-sm font-bold text-[#2D5BE3] uppercase tracking-wide mb-4 sm:mb-6">🏫 Identitas Kelas</h3>
+            <div className="grid grid-cols-1 gap-3 sm:gap-4">
               <div>
-                <label className="block text-sm font-medium text-[#334155] mb-1.5">Nama Kelas <span className="text-[#DC2626]">*</span></label>
-                <div className="flex gap-2">
-                  <input type="text" value={kelasNama} onChange={(e) => setKelasNama(e.target.value)} placeholder="Contoh: Kelas 3A" className="flex-1 px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3]" />
-                  <Button onClick={handleSaveNamaKelas}>💾 Simpan</Button>
+                <label className="block text-xs sm:text-sm font-medium text-[#334155] mb-1.5">Nama Kelas <span className="text-[#DC2626]">*</span></label>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input type="text" value={kelasNama} onChange={(e) => setKelasNama(e.target.value)} placeholder="Contoh: Kelas 3A" className="flex-1 px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-sm" />
+                  <Button onClick={handleSaveNamaKelas} className="whitespace-nowrap">💾 Simpan</Button>
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#334155] mb-1.5">Fase Kurikulum (Otomatis)</label>
-                <div className="px-4 py-2.5 bg-[#F0FDF4] border border-[#059669] rounded-lg text-[#059669] font-bold flex items-center gap-2">
+                <label className="block text-xs sm:text-sm font-medium text-[#334155] mb-1.5">Fase Kurikulum (Otomatis)</label>
+                <div className="px-4 py-2.5 bg-[#F0FDF4] border border-[#059669] rounded-lg text-[#059669] font-bold flex items-center gap-2 text-sm">
                   <span>🎓</span> {getFaseLabel(faseKelas)}
                 </div>
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-6">
-            <h3 className="text-sm font-bold text-[#2D5BE3] uppercase tracking-wide mb-6">👨‍🏫 Data Diri Wali Kelas</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-4 sm:p-6">
+            <h3 className="text-xs sm:text-sm font-bold text-[#2D5BE3] uppercase tracking-wide mb-4 sm:mb-6">👨‍🏫 Data Diri Wali Kelas</h3>
+            <div className="grid grid-cols-1 gap-3 sm:gap-4">
               <InputField label="Nama Lengkap" value={guruData.nama} onChange={(v) => setGuruData({...guruData, nama: v})} required />
               <InputField label="Email" value={guruData.email} onChange={(v) => setGuruData({...guruData, email: v})} type="email" />
               <InputField label="NIP" value={guruData.nip} onChange={(v) => setGuruData({...guruData, nip: v})} placeholder="198501012010011001" />
               <InputField label="No. Telepon" value={guruData.no_telepon} onChange={(v) => setGuruData({...guruData, no_telepon: v})} placeholder="081234567890" />
-              <div className="md:col-span-2"><InputField label="Alamat" value={guruData.alamat} onChange={(v) => setGuruData({...guruData, alamat: v})} rows={2} /></div>
+              <InputField label="Alamat" value={guruData.alamat} onChange={(v) => setGuruData({...guruData, alamat: v})} rows={2} />
             </div>
           </div>
           <div className="flex justify-end"><Button onClick={handleSaveGuru}>💾 Simpan Data Guru</Button></div>
@@ -393,15 +406,19 @@ export default function PengaturanPage() {
 
       {/* TAB: TAHUN AJARAN */}
       {activeTab === 'tahunAjaran' && (
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-6">
-            <h3 className="text-sm font-bold text-[#2D5BE3] uppercase tracking-wide mb-6">Konfigurasi Tahun Ajaran</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InputField label="Tahun Ajaran" value={tahunAjaran.nama_tahun} onChange={(v) => setTahunAjaran({...tahunAjaran, nama_tahun: v})} placeholder="2025/2026" required />
-              <InputField label="Semester Aktif" value={tahunAjaran.semester_aktif} onChange={(v) => setTahunAjaran({...tahunAjaran, semester_aktif: v})} options={['Ganjil', 'Genap']} required />
+        <div className="space-y-4 sm:space-y-6">
+          <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-4 sm:p-6">
+            <h3 className="text-xs sm:text-sm font-bold text-[#2D5BE3] uppercase tracking-wide mb-4 sm:mb-6">Konfigurasi Tahun Ajaran</h3>
+            <div className="grid grid-cols-1 gap-3 sm:gap-4">
+              <div className="grid grid-cols-2 gap-2 sm:gap-4">
+                <InputField label="Tahun Ajaran" value={tahunAjaran.nama_tahun} onChange={(v) => setTahunAjaran({...tahunAjaran, nama_tahun: v})} placeholder="2025/2026" required />
+                <InputField label="Semester Aktif" value={tahunAjaran.semester_aktif} onChange={(v) => setTahunAjaran({...tahunAjaran, semester_aktif: v})} options={['Ganjil', 'Genap']} required />
+              </div>
               <InputField label="Tanggal Mulai Semester" value={tahunAjaran.tanggal_mulai} onChange={(v) => setTahunAjaran({...tahunAjaran, tanggal_mulai: v})} type="date" required />
-              <InputField label="Tanggal Akhir Semester" value={tahunAjaran.tanggal_selesai} onChange={(v) => setTahunAjaran({...tahunAjaran, tanggal_selesai: v})} type="date" />
-              <InputField label="Tanggal Pembagian Rapor" value={tahunAjaran.tanggal_rapor} onChange={(v) => setTahunAjaran({...tahunAjaran, tanggal_rapor: v})} type="date" />
+              <div className="grid grid-cols-2 gap-2 sm:gap-4">
+                <InputField label="Tanggal Akhir Semester" value={tahunAjaran.tanggal_selesai} onChange={(v) => setTahunAjaran({...tahunAjaran, tanggal_selesai: v})} type="date" />
+                <InputField label="Tanggal Pembagian Rapor" value={tahunAjaran.tanggal_rapor} onChange={(v) => setTahunAjaran({...tahunAjaran, tanggal_rapor: v})} type="date" />
+              </div>
               <InputField label="Kota Penetapan" value={tahunAjaran.kota_penetapan} onChange={(v) => setTahunAjaran({...tahunAjaran, kota_penetapan: v})} placeholder="Jakarta" required />
             </div>
           </div>
@@ -411,25 +428,25 @@ export default function PengaturanPage() {
 
       {/* TAB: SISWA */}
       {activeTab === 'siswa' && (
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-sm font-bold text-[#2D5BE3] uppercase">Daftar Siswa ({siswaList.length})</h3>
-              <div className="flex gap-2">
-                <label className="px-4 py-2.5 bg-[#059669] text-white rounded-lg text-sm font-medium hover:bg-[#047857] transition-colors cursor-pointer">
-                  📥 Import dari Excel
+        <div className="space-y-4 sm:space-y-6">
+          <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+              <h3 className="text-xs sm:text-sm font-bold text-[#2D5BE3] uppercase">Daftar Siswa ({siswaList.length})</h3>
+              <div className="flex flex-wrap gap-2">
+                <label className="px-3 sm:px-4 py-2.5 bg-[#059669] text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-[#047857] transition-colors cursor-pointer whitespace-nowrap">
+                  📥 Import
                   <input type="file" accept=".xlsx,.xls,.csv" onChange={handleImportSiswa} className="hidden" />
                 </label>
-                <Button onClick={() => { if (showAddSiswa) { resetSiswaForm(); } else { setShowAddSiswa(true); } }}>
-                  {showAddSiswa ? '✕ Tutup' : '+ Tambah Siswa'}
+                <Button onClick={() => { if (showAddSiswa) { resetSiswaForm(); } else { setShowAddSiswa(true); } }} className="text-xs sm:text-sm">
+                  {showAddSiswa ? '✕ Tutup' : '+ Tambah'}
                 </Button>
               </div>
             </div>
 
             {showAddSiswa && (
-              <div className="bg-[#F8FAFC] p-6 rounded-lg mb-6 border border-[#E2E8F0]">
+              <div className="bg-[#F8FAFC] p-4 sm:p-6 rounded-lg mb-4 sm:mb-6 border border-[#E2E8F0]">
                 <h4 className="text-sm font-bold text-[#0F172A] mb-4">{editingSiswa ? '✏️ Edit Data Siswa' : '➕ Data Siswa Baru'}</h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
                   <InputField label="Nama Lengkap" value={newSiswa.nama} onChange={(v) => setNewSiswa({...newSiswa, nama: v})} required />
                   <InputField label="NISN" value={newSiswa.nisn} onChange={(v) => setNewSiswa({...newSiswa, nisn: v})} placeholder="10 digit" />
                   <InputField label="NIS (Lokal)" value={newSiswa.nis} onChange={(v) => setNewSiswa({...newSiswa, nis: v})} />
@@ -438,8 +455,8 @@ export default function PengaturanPage() {
                   <InputField label="Jenis Kelamin" value={newSiswa.jenis_kelamin} onChange={(v) => setNewSiswa({...newSiswa, jenis_kelamin: v})} options={['Laki-laki', 'Perempuan']} />
                   <InputField label="Agama" value={newSiswa.agama} onChange={(v) => setNewSiswa({...newSiswa, agama: v})} options={['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Konghucu']} />
                 </div>
-                <div className="flex gap-2 pt-4 border-t border-[#E2E8F0]">
-                  <Button onClick={handleSaveSiswa}>💾 {editingSiswa ? 'Update Siswa' : 'Simpan Siswa'}</Button>
+                <div className="flex flex-wrap gap-2 pt-4 border-t border-[#E2E8F0]">
+                  <Button onClick={handleSaveSiswa}>💾 {editingSiswa ? 'Update' : 'Simpan'}</Button>
                   <Button variant="secondary" onClick={resetSiswaForm}>Batal</Button>
                 </div>
               </div>
@@ -449,21 +466,21 @@ export default function PengaturanPage() {
               {siswaList.length === 0 ? (
                 <div className="text-center py-8 text-[#64748B]">
                   <p className="text-4xl mb-3">👨‍🎓</p>
-                  <p>Belum ada siswa. Klik "Import dari Excel" atau "+ Tambah Siswa".</p>
+                  <p className="text-sm">Belum ada siswa. Klik "Import" atau "+ Tambah".</p>
                 </div>
               ) : (
                 siswaList.map((siswa, idx) => (
-                  <div key={siswa.id} className="flex justify-between items-center p-3 bg-[#F8FAFC] rounded-lg hover:bg-[#F1F5F9] transition-colors">
+                  <div key={siswa.id} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 p-3 bg-[#F8FAFC] rounded-lg hover:bg-[#F1F5F9] transition-colors">
                     <div className="flex items-center gap-3">
-                      <span className="text-sm font-bold text-[#64748B] w-8">{idx + 1}.</span>
+                      <span className="text-xs sm:text-sm font-bold text-[#64748B] w-6 sm:w-8">{idx + 1}.</span>
                       <div>
                         <p className="font-medium text-[#0F172A] text-sm">{siswa.nama}</p>
                         <p className="text-xs text-[#64748B]">{siswa.nisn ? `NISN: ${siswa.nisn}` : 'NISN belum diisi'} • {siswa.agama || 'Umum'}</p>
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      <button onClick={() => handleEditSiswa(siswa)} className="text-[#2D5BE3] hover:bg-[#EFF6FF] px-3 py-1.5 rounded-lg text-sm transition-colors">✏️ Edit</button>
-                      <button onClick={() => handleDeleteSiswa(siswa.id)} className="text-[#DC2626] hover:bg-[#FEF2F2] px-3 py-1.5 rounded-lg text-sm transition-colors">🗑️ Hapus</button>
+                    <div className="flex gap-2 w-full sm:w-auto">
+                      <button onClick={() => handleEditSiswa(siswa)} className="flex-1 sm:flex-none text-[#2D5BE3] hover:bg-[#EFF6FF] px-3 py-1.5 rounded-lg text-xs sm:text-sm transition-colors whitespace-nowrap">✏️ Edit</button>
+                      <button onClick={() => handleDeleteSiswa(siswa.id)} className="flex-1 sm:flex-none text-[#DC2626] hover:bg-[#FEF2F2] px-3 py-1.5 rounded-lg text-xs sm:text-sm transition-colors whitespace-nowrap">🗑️ Hapus</button>
                     </div>
                   </div>
                 ))
@@ -475,25 +492,25 @@ export default function PengaturanPage() {
 
       {/* TAB: JADWAL */}
       {activeTab === 'jadwal' && (
-        <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-sm font-bold text-[#2D5BE3] uppercase">Jadwal Pelajaran Mingguan</h3>
-            <Button onClick={() => setShowAddJadwal(!showAddJadwal)}>{showAddJadwal ? '✕ Tutup' : '+ Tambah Jadwal'}</Button>
+        <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+            <h3 className="text-xs sm:text-sm font-bold text-[#2D5BE3] uppercase">Jadwal Pelajaran Mingguan</h3>
+            <Button onClick={() => setShowAddJadwal(!showAddJadwal)} className="text-xs sm:text-sm">{showAddJadwal ? '✕ Tutup' : '+ Tambah Jadwal'}</Button>
           </div>
           {showAddJadwal && (
             <div className="bg-[#F8FAFC] p-4 rounded-lg mb-4 border border-[#E2E8F0]">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
-                <select value={newJadwal.mapel_id} onChange={(e) => setNewJadwal({...newJadwal, mapel_id: e.target.value})} className="px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-sm">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-3">
+                <select value={newJadwal.mapel_id} onChange={(e) => setNewJadwal({...newJadwal, mapel_id: e.target.value})} className="px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-xs sm:text-sm col-span-2 lg:col-span-1">
                   <option value="">Pilih Mapel</option>
                   {mapelList.map(m => <option key={m.id} value={m.id}>{m.nama}</option>)}
                 </select>
-                <select value={newJadwal.hari} onChange={(e) => setNewJadwal({...newJadwal, hari: e.target.value})} className="px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-sm">
+                <select value={newJadwal.hari} onChange={(e) => setNewJadwal({...newJadwal, hari: e.target.value})} className="px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-xs sm:text-sm">
                   {['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'].map(h => <option key={h} value={h}>{h}</option>)}
                 </select>
-                <input type="time" value={newJadwal.jam_mulai} onChange={(e) => setNewJadwal({...newJadwal, jam_mulai: e.target.value})} className="px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-sm" />
-                <input type="time" value={newJadwal.jam_selesai} onChange={(e) => setNewJadwal({...newJadwal, jam_selesai: e.target.value})} className="px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-sm" />
+                <input type="time" value={newJadwal.jam_mulai} onChange={(e) => setNewJadwal({...newJadwal, jam_mulai: e.target.value})} className="px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-xs sm:text-sm" />
+                <input type="time" value={newJadwal.jam_selesai} onChange={(e) => setNewJadwal({...newJadwal, jam_selesai: e.target.value})} className="px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-xs sm:text-sm" />
               </div>
-              <div className="flex gap-2"><Button onClick={handleSaveJadwal}>Simpan</Button><Button variant="secondary" onClick={() => setShowAddJadwal(false)}>Batal</Button></div>
+              <div className="flex flex-wrap gap-2"><Button onClick={handleSaveJadwal} className="text-xs sm:text-sm">Simpan</Button><Button variant="secondary" onClick={() => setShowAddJadwal(false)} className="text-xs sm:text-sm">Batal</Button></div>
             </div>
           )}
           <div className="space-y-4">
@@ -502,18 +519,18 @@ export default function PengaturanPage() {
               if (jadwalHari.length === 0) return null;
               return (
                 <div key={hari}>
-                  <h4 className="text-sm font-bold text-[#2D5BE3] mb-2 flex items-center gap-2">
+                  <h4 className="text-xs sm:text-sm font-bold text-[#2D5BE3] mb-2 flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-[#2D5BE3]"></span>
                     {hari}
                   </h4>
                   <div className="space-y-2 ml-4">
                     {jadwalHari.map(j => (
-                      <div key={j.id} className="flex justify-between items-center p-3 bg-[#F8FAFC] rounded-lg">
-                        <div className="flex items-center gap-4">
-                          <span className="text-sm font-mono text-[#64748B] min-w-[100px]">{j.jam_mulai} - {j.jam_selesai}</span>
-                          <span className="font-semibold text-[#0F172A]">{j.mapel?.nama}</span>
+                      <div key={j.id} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 p-3 bg-[#F8FAFC] rounded-lg">
+                        <div className="flex items-center gap-3 sm:gap-4">
+                          <span className="text-xs sm:text-sm font-mono text-[#64748B] min-w-[80px] sm:min-w-[100px]">{j.jam_mulai} - {j.jam_selesai}</span>
+                          <span className="font-semibold text-[#0F172A] text-sm">{j.mapel?.nama}</span>
                         </div>
-                        <button onClick={() => handleDeleteJadwal(j.id)} className="text-[#DC2626] hover:bg-[#FEF2F2] px-2 py-1 rounded text-sm">🗑️</button>
+                        <button onClick={() => handleDeleteJadwal(j.id)} className="text-[#DC2626] hover:bg-[#FEF2F2] px-2 py-1 rounded text-xs sm:text-sm self-end sm:self-auto">🗑️</button>
                       </div>
                     ))}
                   </div>
@@ -523,7 +540,7 @@ export default function PengaturanPage() {
             {jadwalData.length === 0 && (
               <div className="text-center py-8 text-[#64748B]">
                 <p className="text-4xl mb-3">🗓️</p>
-                <p>Belum ada jadwal. Klik "+ Tambah Jadwal" untuk memulai.</p>
+                <p className="text-sm">Belum ada jadwal. Klik "+ Tambah Jadwal" untuk memulai.</p>
               </div>
             )}
           </div>
