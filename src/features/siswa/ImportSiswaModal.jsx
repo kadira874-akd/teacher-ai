@@ -1,6 +1,6 @@
 'use client';
 import { useState, useCallback } from 'react';
-import { supabase } from '@/config/supabase';
+import { supabase } from '@/lib/supabase';
 import Button from '@/components/ui/Button';
 import * as XLSX from 'xlsx';
 
