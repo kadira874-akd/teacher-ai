@@ -20,7 +20,6 @@ function ManajemenContent() {
   const [mapelList, setMapelList] = useState([]);
   const [selectedMapel, setSelectedMapel] = useState('');
   const [activeTab, setActiveTab] = useState('absensi');
-  const [absensiSubTab, setAbsensiSubTab] = useState('input'); // 'input' atau 'rekap'
   const [scanningResult, setScanningResult] = useState(null);
 
   // ===== STATE ABSENSI =====
@@ -276,9 +275,7 @@ function ManajemenContent() {
 
   // Handler untuk generate QR Code absensi dan scan QR siswa
   const [qrData, setQrData] = useState(null);
-  const [showQRModal, setShowQRModal] = useState(false);
-  const [showScanner, setShowScanner] = useState(false);
-  
+
   const handleGenerateQR = async (data) => {
     if (!data) return;
     
@@ -295,12 +292,6 @@ function ManajemenContent() {
     if (error) {
       console.error('Error saving session:', error);
     }
-  };
-
-  const handleSimpanSesiQR = async () => {
-    if (!qrData) return;
-    await handleGenerateQR(qrData);
-    alert('✅ QR Code Absensi berhasil dibuat!\\nMinta siswa untuk scan QR Code ini.');
   };
 
   const handleScanSuccess = async (decodedText) => {
@@ -711,15 +702,6 @@ function ManajemenContent() {
           onGenerateQR={handleGenerateQR}
           onScanSuccess={handleScanSuccess}
           scanningResult={scanningResult}
-          absensiSubTab={absensiSubTab}
-          setAbsensiSubTab={setAbsensiSubTab}
-          showScanner={showScanner}
-          setShowScanner={setShowScanner}
-          showQRModal={showQRModal}
-          setShowQRModal={setShowQRModal}
-          qrData={qrData}
-          setQrData={setQrData}
-          handleSimpanSesiQR={handleSimpanSesiQR}
         />
       )}
 
