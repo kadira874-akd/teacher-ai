@@ -1,48 +1,53 @@
-```gitignore
-# Compiled and build artifacts
-*.pyc
-__pycache__/
-*.o
-*.obj
-*.exe
-*.dll
-*.so
-*.a
-*.out
-
 # Dependencies
 node_modules/
-venv/
-.venv/
-.env
-.env.local
-.env.*
 
-# Logs and temp files
-*.log
-*.tmp
-*.swp
-*.swo
-
-# Editors
-.vscode/
-.idea/
-
-# Build directories
+# Build artifacts
 dist/
 build/
 target/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.venv-local/
+.venv-shared/
+.venv-dev/
+.venv-test/
+.venv-staging/
+.venv-prod/
+.python-version
 .mypy_cache/
 .pytest_cache/
 .coverage
 coverage/
 htmlcov/
 
-# System files
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.local
+.env.*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# OS
 .DS_Store
 Thumbs.db
 
-# Compressed files
+# Compressed
 *.zip
 *.gz
 *.tar
@@ -65,4 +70,3 @@ Thumbs.db
 *.tar.bz2
 *.tar.xz
 *.tar.zst
-```

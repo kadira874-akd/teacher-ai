@@ -5,6 +5,7 @@ import { useAuthStore } from '@/hooks/useAuthStore';
 import { getFaseByKelas, getFaseLabel } from '@/config/curriculumDatabase';
 import Button from '@/components/ui/Button';
 import * as XLSX from 'xlsx';
+import { QRCodeSVG } from 'qrcode.react';
 
 // Input Field Component - Mobile Optimized with High Contrast
 const InputField = ({ label, value, onChange, type = 'text', placeholder = '', required = false, options = [], rows }) => (
@@ -327,6 +328,7 @@ export default function PengaturanPage() {
     { id: 'tahunAjaran', label: 'Tahun Ajaran', icon: '📅', done: !!tahunAjaran.tanggal_mulai },
     { id: 'siswa', label: `Siswa (${siswaList.length})`, icon: '👨‍🎓', done: siswaList.length > 0 },
     { id: 'jadwal', label: `Jadwal (${jadwalData.length})`, icon: '🗓️', done: jadwalData.length > 0 },
+    { id: 'kartu', label: 'Kartu Siswa', icon: '🎴', done: siswaList.length > 0 },
   ];
 
   return (
@@ -599,6 +601,119 @@ export default function PengaturanPage() {
               </div>
             )}
           </div>
+        </div>
+      )}
+
+      {/* TAB: KARTU SISWA */}
+      {activeTab === 'kartu' && (
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+            <h3 className="text-xs sm:text-sm font-bold text-indigo-700 uppercase">Kartu Absen Siswa</h3>
+          </div>
+          
+          {siswaList.length === 0 ? (
+            <div className="text-center py-8 text-slate-500">
+              <p className="text-4xl mb-3">📭</p>
+              <p className="text-sm">Belum ada siswa. Tambahkan siswa terlebih dahulu di tab "Siswa".</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {siswaList.map((siswa) => (
+                <div key={siswa.id} className="border-2 border-[#2D5BE3] rounded-lg p-4 bg-gradient-to-br from-white to-[#F8FAFC]">
+                  <div className="text-center border-b-2 border-[#2D5BE3] pb-2 mb-3">
+                    <h4 className="text-xs font-bold text-[#2D5BE3] mb-1">KARTU ABSEN SISWA</h4>
+                    <p className="text-[10px] text-[#64748B]">Tahun Ajaran 2024/2025</p>
+                  </div>
+                  
+                  <div className="flex gap-3">
+                    <div className="flex-1">
+                      <p className="text-xs font-semibold text-[#0F172A] mb-2">{siswa.nama}</p>
+                      <p className="text-[10px] text-[#64748B]">NIS: {siswa.nis || '-'}</p>
+                      <p className="text-[10px] text-[#64748B]">NISN: {siswa.nisn || '-'}</p>
+                    </div>
+                    
+                    <div className="w-16 h-16 bg-white p-1 border border-[#E2E8F0] rounded">
+                      <QRCodeSVG
+                        value={JSON.stringify({
+                          type: 'SISWA',
+                          siswa_id: siswa.id,
+                          nama: siswa.nama,
+                          nis: siswa.nis,
+                          timestamp: new Date().toISOString()
+                        })}
+                        size={56}
+                        level="M"
+                        includeMargin={false}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="text-center mt-3 pt-2 border-t border-[#E2E8F0]">
+                    <p className="text-[8px] text-[#64748B]">Scan QR Code untuk absensi</p>
+                  </div>
+                  
+                  <button
+                    onClick={() => {
+                      const qrData = JSON.stringify({
+                        type: 'SISWA',
+                        siswa_id: siswa.id,
+                        nama: siswa.nama,
+                        nis: siswa.nis,
+                        timestamp: new Date().toISOString()
+                      });
+                      const printWindow = window.open('', '_blank');
+                      printWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                          <title>Kartu Absen - ${siswa.nama}</title>
+                          <style>
+                            @media print { @page { size: 3.375in 2.125in; margin: 0; } body { margin: 0; padding: 0; } }
+                            body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f0f0f0; }
+                            .card { width: 3.375in; height: 2.125in; background: white; border: 2px solid #2D5BE3; border-radius: 8px; padding: 12px; box-sizing: border-box; display: flex; flex-direction: column; position: relative; }
+                            .header { text-align: center; border-bottom: 2px solid #2D5BE3; padding-bottom: 6px; margin-bottom: 8px; }
+                            .header h2 { margin: 0; font-size: 12px; color: #2D5BE3; }
+                            .header p { margin: 2px 0 0; font-size: 10px; color: #64748B; }
+                            .content { display: flex; flex: 1; gap: 10px; }
+                            .info { flex: 1; font-size: 9px; }
+                            .info p { margin: 3px 0; }
+                            .info strong { color: #0F172A; }
+                            .qr { width: 80px; height: 80px; border: 1px solid #E2E8F0; border-radius: 4px; padding: 4px; }
+                            .footer { text-align: center; font-size: 8px; color: #64748B; margin-top: 6px; border-top: 1px solid #E2E8F0; padding-top: 4px; }
+                          </style>
+                        </head>
+                        <body>
+                          <div class="card">
+                            <div class="header">
+                              <h2>KARTU ABSEN SISWA</h2>
+                              <p>Tahun Ajaran 2024/2025</p>
+                            </div>
+                            <div class="content">
+                              <div class="info">
+                                <p><strong>Nama:</strong><br/>${siswa.nama}</p>
+                                <p><strong>NIS:</strong> ${siswa.nis || '-'}</p>
+                                <p><strong>NISN:</strong> ${siswa.nisn || '-'}</p>
+                              </div>
+                              <div class="qr">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(qrData)}" alt="QR Code" />
+                              </div>
+                            </div>
+                            <div class="footer">Scan QR Code untuk absensi</div>
+                          </div>
+                          <script>window.onload = function() { window.print(); window.close(); };</script>
+                        </body>
+                        </html>
+                      `);
+                      printWindow.document.close();
+                    }}
+                    className="w-full mt-3 px-4 py-2 bg-[#059669] text-white rounded-lg hover:bg-[#047857] transition-colors text-sm font-medium"
+                  >
+                    🖨️ Cetak Kartu
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
