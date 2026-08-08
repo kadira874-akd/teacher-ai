@@ -6,19 +6,36 @@ import { getFaseByKelas, getFaseLabel } from '@/config/curriculumDatabase';
 import Button from '@/components/ui/Button';
 import * as XLSX from 'xlsx';
 
+// Input Field Component - Mobile Optimized with High Contrast
 const InputField = ({ label, value, onChange, type = 'text', placeholder = '', required = false, options = [], rows }) => (
   <div>
-    <label className="block text-sm font-medium text-[#334155] mb-1.5">
-      {label} {required && <span className="text-[#DC2626]">*</span>}
+    <label className="block text-sm font-semibold text-slate-800 mb-1.5">
+      {label} {required && <span className="text-red-600">*</span>}
     </label>
     {options.length > 0 ? (
-      <select value={value || ''} onChange={(e) => onChange(e.target.value)} className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-base font-medium text-[#0F172A] bg-white">
+      <select 
+        value={value || ''} 
+        onChange={(e) => onChange(e.target.value)} 
+        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 text-base font-semibold text-slate-900 bg-white shadow-sm mobile-input-high-contrast"
+      >
         {options.map(o => <option key={o} value={o}>{o}</option>)}
       </select>
     ) : rows ? (
-      <textarea value={value || ''} onChange={(e) => onChange(e.target.value)} rows={rows} placeholder={placeholder} className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-base font-medium text-[#0F172A] bg-white" />
+      <textarea 
+        value={value || ''} 
+        onChange={(e) => onChange(e.target.value)} 
+        rows={rows} 
+        placeholder={placeholder} 
+        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 text-base font-semibold text-slate-900 bg-white shadow-sm mobile-input-high-contrast" 
+      />
     ) : (
-      <input type={type} value={value || ''} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-base font-medium text-[#0F172A] bg-white" />
+      <input 
+        type={type} 
+        value={value || ''} 
+        onChange={(e) => onChange(e.target.value)} 
+        placeholder={placeholder} 
+        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 text-base font-semibold text-slate-900 bg-white shadow-sm mobile-input-high-contrast" 
+      />
     )}
   </div>
 );
@@ -302,7 +319,7 @@ export default function PengaturanPage() {
   };
 
   // ===== RENDER =====
-  if (loading || !profile || !kelasId) return <div className="flex items-center justify-center h-[60vh]"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#2D5BE3]"></div></div>;
+  if (loading || !profile || !kelasId) return <div className="flex items-center justify-center h-[60vh]"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div></div>;
 
   const tabs = [
     { id: 'sekolah', label: 'Sekolah', icon: '🏫', done: !!sekolahData.nama },
@@ -315,17 +332,17 @@ export default function PengaturanPage() {
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* HEADER - Mobile Optimized */}
-      <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-4 sm:p-6">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6">
         <div className="flex flex-col gap-3">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-[#0F172A]">⚙️ Setup Kelas</h1>
-            <p className="text-sm sm:text-base text-[#64748B] mt-1">Lengkapi data dasar untuk kelas <strong>{kelasNama}</strong> ({getFaseLabel(faseKelas)})</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900">⚙️ Setup Kelas</h1>
+            <p className="text-sm sm:text-base text-slate-600 mt-1">Lengkapi data dasar untuk kelas <strong>{kelasNama}</strong> ({getFaseLabel(faseKelas)})</p>
           </div>
         </div>
       </div>
 
       {/* TABS - Mobile: Dropdown, Desktop: Horizontal Scroll */}
-      <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-4 sm:p-0 sm:bg-transparent sm:border-0 sm:shadow-none">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-0 sm:bg-transparent sm:border-0 sm:shadow-none">
         {/* Mobile: Dropdown Selector */}
         <div className="sm:hidden">
           <label htmlFor="tab-select" className="sr-only">Pilih Menu</label>
@@ -333,7 +350,7 @@ export default function PengaturanPage() {
             id="tab-select"
             value={activeTab}
             onChange={(e) => setActiveTab(e.target.value)}
-            className="w-full px-4 py-3 border border-[#E2E8F0] rounded-lg bg-white text-sm font-medium text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] cursor-pointer"
+            className="w-full px-4 py-3 border border-slate-300 rounded-lg bg-white text-base font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 cursor-pointer mobile-input-high-contrast shadow-sm"
           >
             {tabs.map(tab => (
               <option key={tab.id} value={tab.id}>
@@ -342,13 +359,13 @@ export default function PengaturanPage() {
             ))}
           </select>
           {/* Progress indicator */}
-          <div className="mt-3 flex items-center justify-between text-xs text-[#64748B]">
+          <div className="mt-3 flex items-center justify-between text-xs text-slate-600">
             <span>Progress: {tabs.filter(t => t.done).length}/{tabs.length}</span>
             <div className="flex gap-1">
               {tabs.map(tab => (
                 <div 
                   key={tab.id} 
-                  className={`w-6 h-2 rounded-full transition-colors ${tab.done ? 'bg-[#059669]' : 'bg-[#E2E8F0]'}`}
+                  className={`w-6 h-2 rounded-full transition-colors ${tab.done ? 'bg-emerald-600' : 'bg-slate-200'}`}
                   title={tab.label}
                 />
               ))}
@@ -357,21 +374,21 @@ export default function PengaturanPage() {
         </div>
 
         {/* Desktop: Horizontal Tabs */}
-        <div className="hidden sm:block sticky top-20 z-20 bg-gradient-to-br from-[#F8FAFC] via-[#F1F5F9] to-transparent pt-2 pb-1 -mx-6 px-6 backdrop-blur-sm">
-          <div className="flex gap-2 border-b border-[#E2E8F0] overflow-x-auto scrollbar-hide pb-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+        <div className="hidden sm:block sticky top-20 z-20 bg-gradient-to-br from-slate-50 via-slate-100 to-transparent pt-2 pb-1 -mx-6 px-6 backdrop-blur-sm">
+          <div className="flex gap-2 border-b border-slate-200 overflow-x-auto scrollbar-hide pb-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             {tabs.map(tab => (
               <button 
                 key={tab.id} 
                 onClick={() => setActiveTab(tab.id)} 
-                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium rounded-t-lg transition-all whitespace-nowrap border-b-2 flex-shrink-0 ${
+                className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold rounded-t-lg transition-all whitespace-nowrap border-b-2 flex-shrink-0 ${
                   activeTab === tab.id 
-                    ? 'border-[#2D5BE3] text-[#2D5BE3] bg-white shadow-sm' 
-                    : 'border-transparent text-[#64748B] hover:text-[#334155] hover:bg-[#F8FAFC]'
+                    ? 'border-indigo-600 text-indigo-700 bg-white shadow-sm' 
+                    : 'border-transparent text-slate-600 hover:text-slate-800 hover:bg-slate-50'
                 }`}
               >
                 <span className="text-base">{tab.icon}</span>
                 <span>{tab.label.split(' ')[0]}</span>
-                {tab.done && <span className="text-[#059669] text-sm">✓</span>}
+                {tab.done && <span className="text-emerald-600 text-sm">✓</span>}
               </button>
             ))}
           </div>
@@ -381,8 +398,8 @@ export default function PengaturanPage() {
       {/* TAB: SEKOLAH */}
       {activeTab === 'sekolah' && (
         <div className="space-y-4 sm:space-y-6">
-          <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-4 sm:p-6">
-            <h3 className="text-xs sm:text-sm font-bold text-[#2D5BE3] uppercase tracking-wide mb-4 sm:mb-6">Informasi Utama Sekolah</h3>
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6">
+            <h3 className="text-xs sm:text-sm font-bold text-indigo-700 uppercase tracking-wide mb-4 sm:mb-6">Informasi Utama Sekolah</h3>
             <div className="grid grid-cols-1 gap-3 sm:gap-4">
               <div><InputField label="Nama Sekolah" value={sekolahData.nama} onChange={(v) => setSekolahData({...sekolahData, nama: v})} placeholder="SDN 01 Jakarta" required /></div>
               <div className="grid grid-cols-2 gap-2 sm:gap-4">
@@ -404,26 +421,32 @@ export default function PengaturanPage() {
       {/* TAB: GURU / WALI KELAS */}
       {activeTab === 'guru' && (
         <div className="space-y-4 sm:space-y-6">
-          <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-4 sm:p-6">
-            <h3 className="text-xs sm:text-sm font-bold text-[#2D5BE3] uppercase tracking-wide mb-4 sm:mb-6">🏫 Identitas Kelas</h3>
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6">
+            <h3 className="text-xs sm:text-sm font-bold text-indigo-700 uppercase tracking-wide mb-4 sm:mb-6">🏫 Identitas Kelas</h3>
             <div className="grid grid-cols-1 gap-3 sm:gap-4">
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-[#334155] mb-1.5">Nama Kelas <span className="text-[#DC2626]">*</span></label>
+                <label className="block text-xs sm:text-sm font-semibold text-slate-800 mb-1.5">Nama Kelas <span className="text-red-600">*</span></label>
                 <div className="flex flex-col sm:flex-row gap-2">
-                  <input type="text" value={kelasNama} onChange={(e) => setKelasNama(e.target.value)} placeholder="Contoh: Kelas 3A" className="flex-1 px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-sm" />
+                  <input 
+                    type="text" 
+                    value={kelasNama} 
+                    onChange={(e) => setKelasNama(e.target.value)} 
+                    placeholder="Contoh: Kelas 3A" 
+                    className="flex-1 px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 text-base font-semibold text-slate-900 bg-white shadow-sm mobile-input-high-contrast" 
+                  />
                   <Button onClick={handleSaveNamaKelas} className="whitespace-nowrap">💾 Simpan</Button>
                 </div>
               </div>
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-[#334155] mb-1.5">Fase Kurikulum (Otomatis)</label>
-                <div className="px-4 py-2.5 bg-[#F0FDF4] border border-[#059669] rounded-lg text-[#059669] font-bold flex items-center gap-2 text-sm">
+                <label className="block text-xs sm:text-sm font-semibold text-slate-800 mb-1.5">Fase Kurikulum (Otomatis)</label>
+                <div className="px-4 py-3 bg-emerald-50 border border-emerald-500 rounded-lg text-emerald-700 font-bold flex items-center gap-2 text-sm">
                   <span>🎓</span> {getFaseLabel(faseKelas)}
                 </div>
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-4 sm:p-6">
-            <h3 className="text-xs sm:text-sm font-bold text-[#2D5BE3] uppercase tracking-wide mb-4 sm:mb-6">👨‍🏫 Data Diri Wali Kelas</h3>
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6">
+            <h3 className="text-xs sm:text-sm font-bold text-indigo-700 uppercase tracking-wide mb-4 sm:mb-6">👨‍🏫 Data Diri Wali Kelas</h3>
             <div className="grid grid-cols-1 gap-3 sm:gap-4">
               <InputField label="Nama Lengkap" value={guruData.nama} onChange={(v) => setGuruData({...guruData, nama: v})} required />
               <InputField label="Email" value={guruData.email} onChange={(v) => setGuruData({...guruData, email: v})} type="email" />
@@ -439,8 +462,8 @@ export default function PengaturanPage() {
       {/* TAB: TAHUN AJARAN */}
       {activeTab === 'tahunAjaran' && (
         <div className="space-y-4 sm:space-y-6">
-          <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-4 sm:p-6">
-            <h3 className="text-xs sm:text-sm font-bold text-[#2D5BE3] uppercase tracking-wide mb-4 sm:mb-6">Konfigurasi Tahun Ajaran</h3>
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6">
+            <h3 className="text-xs sm:text-sm font-bold text-indigo-700 uppercase tracking-wide mb-4 sm:mb-6">Konfigurasi Tahun Ajaran</h3>
             <div className="grid grid-cols-1 gap-3 sm:gap-4">
               <div className="grid grid-cols-2 gap-2 sm:gap-4">
                 <InputField label="Tahun Ajaran" value={tahunAjaran.nama_tahun} onChange={(v) => setTahunAjaran({...tahunAjaran, nama_tahun: v})} placeholder="2025/2026" required />
@@ -461,11 +484,11 @@ export default function PengaturanPage() {
       {/* TAB: SISWA */}
       {activeTab === 'siswa' && (
         <div className="space-y-4 sm:space-y-6">
-          <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-4 sm:p-6">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
-              <h3 className="text-xs sm:text-sm font-bold text-[#2D5BE3] uppercase">Daftar Siswa ({siswaList.length})</h3>
+              <h3 className="text-xs sm:text-sm font-bold text-indigo-700 uppercase">Daftar Siswa ({siswaList.length})</h3>
               <div className="flex flex-wrap gap-2">
-                <label className="px-3 sm:px-4 py-2.5 bg-[#059669] text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-[#047857] transition-colors cursor-pointer whitespace-nowrap">
+                <label className="px-3 sm:px-4 py-2.5 bg-emerald-600 text-white rounded-lg text-xs sm:text-sm font-semibold hover:bg-emerald-700 transition-colors cursor-pointer whitespace-nowrap shadow-sm">
                   📥 Import
                   <input type="file" accept=".xlsx,.xls,.csv" onChange={handleImportSiswa} className="hidden" />
                 </label>
@@ -476,8 +499,8 @@ export default function PengaturanPage() {
             </div>
 
             {showAddSiswa && (
-              <div className="bg-[#F8FAFC] p-4 sm:p-6 rounded-lg mb-4 sm:mb-6 border border-[#E2E8F0]">
-                <h4 className="text-sm font-bold text-[#0F172A] mb-4">{editingSiswa ? '✏️ Edit Data Siswa' : '➕ Data Siswa Baru'}</h4>
+              <div className="bg-slate-50 p-4 sm:p-6 rounded-lg mb-4 sm:mb-6 border border-slate-200">
+                <h4 className="text-sm font-bold text-slate-900 mb-4">{editingSiswa ? '✏️ Edit Data Siswa' : '➕ Data Siswa Baru'}</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
                   <InputField label="Nama Lengkap" value={newSiswa.nama} onChange={(v) => setNewSiswa({...newSiswa, nama: v})} required />
                   <InputField label="NISN" value={newSiswa.nisn} onChange={(v) => setNewSiswa({...newSiswa, nisn: v})} placeholder="10 digit" />
@@ -487,7 +510,7 @@ export default function PengaturanPage() {
                   <InputField label="Jenis Kelamin" value={newSiswa.jenis_kelamin} onChange={(v) => setNewSiswa({...newSiswa, jenis_kelamin: v})} options={['Laki-laki', 'Perempuan']} />
                   <InputField label="Agama" value={newSiswa.agama} onChange={(v) => setNewSiswa({...newSiswa, agama: v})} options={['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Konghucu']} />
                 </div>
-                <div className="flex flex-wrap gap-2 pt-4 border-t border-[#E2E8F0]">
+                <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-200">
                   <Button onClick={handleSaveSiswa}>💾 {editingSiswa ? 'Update' : 'Simpan'}</Button>
                   <Button variant="secondary" onClick={resetSiswaForm}>Batal</Button>
                 </div>
@@ -496,23 +519,23 @@ export default function PengaturanPage() {
 
             <div className="space-y-2">
               {siswaList.length === 0 ? (
-                <div className="text-center py-8 text-[#64748B]">
+                <div className="text-center py-8 text-slate-500">
                   <p className="text-4xl mb-3">👨‍🎓</p>
                   <p className="text-sm">Belum ada siswa. Klik "Import" atau "+ Tambah".</p>
                 </div>
               ) : (
                 siswaList.map((siswa, idx) => (
-                  <div key={siswa.id} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 p-3 bg-[#F8FAFC] rounded-lg hover:bg-[#F1F5F9] transition-colors">
+                  <div key={siswa.id} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
                     <div className="flex items-center gap-3">
-                      <span className="text-xs sm:text-sm font-bold text-[#64748B] w-6 sm:w-8">{idx + 1}.</span>
+                      <span className="text-xs sm:text-sm font-bold text-slate-500 w-6 sm:w-8">{idx + 1}.</span>
                       <div>
-                        <p className="font-medium text-[#0F172A] text-sm">{siswa.nama}</p>
-                        <p className="text-xs text-[#64748B]">{siswa.nisn ? `NISN: ${siswa.nisn}` : 'NISN belum diisi'} • {siswa.agama || 'Umum'}</p>
+                        <p className="font-semibold text-slate-900 text-sm">{siswa.nama}</p>
+                        <p className="text-xs text-slate-500">{siswa.nisn ? `NISN: ${siswa.nisn}` : 'NISN belum diisi'} • {siswa.agama || 'Umum'}</p>
                       </div>
                     </div>
                     <div className="flex gap-2 w-full sm:w-auto">
-                      <button onClick={() => handleEditSiswa(siswa)} className="flex-1 sm:flex-none text-[#2D5BE3] hover:bg-[#EFF6FF] px-3 py-1.5 rounded-lg text-xs sm:text-sm transition-colors whitespace-nowrap">✏️ Edit</button>
-                      <button onClick={() => handleDeleteSiswa(siswa.id)} className="flex-1 sm:flex-none text-[#DC2626] hover:bg-[#FEF2F2] px-3 py-1.5 rounded-lg text-xs sm:text-sm transition-colors whitespace-nowrap">🗑️ Hapus</button>
+                      <button onClick={() => handleEditSiswa(siswa)} className="flex-1 sm:flex-none text-indigo-600 hover:bg-indigo-50 px-3 py-1.5 rounded-lg text-xs sm:text-sm transition-colors whitespace-nowrap font-medium">✏️ Edit</button>
+                      <button onClick={() => handleDeleteSiswa(siswa.id)} className="flex-1 sm:flex-none text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg text-xs sm:text-sm transition-colors whitespace-nowrap font-medium">🗑️ Hapus</button>
                     </div>
                   </div>
                 ))
@@ -524,23 +547,23 @@ export default function PengaturanPage() {
 
       {/* TAB: JADWAL */}
       {activeTab === 'jadwal' && (
-        <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-4 sm:p-6">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
-            <h3 className="text-xs sm:text-sm font-bold text-[#2D5BE3] uppercase">Jadwal Pelajaran Mingguan</h3>
+            <h3 className="text-xs sm:text-sm font-bold text-indigo-700 uppercase">Jadwal Pelajaran Mingguan</h3>
             <Button onClick={() => setShowAddJadwal(!showAddJadwal)} className="text-xs sm:text-sm">{showAddJadwal ? '✕ Tutup' : '+ Tambah Jadwal'}</Button>
           </div>
           {showAddJadwal && (
-            <div className="bg-[#F8FAFC] p-4 rounded-lg mb-4 border border-[#E2E8F0]">
+            <div className="bg-slate-50 p-4 rounded-lg mb-4 border border-slate-200">
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-3">
-                <select value={newJadwal.mapel_id} onChange={(e) => setNewJadwal({...newJadwal, mapel_id: e.target.value})} className="px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-xs sm:text-sm col-span-2 lg:col-span-1">
+                <select value={newJadwal.mapel_id} onChange={(e) => setNewJadwal({...newJadwal, mapel_id: e.target.value})} className="px-3 py-3 border border-slate-300 rounded-lg text-base font-semibold text-slate-900 bg-white shadow-sm col-span-2 lg:col-span-1 mobile-input-high-contrast">
                   <option value="">Pilih Mapel</option>
                   {mapelList.map(m => <option key={m.id} value={m.id}>{m.nama}</option>)}
                 </select>
-                <select value={newJadwal.hari} onChange={(e) => setNewJadwal({...newJadwal, hari: e.target.value})} className="px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-xs sm:text-sm">
+                <select value={newJadwal.hari} onChange={(e) => setNewJadwal({...newJadwal, hari: e.target.value})} className="px-3 py-3 border border-slate-300 rounded-lg text-base font-semibold text-slate-900 bg-white shadow-sm mobile-input-high-contrast">
                   {['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'].map(h => <option key={h} value={h}>{h}</option>)}
                 </select>
-                <input type="time" value={newJadwal.jam_mulai} onChange={(e) => setNewJadwal({...newJadwal, jam_mulai: e.target.value})} className="px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-xs sm:text-sm" />
-                <input type="time" value={newJadwal.jam_selesai} onChange={(e) => setNewJadwal({...newJadwal, jam_selesai: e.target.value})} className="px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-xs sm:text-sm" />
+                <input type="time" value={newJadwal.jam_mulai} onChange={(e) => setNewJadwal({...newJadwal, jam_mulai: e.target.value})} className="px-3 py-3 border border-slate-300 rounded-lg text-base font-semibold text-slate-900 bg-white shadow-sm mobile-input-high-contrast" />
+                <input type="time" value={newJadwal.jam_selesai} onChange={(e) => setNewJadwal({...newJadwal, jam_selesai: e.target.value})} className="px-3 py-3 border border-slate-300 rounded-lg text-base font-semibold text-slate-900 bg-white shadow-sm mobile-input-high-contrast" />
               </div>
               <div className="flex flex-wrap gap-2"><Button onClick={handleSaveJadwal} className="text-xs sm:text-sm">Simpan</Button><Button variant="secondary" onClick={() => setShowAddJadwal(false)} className="text-xs sm:text-sm">Batal</Button></div>
             </div>
@@ -551,18 +574,18 @@ export default function PengaturanPage() {
               if (jadwalHari.length === 0) return null;
               return (
                 <div key={hari}>
-                  <h4 className="text-xs sm:text-sm font-bold text-[#2D5BE3] mb-2 flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#2D5BE3]"></span>
+                  <h4 className="text-xs sm:text-sm font-bold text-indigo-700 mb-2 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-indigo-600"></span>
                     {hari}
                   </h4>
                   <div className="space-y-2 ml-4">
                     {jadwalHari.map(j => (
-                      <div key={j.id} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 p-3 bg-[#F8FAFC] rounded-lg">
+                      <div key={j.id} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 p-3 bg-slate-50 rounded-lg">
                         <div className="flex items-center gap-3 sm:gap-4">
-                          <span className="text-xs sm:text-sm font-mono text-[#64748B] min-w-[80px] sm:min-w-[100px]">{j.jam_mulai} - {j.jam_selesai}</span>
-                          <span className="font-semibold text-[#0F172A] text-sm">{j.mapel?.nama}</span>
+                          <span className="text-xs sm:text-sm font-mono text-slate-600 min-w-[80px] sm:min-w-[100px]">{j.jam_mulai} - {j.jam_selesai}</span>
+                          <span className="font-semibold text-slate-900 text-sm">{j.mapel?.nama}</span>
                         </div>
-                        <button onClick={() => handleDeleteJadwal(j.id)} className="text-[#DC2626] hover:bg-[#FEF2F2] px-2 py-1 rounded text-xs sm:text-sm self-end sm:self-auto">🗑️</button>
+                        <button onClick={() => handleDeleteJadwal(j.id)} className="text-red-600 hover:bg-red-50 px-2 py-1 rounded text-xs sm:text-sm self-end sm:self-auto">🗑️</button>
                       </div>
                     ))}
                   </div>
@@ -570,7 +593,7 @@ export default function PengaturanPage() {
               );
             })}
             {jadwalData.length === 0 && (
-              <div className="text-center py-8 text-[#64748B]">
+              <div className="text-center py-8 text-slate-500">
                 <p className="text-4xl mb-3">🗓️</p>
                 <p className="text-sm">Belum ada jadwal. Klik "+ Tambah Jadwal" untuk memulai.</p>
               </div>
