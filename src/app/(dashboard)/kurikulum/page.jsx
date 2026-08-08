@@ -708,10 +708,12 @@ export default function KurikulumPage() {
 
           <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-              <h3 className="text-sm font-bold text-[#2D5BE3] uppercase tracking-wide">Pilih Mata Pelajaran</h3>
-              <Button onClick={() => setShowAddMapelInKurikulum(!showAddMapelInKurikulum)}>
-                {showAddMapelInKurikulum ? '✕ Tutup' : '+ Tambah Mapel'}
-              </Button>
+              <h3 className="text-sm font-bold text-[#2D5BE3] uppercase tracking-wide">📚 Pilih Mata Pelajaran</h3>
+              <div className="flex gap-2">
+                <Button onClick={() => setShowAddMapelInKurikulum(!showAddMapelInKurikulum)}>
+                  {showAddMapelInKurikulum ? '✕ Tutup' : '+ Tambah Mapel'}
+                </Button>
+              </div>
             </div>
 
             {showAddMapelInKurikulum && (
@@ -731,18 +733,29 @@ export default function KurikulumPage() {
               </div>
             )}
 
-            <select
-              value={selectedMapelForKurikulum}
-              onChange={(e) => {
-                setSelectedMapelForKurikulum(e.target.value);
-                const mapel = mapelList.find(m => m.id === e.target.value);
-                setSelectedMapelObj(mapel || null);
-              }}
-              className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-base font-medium text-[#0F172A] bg-white"
-            >
-              <option value="">-- Pilih Mata Pelajaran --</option>
-              {mapelList.map(m => <option key={m.id} value={m.id}>{m.nama}</option>)}
-            </select>
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-[#0F172A]">
+                Pilih Mata Pelajaran yang Diampu
+                <span className="text-xs text-[#64748B] ml-2">(Semua mapel tersedia untuk fase {getFaseLabel(faseKelas)})</span>
+              </label>
+              <select
+                value={selectedMapelForKurikulum}
+                onChange={(e) => {
+                  setSelectedMapelForKurikulum(e.target.value);
+                  const mapel = mapelList.find(m => m.id === e.target.value);
+                  setSelectedMapelObj(mapel || null);
+                }}
+                className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-base font-medium text-[#0F172A] bg-white"
+              >
+                <option value="">-- Pilih Mata Pelajaran --</option>
+                {mapelList.map(m => (
+                  <option key={m.id} value={m.id}>
+                    📖 {m.nama} {m.urutan ? `(Urutan: ${m.urutan})` : ''}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-[#64748B]">💡 Guru dapat memilih semua mata pelajaran sesuai fase kelas yang diampu</p>
+            </div>
 
             {selectedMapelObj && (
               <div className="mt-4 p-4 bg-gradient-to-r from-[#EFF6FF] to-[#F0FDF4] rounded-lg border border-[#2D5BE3]/20">

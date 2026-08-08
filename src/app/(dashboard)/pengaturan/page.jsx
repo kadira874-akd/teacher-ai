@@ -63,6 +63,9 @@ export default function PengaturanPage() {
     jenis_kelamin: 'Laki-laki', pendidikan_terakhir: '', no_telepon: '', alamat: ''
   });
 
+  // ===== STATE: NAMA KELAS OPTIONS =====
+  const [kelasOptions, setKelasOptions] = useState([]);
+
   // ===== STATE: TAHUN AJARAN =====
   const [tahunAjaran, setTahunAjaran] = useState({
     nama_tahun: '2025/2026', semester_aktif: 'Ganjil',
@@ -103,9 +106,18 @@ export default function PengaturanPage() {
       if (!profile) await fetchSession();
       if (profile?.id) {
         setLoading(true);
-        const { data: kelasData } = await supabase.from('kelas').select('id, nama_kelas, fase').eq('guru_id', profile.id).limit(1);
-        if (kelasData && kelasData.length > 0) {
-          const k = kelasData[0];
+        
+        // Load semua opsi kelas untuk dropdown
+        const { data: allKelasData } = await supabase
+          .from('kelas')
+          .select('id, nama_kelas, fase')
+          .eq('guru_id', profile.id)
+          .order('nama_kelas');
+        
+        if (allKelasData && allKelasData.length > 0) {
+          setKelasOptions(allKelasData.map(k => ({ id: k.id, nama: k.nama_kelas, fase: k.fase })));
+          
+          const k = allKelasData[0]; // Gunakan kelas pertama sebagai default
           setKelasId(k.id);
           setKelasNama(k.nama_kelas || '');
           setFaseKelas(k.fase || detectFaseFromNama(k.nama_kelas)); 
@@ -181,15 +193,11 @@ export default function PengaturanPage() {
   };
 
   const handleSaveNamaKelas = async () => {
-    if (!kelasNama.trim()) { alert('Nama kelas tidak boleh kosong!'); return; }
-    const newFase = detectFaseFromNama(kelasNama);
-    setFaseKelas(newFase);
-    const { error } = await supabase.from('kelas').update({ nama_kelas: kelasNama.trim(), fase: newFase }).eq('id', kelasId);
-    if (error) alert('Gagal menyimpan: ' + error.message);
-    else {
-      alert(`✅ Nama kelas diperbarui! Fase otomatis diset ke: ${getFaseLabel(newFase)}`);
-      await fetchSession();
-    }
+    if (!kelasId) { alert('Pilih kelas terlebih dahulu!'); return; }
+    // Kelas sekarang dipilih dari dropdown, jadi tidak perlu update nama
+    // Hanya konfirmasi bahwa kelas sudah aktif
+    alert(`✅ Kelas ${kelasNama} sudah aktif! Fase: ${getFaseLabel(faseKelas)}`);
+    await fetchSession();
   };
 
   const handleSaveTahunAjaran = async () => {
@@ -428,16 +436,27 @@ export default function PengaturanPage() {
             <div className="grid grid-cols-1 gap-3 sm:gap-4">
               <div>
                 <label className="block text-xs sm:text-sm font-semibold text-slate-800 mb-1.5">Nama Kelas <span className="text-red-600">*</span></label>
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <input 
-                    type="text" 
-                    value={kelasNama} 
-                    onChange={(e) => setKelasNama(e.target.value)} 
-                    placeholder="Contoh: Kelas 3A" 
-                    className="flex-1 px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 text-base font-semibold text-slate-900 bg-white shadow-sm mobile-input-high-contrast" 
-                  />
-                  <Button onClick={handleSaveNamaKelas} className="whitespace-nowrap">💾 Simpan</Button>
-                </div>
+                <select 
+                  value={kelasId} 
+                  onChange={(e) => {
+                    const selectedKelas = kelasOptions.find(k => k.id === e.target.value);
+                    if (selectedKelas) {
+                      setKelasId(selectedKelas.id);
+                      setKelasNama(selectedKelas.nama || '');
+                      setFaseKelas(selectedKelas.fase || detectFaseFromNama(selectedKelas.nama));
+                    }
+                  }}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 text-base font-semibold text-slate-900 bg-white shadow-sm mobile-input-high-contrast"
+                >
+                  {kelasOptions.length === 0 ? (
+                    <option value="">Belum ada kelas terdaftar</option>
+                  ) : (
+                    kelasOptions.map(k => (
+                      <option key={k.id} value={k.id}>{k.nama}</option>
+                    ))
+                  )}
+                </select>
+                <p className="text-xs text-slate-500 mt-1">💡 Pilih kelas yang sedang Anda ampuh</p>
               </div>
               <div>
                 <label className="block text-xs sm:text-sm font-semibold text-slate-800 mb-1.5">Fase Kurikulum (Otomatis)</label>
@@ -447,6 +466,7 @@ export default function PengaturanPage() {
               </div>
             </div>
           </div>
+          <div className="flex justify-end"><Button onClick={handleSaveNamaKelas}>✅ Konfirmasi Kelas Aktif</Button></div>
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6">
             <h3 className="text-xs sm:text-sm font-bold text-indigo-700 uppercase tracking-wide mb-4 sm:mb-6">👨‍🏫 Data Diri Wali Kelas</h3>
             <div className="grid grid-cols-1 gap-3 sm:gap-4">
