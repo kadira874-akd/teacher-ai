@@ -158,7 +158,7 @@ export default function EkskulPage() {
         {showAddEkskul && (
           <div className="bg-[#F8FAFC] p-4 rounded-lg mb-4 border border-[#E2E8F0]">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-              <input type="text" value={newEkskul.nama} onChange={(e) => setNewEkskul({...newEkskul, nama: e.target.value})} placeholder="Nama Ekskul (Pramuka, PMR, dll)" className="px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-sm" />
+              <input type="text" value={newEkskul.nama} onChange={(e) => setNewEkskul({...newEkskul, nama: e.target.value})} placeholder="Nama Ekskul (Pramuka, PMR, dll)" className="px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-sm text-[#0F172A]" />
               <select value={newEkskul.jenis} onChange={(e) => setNewEkskul({...newEkskul, jenis: e.target.value})} className="px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-sm">
                 <option value="wajib">Wajib</option>
                 <option value="pilihan">Pilihan</option>

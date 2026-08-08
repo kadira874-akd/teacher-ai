@@ -723,7 +723,7 @@ export default function KurikulumPage() {
                     value={newMapelNameInKurikulum}
                     onChange={(e) => setNewMapelNameInKurikulum(e.target.value)}
                     placeholder="Contoh: Bahasa Indonesia, Pendidikan Agama"
-                    className="flex-1 px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2D5BE3]"
+                    className="flex-1 px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-[#0F172A]"
                     onKeyDown={(e) => { if (e.key === 'Enter') handleAddMapelInKurikulum(); }}
                   />
                   <Button onClick={handleAddMapelInKurikulum}>💾 Simpan Mapel</Button>
@@ -781,11 +781,11 @@ export default function KurikulumPage() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
                     <div className="md:col-span-1">
                       <label className="block text-xs font-medium text-[#334155] mb-1">Nama Elemen</label>
-                      <input type="text" value={newElemen.nama_elemen} onChange={(e) => setNewElemen({...newElemen, nama_elemen: e.target.value})} placeholder="Contoh: Menulis" className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm" />
+                      <input type="text" value={newElemen.nama_elemen} onChange={(e) => setNewElemen({...newElemen, nama_elemen: e.target.value})} placeholder="Contoh: Menulis" className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm text-[#0F172A]" />
                     </div>
                     <div className="md:col-span-1">
                       <label className="block text-xs font-medium text-[#334155] mb-1">Urutan</label>
-                      <input type="number" value={newElemen.urutan} onChange={(e) => setNewElemen({...newElemen, urutan: parseInt(e.target.value) || 1})} min="1" className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm" />
+                      <input type="number" value={newElemen.urutan} onChange={(e) => setNewElemen({...newElemen, urutan: parseInt(e.target.value) || 1})} min="1" className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm text-[#0F172A]" />
                     </div>
                     {(selectedMapelObj?.is_mapel_agama || selectedMapelObj?.nama?.toLowerCase().includes('agama')) && (
                       <div className="md:col-span-1">
@@ -1090,7 +1090,7 @@ export default function KurikulumPage() {
                       value={newEkskul.nama} 
                       onChange={(e) => setNewEkskul({...newEkskul, nama: e.target.value})} 
                       placeholder="Contoh: Pramuka, Futsal, Robotik"
-                      className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:ring-2 focus:ring-[#2D5BE3]" 
+                      className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:ring-2 focus:ring-[#2D5BE3] text-[#0F172A]" 
                     />
                   </div>
                   <div>
@@ -1100,7 +1100,7 @@ export default function KurikulumPage() {
                       value={newEkskul.pembina} 
                       onChange={(e) => setNewEkskul({...newEkskul, pembina: e.target.value})} 
                       placeholder="Nama pembina"
-                      className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:ring-2 focus:ring-[#2D5BE3]" 
+                      className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:ring-2 focus:ring-[#2D5BE3] text-[#0F172A]" 
                     />
                   </div>
                   <div>
@@ -1122,7 +1122,7 @@ export default function KurikulumPage() {
                       value={newEkskul.jam} 
                       onChange={(e) => setNewEkskul({...newEkskul, jam: e.target.value})} 
                       placeholder="Contoh: 14:00 - 16:00"
-                      className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:ring-2 focus:ring-[#2D5BE3]" 
+                      className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:ring-2 focus:ring-[#2D5BE3] text-[#0F172A]" 
                     />
                   </div>
                 </div>

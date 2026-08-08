@@ -327,11 +327,11 @@ export default function BahanAjarPage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                           <label className="block text-xs font-medium text-[#334155] mb-1">Judul Modul <span className="text-[#DC2626]">*</span></label>
-                          <input type="text" value={newModulAjar.judul} onChange={(e) => setNewModulAjar({...newModulAjar, judul: e.target.value})} className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm" />
+                          <input type="text" value={newModulAjar.judul} onChange={(e) => setNewModulAjar({...newModulAjar, judul: e.target.value})} className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm text-[#0F172A]" />
                         </div>
                         <div>
                           <label className="block text-xs font-medium text-[#334155] mb-1">Alokasi Waktu</label>
-                          <input type="text" value={newModulAjar.alokasi_waktu} onChange={(e) => setNewModulAjar({...newModulAjar, alokasi_waktu: e.target.value})} placeholder="2 x 40 menit" className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm" />
+                          <input type="text" value={newModulAjar.alokasi_waktu} onChange={(e) => setNewModulAjar({...newModulAjar, alokasi_waktu: e.target.value})} placeholder="2 x 40 menit" className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm text-[#0F172A]" />
                         </div>
                       </div>
                       <div>
@@ -500,7 +500,7 @@ export default function BahanAjarPage() {
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-[#334155] mb-1">Nama Bahan Ajar <span className="text-[#DC2626]">*</span></label>
-                    <input type="text" value={newBahanAjar.nama_file} onChange={(e) => setNewBahanAjar({...newBahanAjar, nama_file: e.target.value})} className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm" />
+                    <input type="text" value={newBahanAjar.nama_file} onChange={(e) => setNewBahanAjar({...newBahanAjar, nama_file: e.target.value})} className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm text-[#0F172A]" />
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-[#334155] mb-1">Jenis <span className="text-[#DC2626]">*</span></label>
@@ -534,11 +534,11 @@ export default function BahanAjarPage() {
                     <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-[#E2E8F0]"></div></div>
                     <div className="relative flex justify-center text-xs uppercase"><span className="bg-[#F8FAFC] px-2 text-[#64748B]">atau masukkan link</span></div>
                   </div>
-                  <input type="text" value={newBahanAjar.file_url} onChange={(e) => setNewBahanAjar({...newBahanAjar, file_url: e.target.value})} placeholder="https://youtube.com/... atau https://canva.com/..." className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm" />
+                  <input type="text" value={newBahanAjar.file_url} onChange={(e) => setNewBahanAjar({...newBahanAjar, file_url: e.target.value})} placeholder="https://youtube.com/... atau https://canva.com/..." className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm text-[#0F172A]" />
                 </div>
                 <div className="mb-3">
                   <label className="block text-xs font-medium text-[#334155] mb-1">Deskripsi (Opsional)</label>
-                  <input type="text" value={newBahanAjar.deskripsi} onChange={(e) => setNewBahanAjar({...newBahanAjar, deskripsi: e.target.value})} className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm" />
+                  <input type="text" value={newBahanAjar.deskripsi} onChange={(e) => setNewBahanAjar({...newBahanAjar, deskripsi: e.target.value})} className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm text-[#0F172A]" />
                 </div>
                 <div className="flex gap-2 pt-2 border-t border-[#E2E8F0]">
                   <Button onClick={handleSaveBahanAjar}>💾 {editingBahanAjar ? 'Update' : 'Simpan'} Bahan Ajar</Button>
