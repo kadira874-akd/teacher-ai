@@ -67,6 +67,72 @@ export const getMapelByFase = (fase) => {
   return Object.keys(kurikulum);
 };
 
+/**
+ * Mendapatkan daftar mata pelajaran lengkap dengan info tambahan untuk dropdown
+ * @param {string} fase - Fase kurikulum (faseA, faseB, faseC, faseD)
+ * @returns {Array} Array objek mapel dengan nama dan properti tambahan
+ */
+export const getMapelListForDropdown = (fase) => {
+  const kurikulum = getKurikulumByFase(fase);
+  return Object.entries(kurikulum).map(([nama, elemenCP]) => ({
+    nama,
+    is_mapel_agama: nama.toLowerCase().includes('agama'),
+    total_elemen: elemenCP.length,
+    total_tp: elemenCP.reduce((sum, elem) => sum + (elem.contohTP?.length || 0), 0)
+  }));
+};
+
+/**
+ * Normalisasi nama mata pelajaran untuk pencocokan yang lebih fleksibel
+ * @param {string} nama - Nama mata pelajaran yang akan dinormalisasi
+ * @returns {string} Nama yang sudah dinormalisasi
+ */
+export const normalizeMapelName = (nama) => {
+  return nama.toLowerCase()
+    .replace(/pendidikan\s+agama\s+/g, 'pa ')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
+/**
+ * Mencari kecocokan nama mata pelajaran dengan template kurikulum
+ * @param {string} inputNama - Nama mapel yang diinput user
+ * @param {string} fase - Fase kurikulum
+ * @returns {Object|null} Objek { found: boolean, matchedName: string|null, suggestions: Array }
+ */
+export const findMatchingMapel = (inputNama, fase) => {
+  const mapelList = getMapelByFase(fase);
+  const normalizedInput = normalizeMapelName(inputNama);
+  
+  // Cari kecocokan eksak
+  const exactMatch = mapelList.find(nama => 
+    normalizeMapelName(nama) === normalizedInput
+  );
+  
+  if (exactMatch) {
+    return { found: true, matchedName: exactMatch, suggestions: [] };
+  }
+  
+  // Cari kecocokan parsial
+  const partialMatch = mapelList.find(nama => {
+    const normalizedDb = normalizeMapelName(nama);
+    return normalizedDb.includes(normalizedInput) || normalizedInput.includes(normalizedDb);
+  });
+  
+  if (partialMatch) {
+    return { found: true, matchedName: partialMatch, suggestions: [] };
+  }
+  
+  // Tidak ditemukan, berikan saran
+  const suggestions = mapelList.filter(nama => {
+    const normalizedDb = normalizeMapelName(nama);
+    const words = normalizedInput.split(' ');
+    return words.some(word => word.length > 2 && normalizedDb.includes(word));
+  }).slice(0, 5);
+  
+  return { found: false, matchedName: null, suggestions };
+};
+
 export const getElemenCP = (fase, mapelNama) => {
   const kurikulum = getKurikulumByFase(fase);
   return kurikulum[mapelNama] || [];
