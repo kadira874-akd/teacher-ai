@@ -35,12 +35,6 @@ export default function SignUpPage() {
       return false;
     }
 
-    // School email validation
-    if (!formData.email.endsWith('.sch.id') && !formData.email.endsWith('.id')) {
-      setError('Gunakan email sekolah (.sch.id atau .id).');
-      return false;
-    }
-
     // Password length
     if (formData.password.length < 8) {
       setError('Password minimal 8 karakter.');
@@ -178,19 +172,18 @@ export default function SignUpPage() {
             {/* Email */}
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">
-                Email Sekolah <span className="text-red-500">*</span>
+                Email <span className="text-red-500">*</span>
               </label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                placeholder="guru@sekolah.sch.id"
+                placeholder="guru@contoh.com"
                 required
                 disabled={loading || success}
                 className="w-full px-4 py-3.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] focus:border-transparent transition-all bg-white/50 hover:bg-white disabled:opacity-50"
               />
-              <p className="text-xs text-slate-400 mt-1">Gunakan email sekolah (.sch.id atau .id)</p>
             </div>
 
             {/* Full Name */}
