@@ -506,7 +506,7 @@ function ManajemenContent() {
               type="date"
               value={tanggalKonteks}
               onChange={(e) => setTanggalKonteks(e.target.value)}
-              className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-base font-medium text-[#0F172A] bg-white"
+              className="w-full px-4 py-3 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-base font-medium text-[#0F172A] bg-white mobile-input-high-contrast min-h-[48px]"
             />
           </div>
           <div>
@@ -514,7 +514,7 @@ function ManajemenContent() {
             <select
               value={selectedMapel}
               onChange={(e) => setSelectedMapel(e.target.value)}
-              className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-base font-semibold text-[#0F172A] bg-white"
+              className="w-full px-4 py-3 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-base font-semibold text-[#0F172A] bg-white mobile-input-high-contrast min-h-[48px]"
             >
               {mapelList.map(m => <option key={m.id} value={m.id}>{m.nama}</option>)}
             </select>
@@ -761,7 +761,7 @@ function ManajemenContent() {
                   value={formatifAktivitas}
                   onChange={(e) => setFormatifAktivitas(e.target.value)}
                   placeholder="Contoh: Kuis 1, PR, Presentasi"
-                  className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg text-base font-medium text-[#0F172A] bg-white focus:outline-none focus:ring-2 focus:ring-[#2D5BE3]"
+                  className="w-full px-4 py-3 border border-[#E2E8F0] rounded-lg text-base font-medium text-[#0F172A] bg-white focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] mobile-input-high-contrast min-h-[48px]"
                 />
               </div>
 
@@ -932,7 +932,7 @@ function ManajemenContent() {
               <select
                 value={selectedModul}
                 onChange={(e) => setSelectedModul(e.target.value)}
-                className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-base font-medium text-[#0F172A] bg-white"
+                className="w-full px-4 py-3 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-base font-medium text-[#0F172A] bg-white mobile-input-high-contrast min-h-[48px]"
               >
                 <option value="">-- Pilih Modul Ajar --</option>
                 {modulAjarList.map(m => (
