@@ -506,7 +506,7 @@ function ManajemenContent() {
               type="date"
               value={tanggalKonteks}
               onChange={(e) => setTanggalKonteks(e.target.value)}
-              className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3]"
+              className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-[#0F172A]"
             />
           </div>
           <div>
@@ -761,7 +761,7 @@ function ManajemenContent() {
                   value={formatifAktivitas}
                   onChange={(e) => setFormatifAktivitas(e.target.value)}
                   placeholder="Contoh: Kuis 1, PR, Presentasi"
-                  className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg"
+                  className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg text-[#0F172A]"
                 />
               </div>
 
@@ -790,7 +790,7 @@ function ManajemenContent() {
                             }
                           }}
                           placeholder="0"
-                          className="w-24 px-3 py-1.5 text-center border border-[#E2E8F0] rounded focus:ring-2 focus:ring-[#2D5BE3]"
+                          className="w-24 px-3 py-1.5 text-center border border-[#E2E8F0] rounded focus:ring-2 focus:ring-[#2D5BE3] text-[#0F172A]"
                         />
                       </td>
                     </tr>
