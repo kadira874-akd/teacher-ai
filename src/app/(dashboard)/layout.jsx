@@ -33,8 +33,6 @@ export default function DashboardLayout({ children }) {
 
   const menuItems = [
     { name: 'Dashboard', href: '/dashboard', icon: '🏠' },
-    { name: 'Absensi', href: '/absensi', icon: '📋' },
-    { name: 'Kartu Siswa', href: '/kartu-siswa', icon: '🎴' },
     { name: 'Input Data', href: '/pengaturan', icon: '⚙️' },
     { name: 'Manajemen Kelas', href: '/manajemen', icon: '🏫' },
     { name: 'Kurikulum', href: '/kurikulum', icon: '📖' },
@@ -204,7 +202,7 @@ export default function DashboardLayout({ children }) {
 
       {/* MOBILE BOTTOM NAVIGATION - App-like Experience */}
       <nav className="mobile-bottom-nav safe-area-bottom">
-        {menuItems.slice(0, 5).map((item) => {
+        {menuItems.slice(0, 4).map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link
