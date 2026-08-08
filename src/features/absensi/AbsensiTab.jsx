@@ -25,35 +25,13 @@ export default function AbsensiTab({
   onExportRekap,
   onGenerateQR,
   onScanSuccess,
-  scanningResult,
-  // Props dari parent untuk state management (opsional)
-  absensiSubTab: parentAbsensiSubTab,
-  setAbsensiSubTab: parentSetAbsensiSubTab,
-  showScanner: parentShowScanner,
-  setShowScanner: parentSetShowScanner,
-  showQRModal: parentShowQRModal,
-  setShowQRModal: parentSetShowQRModal,
-  qrData: parentQrData,
-  setQrData: parentSetQrData,
-  handleSimpanSesiQR: parentHandleSimpanSesiQR
+  scanningResult
 }) {
-  // Gunakan props dari parent jika ada, atau buat state lokal
-  const [localAbsensiSubTab, localSetAbsensiSubTab] = useState('input');
-  const [localShowScanner, localSetShowScanner] = useState(false);
-  const [localShowQRModal, localSetShowQRModal] = useState(false);
-  const [localQrData, localSetQrData] = useState(null);
+  const [absensiSubTab, setAbsensiSubTab] = useState('input'); // 'input' atau 'rekap'
   const [absensiMode, setAbsensiMode] = useState('manual'); // 'manual' atau 'qr'
-  
-  // Gunakan nilai dari parent jika tersedia, jika tidak gunakan state lokal
-  const absensiSubTab = parentAbsensiSubTab !== undefined ? parentAbsensiSubTab : localAbsensiSubTab;
-  const setAbsensiSubTab = parentSetAbsensiSubTab || localSetAbsensiSubTab;
-  const showScanner = parentShowScanner !== undefined ? parentShowScanner : localShowScanner;
-  const setShowScanner = parentSetShowScanner || localSetShowScanner;
-  const showQRModal = parentShowQRModal !== undefined ? parentShowQRModal : localShowQRModal;
-  const setShowQRModal = parentSetShowQRModal || localSetShowQRModal;
-  const qrData = parentQrData !== undefined ? parentQrData : localQrData;
-  const setQrData = parentSetQrData || localSetQrData;
-  const handleSimpanSesiQR = parentHandleSimpanSesiQR || (() => {});
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
+  const [qrData, setQrData] = useState(null);
 
   // Hitung statistik kehadiran
   const attendanceStats = Object.values(attendance).reduce((acc, status) => {
