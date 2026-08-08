@@ -5,84 +5,57 @@ node_modules/
 # Build artifacts
 dist/
 build/
-.next/
-out/
-
-# Environment variables
-.env
-.env.local
-.env.*
-
-# Logs
-*.log
-
-# Temporary files
-*.tmp
-*.swp
-*.swo
-
-# OS generated files
-.DS_Store
-Thumbs.db
+target/
 
 # Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-.Python
-env/
+*.py~
+*.py.class
+*.py.obj
+*.py.out
+*.py.exe
+*.py.dll
+*.py.so
+*.py.a
+*.py.obj
+*.py.out
+
+# Virtual environments
 venv/
 .venv/
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.log
-.git/modules/
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-.travis.yml
-appveyor.yml
-circle.yml
-.mypy_cache/
-.pytest_cache/
-.hypothesis/
+env/
+.env
+.env.local
+.env.
 
-# Node.js
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-node_modules/
-dist/
-build/
-.next/
-out/
-coverage/
-.nyc_output/
-.jscpd/
-.eslintcache
-
-# VSCode
+# IDE
 .vscode/
-
-# IntelliJ IDEA
 .idea/
+*.swp
+*.swo
 
-# Git
-*.orig
+# Logs
+*.log
 
-# Compression
+# OS
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Temp
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Compressed
 *.zip
 *.gz
 *.tar
@@ -105,4 +78,203 @@ coverage/
 *.tar.bz2
 *.tar.xz
 *.tar.zst
+
+# MyPy
+.mypy_cache/
+__pycache__/
+
+# PyTest
+.pytest_cache/
+
+# Gradle
+.gradle/
+
+# Maven
+target/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Bower
+bower_components/
+
+# Jspm
+jspm_packages/
+
+# Grunt
+.grunt
+
+# Gulp
+gulp-cache/
+
+# Brunch
+public/bundle.js
+
+# Webpack
+webpack-stats.json
+*.bundle.js
+*.chunk.js
+
+# Ember
+tmp/
+temp/
+dist/
+
+# Jekyll
+_site/
+
+# Django
+*.mo
+*.pot
+
+# Rails
+*.rbc
+capybara-*.html
+.rspec
+vendor/bundle
+.bundle
+
+# Phoenix
+deps/
+lib/
+priv/static/
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Rust
+*.o
+*.a
+*.so
+
+# C#
+*.sln
+*.csproj
+*.user
+*.suo
+*.pdb
+*.userprefs
+*.cache
+*.idb
+*.ilk
+*.iobj
+*.ipdb
+*.aps
+*.ncb
+*.obj
+*.o
+*.gch
+*.pch
+*.ilk
+*.meta
+*.pidb
+*.svclog
+*.rsp
+*.sdf
+*.opendb
+*.opensdf
+*.un~*
+*~
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+
+# Scala
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+
+# Clojure
+*.class
+
+# C++
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+
+# Objective-C
+*.o
+*.a
+*.dylib
+*.dll
+*.exe
+
+# Swift
+*.o
+*.a
+*.dylib
+*.dll
+*.exe
+
+# Perl
+*.plc
+*.pmc
+*.pod
+
+# PHP
+*.phar
+
+# R
+*.RData
+
+# Ruby
+*.gem
+*.rbc
+capybara-*.html
+.rspec
+.bundle
+.rbx
+.rake
+
+# Python
+*.py[cod]
+*$py.class
+*$py.o
+*$py.obj
+*$py.out
+*$py.exe
+*$py.dll
+*$py.so
+*$py.a
+*$py.obj
+*$py.out
+
+# Julia
+*.ji
+*.jl.c
+*.jl.o
+*.jl.so
+*.jl.dll
+*.jl.exe
+
+# Zig
+zig-cache/
+zig-out/
+
+# Julia
+julia-*/
+
+# Docker
+.dockerignore
+docker-compose*.yml
 ```

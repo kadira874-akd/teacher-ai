@@ -4,6 +4,8 @@ import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/config/supabase';
 import { useAuthStore } from '@/hooks/useAuthStore';
 import Button from '@/components/ui/Button';
+import QRScanner from '@/components/QRScanner';
+import { QRCodeSVG } from 'qrcode.react';
 import * as XLSX from 'xlsx';
 
 function ManajemenContent() {
@@ -18,6 +20,7 @@ function ManajemenContent() {
   const [selectedMapel, setSelectedMapel] = useState('');
   const [activeTab, setActiveTab] = useState('absensi');
   const [absensiSubTab, setAbsensiSubTab] = useState('input'); // 'input' atau 'rekap'
+  const [absensiMode, setAbsensiMode] = useState('manual'); // 'manual' atau 'qr'
 
   // ===== STATE ABSENSI =====
   const [siswaList, setSiswaList] = useState([]);
@@ -268,6 +271,114 @@ function ManajemenContent() {
     if (error) alert('Gagal: ' + error.message);
     else alert('✅ Absensi berhasil disimpan!');
     setSavingAbsen(false);
+  };
+
+  // Handler untuk generate QR Code absensi dan scan QR siswa
+  const [qrData, setQrData] = useState(null);
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
+  const [scanningResult, setScanningResult] = useState(null);
+
+  const handleGenerateQR = () => {
+    if (!selectedMapel || !tanggalKonteks) {
+      alert('Pilih mata pelajaran dan tanggal!');
+      return;
+    }
+    
+    const data = {
+      type: 'ABSENSI',
+      mapel_id: selectedMapel,
+      tanggal: tanggalKonteks,
+      timestamp: new Date().toISOString()
+    };
+    setQrData(JSON.stringify(data));
+    setShowQRModal(true);
+  };
+
+  const handleSimpanSesiQR = async () => {
+    if (!qrData) return;
+    
+    const parsedData = JSON.parse(qrData);
+    const { error } = await supabase.from('sesi_absensi').insert({
+      mapel_id: parsedData.mapel_id,
+      tanggal: parsedData.tanggal,
+      qr_data: qrData,
+      created_by: profile.id,
+      created_at: new Date().toISOString(),
+      is_active: true
+    });
+    
+    if (error) {
+      console.error('Error saving session:', error);
+    }
+    
+    alert('✅ QR Code Absensi berhasil dibuat!\nMinta siswa untuk scan QR Code ini.');
+  };
+
+  const handleScanSuccess = async (decodedText) => {
+    try {
+      const scannedData = JSON.parse(decodedText);
+      
+      if (scannedData.type !== 'SISWA') {
+        alert('⚠️ QR Code bukan dari kartu absen siswa!');
+        setShowScanner(false);
+        return;
+      }
+      
+      const { data: siswaData } = await supabase
+        .from('siswa')
+        .select('id, nama')
+        .eq('id', scannedData.siswa_id)
+        .single();
+      
+      if (!siswaData) {
+        alert('⚠️ Data siswa tidak ditemukan!');
+        setShowScanner(false);
+        return;
+      }
+      
+      // Cek apakah sudah absen hari ini
+      const { data: existingAbsen } = await supabase
+        .from('absensi')
+        .select('id')
+        .eq('siswa_id', scannedData.siswa_id)
+        .eq('mapel_id', selectedMapel)
+        .eq('tanggal', tanggalKonteks)
+        .single();
+      
+      if (existingAbsen) {
+        alert(`ℹ️ ${siswaData.nama} sudah absen hari ini.`);
+        setShowScanner(false);
+        return;
+      }
+      
+      // Simpan absensi
+      const { error } = await supabase.from('absensi').insert({
+        siswa_id: scannedData.siswa_id,
+        mapel_id: selectedMapel,
+        tanggal: tanggalKonteks,
+        status: 'H'
+      });
+      
+      if (error) {
+        alert('⚠️ Gagal menyimpan absensi: ' + error.message);
+      } else {
+        alert(`✅ Absensi ${siswaData.nama} berhasil dicatat!`);
+        setScanningResult({
+          nama: siswaData.nama,
+          waktu: new Date().toLocaleTimeString('id-ID')
+        });
+        
+        // Refresh attendance state
+        setAttendance(prev => ({ ...prev, [scannedData.siswa_id]: 'H' }));
+      }
+      
+      setShowScanner(false);
+    } catch (e) {
+      alert('⚠️ Format QR Code tidak valid!');
+      console.error(e);
+      setShowScanner(false);
+    }
   };
 
   const handleSaveFormatif = async () => {
@@ -543,6 +654,61 @@ function ManajemenContent() {
         ))}
       </div>
 
+      {/* ===== MODAL QR CODE ===== */}
+      {showQRModal && qrData && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold text-[#0F172A]">📱 QR Code Absensi</h3>
+              <button
+                onClick={() => setShowQRModal(false)}
+                className="text-[#64748B] hover:text-[#DC2626]"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="flex justify-center mb-6">
+              <div className="bg-white p-4 rounded-xl border-2 border-[#2D5BE3]">
+                <QRCodeSVG
+                  value={qrData}
+                  size={256}
+                  level="H"
+                  includeMargin={true}
+                />
+              </div>
+            </div>
+            
+            <p className="text-sm text-[#64748B] text-center mb-4">
+              Minta siswa untuk scan QR Code ini
+            </p>
+            
+            <Button onClick={handleSimpanSesiQR} className="w-full mb-3">
+              💾 Simpan Sesi Absensi
+            </Button>
+            
+            <button
+              onClick={() => {
+                const url = `${window.location.origin}/absen-siswa?data=${encodeURIComponent(qrData)}`;
+                navigator.clipboard.writeText(url);
+                alert('✅ Link absensi berhasil disalin!');
+              }}
+              className="w-full px-4 py-2 bg-[#F8FAFC] text-[#2D5BE3] rounded-lg hover:bg-[#F1F5F9] transition-colors text-sm font-medium"
+            >
+              📋 Salin Link
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ===== MODAL SCANNER QR ===== */}
+      {showScanner && (
+        <QRScanner
+          onScanSuccess={handleScanSuccess}
+          onClose={() => setShowScanner(false)}
+        />
+      )}
+
       {/* ===== TAB ABSENSI ===== */}
       {activeTab === 'absensi' && (
         <div className="space-y-4">
@@ -573,54 +739,128 @@ function ManajemenContent() {
           {/* Input Harian */}
           {absensiSubTab === 'input' && (
             <div className="space-y-4">
-              <div className="bg-white p-4 rounded-xl border border-[#E2E8F0] shadow-sm flex flex-col md:flex-row gap-4 items-end">
-                <div className="text-sm text-[#64748B]">
-                  Absensi <strong className="text-[#0F172A]">{selectedMapelName}</strong> • {siswaList.length} siswa • Tanggal: <strong>{tanggalKonteks}</strong>
-                </div>
-                <Button onClick={handleSaveAbsen} disabled={savingAbsen} className="md:ml-auto">
-                  {savingAbsen ? 'Menyimpan...' : '💾 Simpan Absensi'}
-                </Button>
+              {/* Mode selector: Manual atau QR Code */}
+              <div className="bg-white p-2 rounded-xl border border-[#E2E8F0] shadow-sm flex gap-2">
+                <button
+                  onClick={() => setAbsensiMode('manual')}
+                  className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    absensiMode === 'manual'
+                      ? 'bg-[#2D5BE3] text-white'
+                      : 'bg-[#F8FAFC] text-[#64748B] hover:bg-[#F1F5F9]'
+                  }`}
+                >
+                  ✍️ Absen Manual
+                </button>
+                <button
+                  onClick={() => setAbsensiMode('qr')}
+                  className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    absensiMode === 'qr'
+                      ? 'bg-[#2D5BE3] text-white'
+                      : 'bg-[#F8FAFC] text-[#64748B] hover:bg-[#F1F5F9]'
+                  }`}
+                >
+                  📱 Absen QR Code
+                </button>
               </div>
 
-              <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm overflow-hidden">
-                <table className="w-full text-sm">
-                  <thead className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
-                    <tr>
-                      <th className="px-4 py-3 text-left w-12">No</th>
-                      <th className="px-4 py-3 text-left">Nama Siswa</th>
-                      <th className="px-4 py-3 text-center">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#E2E8F0]">
-                    {siswaList.map((siswa, idx) => (
-                      <tr key={siswa.id} className="hover:bg-[#F8FAFC]">
-                        <td className="px-4 py-3 text-[#64748B]">{idx + 1}</td>
-                        <td className="px-4 py-3 font-medium text-[#0F172A]">{siswa.nama}</td>
-                        <td className="px-4 py-3">
-                          <div className="flex justify-center gap-2">
-                            {['H', 'S', 'I', 'A'].map(status => (
-                              <button
-                                key={status}
-                                onClick={() => setAttendance(prev => ({ ...prev, [siswa.id]: status }))}
-                                className={`px-3 py-1.5 rounded text-xs font-bold border transition-all ${
-                                  attendance[siswa.id] === status
-                                    ? status === 'H' ? 'bg-[#059669] text-white border-[#059669]'
-                                    : status === 'S' ? 'bg-[#D97706] text-white border-[#D97706]'
-                                    : status === 'I' ? 'bg-[#0369A1] text-white border-[#0369A1]'
-                                    : 'bg-[#DC2626] text-white border-[#DC2626]'
-                                    : 'bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#2D5BE3]'
-                                }`}
-                              >
-                                {status}
-                              </button>
-                            ))}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              {/* Mode Manual */}
+              {absensiMode === 'manual' && (
+                <div className="space-y-4">
+                  <div className="bg-white p-4 rounded-xl border border-[#E2E8F0] shadow-sm flex flex-col md:flex-row gap-4 items-end">
+                    <div className="text-sm text-[#64748B]">
+                      Absensi <strong className="text-[#0F172A]">{selectedMapelName}</strong> • {siswaList.length} siswa • Tanggal: <strong>{tanggalKonteks}</strong>
+                    </div>
+                    <Button onClick={handleSaveAbsen} disabled={savingAbsen} className="md:ml-auto">
+                      {savingAbsen ? 'Menyimpan...' : '💾 Simpan Absensi'}
+                    </Button>
+                  </div>
+
+                  <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
+                        <tr>
+                          <th className="px-4 py-3 text-left w-12">No</th>
+                          <th className="px-4 py-3 text-left">Nama Siswa</th>
+                          <th className="px-4 py-3 text-center">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#E2E8F0]">
+                        {siswaList.map((siswa, idx) => (
+                          <tr key={siswa.id} className="hover:bg-[#F8FAFC]">
+                            <td className="px-4 py-3 text-[#64748B]">{idx + 1}</td>
+                            <td className="px-4 py-3 font-medium text-[#0F172A]">{siswa.nama}</td>
+                            <td className="px-4 py-3">
+                              <div className="flex justify-center gap-2">
+                                {['H', 'S', 'I', 'A'].map(status => (
+                                  <button
+                                    key={status}
+                                    onClick={() => setAttendance(prev => ({ ...prev, [siswa.id]: status }))}
+                                    className={`px-3 py-1.5 rounded text-xs font-bold border transition-all ${
+                                      attendance[siswa.id] === status
+                                        ? status === 'H' ? 'bg-[#059669] text-white border-[#059669]'
+                                        : status === 'S' ? 'bg-[#D97706] text-white border-[#D97706]'
+                                        : status === 'I' ? 'bg-[#0369A1] text-white border-[#0369A1]'
+                                        : 'bg-[#DC2626] text-white border-[#DC2626]'
+                                        : 'bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#2D5BE3]'
+                                    }`}
+                                  >
+                                    {status}
+                                  </button>
+                                ))}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* Mode QR Code */}
+              {absensiMode === 'qr' && (
+                <div className="space-y-4">
+                  <div className="bg-white p-6 rounded-xl border border-[#E2E8F0] shadow-sm">
+                    <h3 className="text-lg font-bold text-[#0F172A] mb-4">📱 Absensi QR Code</h3>
+                    <p className="text-sm text-[#64748B] mb-6">
+                      Guru dapat menampilkan QR Code untuk di-scan oleh siswa, atau scan QR Code dari kartu absen siswa.
+                    </p>
+                    
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {/* Opsi 1: Tampilkan QR Code untuk di-scan siswa */}
+                      <div className="border border-[#E2E8F0] rounded-xl p-4 bg-[#F8FAFC]">
+                        <h4 className="font-semibold text-[#0F172A] mb-3">📤 Tampilkan QR Code</h4>
+                        <p className="text-xs text-[#64748B] mb-4">
+                          Generate QR Code yang akan ditampilkan di layar untuk di-scan oleh siswa menggunakan perangkat mereka.
+                        </p>
+                        <Button onClick={handleGenerateQR} className="w-full">
+                          📱 Buat QR Code Absensi
+                        </Button>
+                      </div>
+                      
+                      {/* Opsi 2: Scan QR Code dari kartu siswa */}
+                      <div className="border border-[#E2E8F0] rounded-xl p-4 bg-[#F8FAFC]">
+                        <h4 className="font-semibold text-[#0F172A] mb-3">📷 Scan Kartu Siswa</h4>
+                        <p className="text-xs text-[#64748B] mb-4">
+                          Scan QR Code yang ada di kartu absen siswa untuk mencatat kehadiran mereka secara otomatis.
+                        </p>
+                        <Button onClick={() => setShowScanner(true)} className="w-full bg-[#059669] hover:bg-[#047857]">
+                          📷 Mulai Scan QR
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Hasil scanning terakhir */}
+                    {scanningResult && (
+                      <div className="mt-6 p-4 bg-[#DCFCE7] rounded-xl border border-[#059669]">
+                        <p className="text-sm font-semibold text-[#059669]">✅ Siswa terakhir yang absen:</p>
+                        <p className="text-lg font-bold text-[#059669]">{scanningResult.nama}</p>
+                        <p className="text-xs text-[#059669]">Pukul: {scanningResult.waktu}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
