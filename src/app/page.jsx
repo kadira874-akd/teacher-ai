@@ -136,14 +136,23 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Link Lupa Password */}
-          <div className="mt-6 text-center">
+          {/* Link Lupa Password & Sign Up */}
+          <div className="mt-6 text-center space-y-2">
             <Link 
               href="/forgot-password" 
-              className="text-sm text-[#2D5BE3] hover:text-[#1E40AF] font-semibold hover:underline transition-colors"
+              className="text-sm text-[#2D5BE3] hover:text-[#1E40AF] font-semibold hover:underline transition-colors block"
             >
               Lupa password? Klik di sini
             </Link>
+            <p className="text-sm text-slate-600">
+              Belum punya akun?{' '}
+              <Link 
+                href="/signup" 
+                className="text-[#2D5BE3] hover:text-[#1E40AF] font-semibold hover:underline transition-colors"
+              >
+                Daftar sekarang
+              </Link>
+            </p>
           </div>
 
           {/* Footer */}
