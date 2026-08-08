@@ -70,12 +70,12 @@ export default function TambahSiswaModal({ isOpen, onClose, onSuccess, kelasId }
           
           <div className="mb-4">
             <label className="block text-sm font-medium text-[#334155] mb-1.5">Tanggal Lahir <span className="text-[#DC2626]">*</span></label>
-            <input type="date" name="tanggal_lahir" value={formData.tanggal_lahir} onChange={handleChange} required className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3]" />
+            <input type="date" name="tanggal_lahir" value={formData.tanggal_lahir} onChange={handleChange} required className="w-full px-4 py-3 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] mobile-input-high-contrast min-h-[48px]" />
           </div>
 
           <div className="mb-4">
             <label className="block text-sm font-medium text-[#334155] mb-1.5">Jenis Kelamin <span className="text-[#DC2626]">*</span></label>
-            <select name="jenis_kelamin" value={formData.jenis_kelamin} onChange={handleChange} className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3]">
+            <select name="jenis_kelamin" value={formData.jenis_kelamin} onChange={handleChange} className="w-full px-4 py-3 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] mobile-input-high-contrast min-h-[48px]">
               <option>Laki-laki</option>
               <option>Perempuan</option>
             </select>
@@ -86,7 +86,7 @@ export default function TambahSiswaModal({ isOpen, onClose, onSuccess, kelasId }
           
           <div className="md:col-span-2 mb-4">
             <label className="block text-sm font-medium text-[#334155] mb-1.5">Alamat Lengkap</label>
-            <textarea name="alamat" value={formData.alamat} onChange={handleChange} rows="2" className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3]"></textarea>
+            <textarea name="alamat" value={formData.alamat} onChange={handleChange} rows="2" className="w-full px-4 py-3 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] mobile-input-high-contrast min-h-[48px]"></textarea>
           </div>
 
           <div className="md:col-span-2 mt-4"><h3 className="text-sm font-bold text-[#2D5BE3] mb-2 uppercase tracking-wide">Data Orang Tua</h3></div>
@@ -118,7 +118,7 @@ function InputField({ label, name, value, onChange, required = false, type = 'te
         value={value}
         onChange={onChange}
         required={required}
-        className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-[#0F172A]"
+        className="w-full px-4 py-3 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-[#0F172A] mobile-input-high-contrast min-h-[48px]"
       />
     </div>
   );

@@ -446,30 +446,51 @@ body {
 
 /* Mobile High Contrast Inputs - Critical for Visibility */
 @media (max-width: 640px) {
-  .mobile-input-high-contrast {
+  .mobile-input-high-contrast,
+  input.mobile-input-high-contrast,
+  select.mobile-input-high-contrast,
+  textarea.mobile-input-high-contrast {
+    width: 100% !important;
+    min-height: 48px !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 16px !important; /* Prevents iOS zoom on focus */
+    font-weight: 500 !important;
     background-color: white !important;
     color: var(--slate-900) !important;
-    border-color: var(--border-medium) !important;
+    border: 1.5px solid var(--border-medium) !important;
+    border-radius: var(--radius-lg) !important;
     box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
     -webkit-text-fill-color: var(--slate-900) !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
   }
   
-  .mobile-input-high-contrast:focus {
+  .mobile-input-high-contrast:focus,
+  input.mobile-input-high-contrast:focus,
+  select.mobile-input-high-contrast:focus,
+  textarea.mobile-input-high-contrast:focus {
     background-color: white !important;
     color: var(--slate-900) !important;
     border-color: var(--primary-500) !important;
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2) !important;
     -webkit-text-fill-color: var(--slate-900) !important;
+    outline: none !important;
   }
   
-  .mobile-input-high-contrast::placeholder {
+  .mobile-input-high-contrast::placeholder,
+  input.mobile-input-high-contrast::placeholder,
+  textarea.mobile-input-high-contrast::placeholder {
     color: var(--slate-500) !important;
     opacity: 1;
+    font-weight: 400 !important;
   }
   
   option {
     background-color: white !important;
     color: var(--slate-900) !important;
+    padding: 0.75rem 1rem !important;
   }
 }
 

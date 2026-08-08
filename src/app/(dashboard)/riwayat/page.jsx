@@ -95,14 +95,14 @@ export default function RiwayatPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-[#334155] mb-1.5">Mata Pelajaran</label>
-            <select value={filterMapel} onChange={(e) => setFilterMapel(e.target.value)} className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg">
+            <select value={filterMapel} onChange={(e) => setFilterMapel(e.target.value)} className="w-full px-4 py-3 border border-[#E2E8F0] rounded-lg mobile-input-high-contrast min-h-[48px]">
               <option value="">Semua Mapel</option>
               {mapelList.map(m => <option key={m.id} value={m.id}>{m.nama}</option>)}
             </select>
           </div>
           <div>
             <label className="block text-sm font-medium text-[#334155] mb-1.5">Siswa</label>
-            <select value={filterSiswa} onChange={(e) => setFilterSiswa(e.target.value)} className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg">
+            <select value={filterSiswa} onChange={(e) => setFilterSiswa(e.target.value)} className="w-full px-4 py-3 border border-[#E2E8F0] rounded-lg mobile-input-high-contrast min-h-[48px]">
               <option value="">Semua Siswa</option>
               {siswaList.map(s => <option key={s.id} value={s.id}>{s.nama}</option>)}
             </select>
