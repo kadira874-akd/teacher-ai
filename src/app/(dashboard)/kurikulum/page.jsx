@@ -348,13 +348,13 @@ export default function KurikulumPage() {
         if (elemenError) continue;
 
         if (elemen.contohTP && elemen.contohTP.length > 0) {
-          const tpPayload = elemen.contohTP.map((teks) => {
+          const tpPayload = elemen.contohTP.map((tpItem) => {
             const currentTPNumber = currentGlobalTPNumber++;
             totalTPAdded++;
             return {
               elemen_cp_id: elemenDb.id,
               kode_tp: `TP ${currentTPNumber}`,
-              teks: teks,
+              teks: tpItem.teks,
               urutan_global: currentTPNumber
             };
           });
