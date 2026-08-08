@@ -4,6 +4,7 @@ import { supabase } from '@/config/supabase';
 import { useAuthStore } from '@/hooks/useAuthStore';
 import { getFaseByKelas, getFaseLabel } from '@/config/curriculumDatabase';
 import Button from '@/components/ui/Button';
+import { QRCodeSVG } from 'qrcode.react';
 import * as XLSX from 'xlsx';
 
 // Input Field Component - Mobile Optimized with High Contrast
@@ -284,6 +285,134 @@ export default function PengaturanPage() {
     XLSX.writeFile(wb, 'Template_Data_Siswa.xlsx');
   };
 
+  // Fungsi untuk generate QR Data siswa
+  const generateQRDataSiswa = (siswa) => {
+    return JSON.stringify({
+      type: 'SISWA',
+      siswa_id: siswa.id,
+      nama: siswa.nama,
+      nis: siswa.nis,
+      timestamp: new Date().toISOString()
+    });
+  };
+
+  // Fungsi untuk cetak kartu siswa
+  const printKartuSiswa = (siswa) => {
+    const qrData = generateQRDataSiswa(siswa);
+    const printWindow = window.open('', '_blank');
+    
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Kartu Absen - ${siswa.nama}</title>
+        <style>
+          @media print {
+            @page { size: 3.375in 2.125in; margin: 0; }
+            body { margin: 0; padding: 0; }
+          }
+          body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: #f0f0f0;
+          }
+          .card {
+            width: 3.375in;
+            height: 2.125in;
+            background: white;
+            border: 2px solid #2D5BE3;
+            border-radius: 8px;
+            padding: 12px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+          }
+          .header {
+            text-align: center;
+            border-bottom: 2px solid #2D5BE3;
+            padding-bottom: 6px;
+            margin-bottom: 8px;
+          }
+          .header h2 {
+            margin: 0;
+            font-size: 12px;
+            color: #2D5BE3;
+          }
+          .header p {
+            margin: 2px 0 0;
+            font-size: 10px;
+            color: #64748B;
+          }
+          .content {
+            display: flex;
+            flex: 1;
+            gap: 10px;
+          }
+          .info {
+            flex: 1;
+            font-size: 9px;
+          }
+          .info p {
+            margin: 3px 0;
+          }
+          .info strong {
+            color: #0F172A;
+          }
+          .qr {
+            width: 80px;
+            height: 80px;
+            border: 1px solid #E2E8F0;
+            border-radius: 4px;
+            padding: 4px;
+          }
+          .footer {
+            text-align: center;
+            font-size: 8px;
+            color: #64748B;
+            margin-top: 6px;
+            border-top: 1px solid #E2E8F0;
+            padding-top: 4px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="card">
+          <div class="header">
+            <h2>KARTU ABSEN SISWA</h2>
+            <p>Tahun Ajaran 2024/2025</p>
+          </div>
+          <div class="content">
+            <div class="info">
+              <p><strong>Nama:</strong><br/>${siswa.nama}</p>
+              <p><strong>NIS:</strong> ${siswa.nis || '-'}</p>
+              <p><strong>NISN:</strong> ${siswa.nisn || '-'}</p>
+            </div>
+            <div class="qr">
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(qrData)}" alt="QR Code" />
+            </div>
+          </div>
+          <div class="footer">
+            Scan QR Code untuk absensi
+          </div>
+        </div>
+        <script>
+          window.onload = function() {
+            window.print();
+            window.close();
+          };
+        </script>
+      </body>
+      </html>
+    `);
+    
+    printWindow.document.close();
+  };
+
   const handleAddMapel = async () => {
     if (!newMapelName.trim()) { alert('Nama mata pelajaran wajib diisi!'); return; }
     const urutan = mapelList.length > 0 ? Math.max(...mapelList.map(m => m.urutan || 0)) + 1 : 1;
@@ -535,6 +664,7 @@ export default function PengaturanPage() {
                     </div>
                     <div className="flex gap-2 w-full sm:w-auto">
                       <button onClick={() => handleEditSiswa(siswa)} className="flex-1 sm:flex-none text-indigo-600 hover:bg-indigo-50 px-3 py-1.5 rounded-lg text-xs sm:text-sm transition-colors whitespace-nowrap font-medium">✏️ Edit</button>
+                      <button onClick={() => printKartuSiswa(siswa)} className="flex-1 sm:flex-none text-emerald-600 hover:bg-emerald-50 px-3 py-1.5 rounded-lg text-xs sm:text-sm transition-colors whitespace-nowrap font-medium">🖨️ Cetak Kartu</button>
                       <button onClick={() => handleDeleteSiswa(siswa.id)} className="flex-1 sm:flex-none text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg text-xs sm:text-sm transition-colors whitespace-nowrap font-medium">🗑️ Hapus</button>
                     </div>
                   </div>
