@@ -268,7 +268,7 @@ export default function RiwayatRekapPage() {
               value={selectedMapel} 
               onChange={(e) => { setSelectedMapel(e.target.value); setShowSemuaMapel(false); }}
               disabled={showSemuaMapel}
-              className={`w-full md:w-1/2 px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] ${showSemuaMapel ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
+              className={`w-full md:w-1/2 px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-base font-medium text-[#0F172A] bg-white ${showSemuaMapel ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
             >
               <option value="">-- Pilih Mata Pelajaran --</option>
               {mapelList.map(m => <option key={m.id} value={m.id}>{m.nama}</option>)}
@@ -398,7 +398,7 @@ export default function RiwayatRekapPage() {
                                 inputMode="decimal"
                                 value={val}
                                 onChange={(e) => handleNilaiChange(siswa.id, lm.id, e.target.value)}
-                                className="w-16 px-2 py-1.5 text-center border border-[#E2E8F0] rounded focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] transition-all"
+                                className="w-16 px-2 py-1.5 text-center border border-[#E2E8F0] rounded focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] transition-all text-base font-semibold text-[#0F172A] bg-white"
                                 placeholder="0"
                               />
                             ) : (
@@ -414,7 +414,7 @@ export default function RiwayatRekapPage() {
                           inputMode="decimal"
                           value={dataSiswa.sas ?? ''}
                           onChange={(e) => handleNilaiChange(siswa.id, 'sas', e.target.value)}
-                          className="w-16 px-2 py-1.5 text-center border border-[#E2E8F0] rounded focus:outline-none focus:ring-2 focus:ring-[#9A3412] transition-all font-semibold"
+                          className="w-16 px-2 py-1.5 text-center border border-[#E2E8F0] rounded focus:outline-none focus:ring-2 focus:ring-[#9A3412] transition-all text-base font-semibold text-[#0F172A] bg-white"
                           placeholder="0"
                         />
                       </td>

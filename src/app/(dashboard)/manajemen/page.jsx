@@ -506,7 +506,7 @@ function ManajemenContent() {
               type="date"
               value={tanggalKonteks}
               onChange={(e) => setTanggalKonteks(e.target.value)}
-              className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-[#0F172A]"
+              className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-base font-medium text-[#0F172A] bg-white"
             />
           </div>
           <div>
@@ -514,7 +514,7 @@ function ManajemenContent() {
             <select
               value={selectedMapel}
               onChange={(e) => setSelectedMapel(e.target.value)}
-              className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-lg font-semibold"
+              className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-base font-semibold text-[#0F172A] bg-white"
             >
               {mapelList.map(m => <option key={m.id} value={m.id}>{m.nama}</option>)}
             </select>
@@ -761,7 +761,7 @@ function ManajemenContent() {
                   value={formatifAktivitas}
                   onChange={(e) => setFormatifAktivitas(e.target.value)}
                   placeholder="Contoh: Kuis 1, PR, Presentasi"
-                  className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg text-[#0F172A]"
+                  className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg text-base font-medium text-[#0F172A] bg-white focus:outline-none focus:ring-2 focus:ring-[#2D5BE3]"
                 />
               </div>
 
@@ -790,7 +790,7 @@ function ManajemenContent() {
                             }
                           }}
                           placeholder="0"
-                          className="w-24 px-3 py-1.5 text-center border border-[#E2E8F0] rounded focus:ring-2 focus:ring-[#2D5BE3] text-[#0F172A]"
+                          className="w-24 px-3 py-1.5 text-center border border-[#E2E8F0] rounded focus:ring-2 focus:ring-[#2D5BE3] text-base font-semibold text-[#0F172A] bg-white"
                         />
                       </td>
                     </tr>
@@ -842,7 +842,7 @@ function ManajemenContent() {
                             }
                           }}
                           placeholder="0"
-                          className="w-24 px-3 py-1.5 text-center border border-[#E2E8F0] rounded focus:ring-2 focus:ring-[#D97706]"
+                          className="w-24 px-3 py-1.5 text-center border border-[#E2E8F0] rounded focus:ring-2 focus:ring-[#D97706] text-base font-semibold text-[#0F172A] bg-white"
                         />
                       </td>
                     </tr>
@@ -888,7 +888,7 @@ function ManajemenContent() {
                             }
                           }}
                           placeholder="0"
-                          className="w-24 px-3 py-1.5 text-center border border-[#E2E8F0] rounded focus:ring-2 focus:ring-[#DC2626]"
+                          className="w-24 px-3 py-1.5 text-center border border-[#E2E8F0] rounded focus:ring-2 focus:ring-[#DC2626] text-base font-semibold text-[#0F172A] bg-white"
                         />
                       </td>
                     </tr>
@@ -932,7 +932,7 @@ function ManajemenContent() {
               <select
                 value={selectedModul}
                 onChange={(e) => setSelectedModul(e.target.value)}
-                className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-sm"
+                className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-base font-medium text-[#0F172A] bg-white"
               >
                 <option value="">-- Pilih Modul Ajar --</option>
                 {modulAjarList.map(m => (

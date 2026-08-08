@@ -723,7 +723,7 @@ export default function KurikulumPage() {
                     value={newMapelNameInKurikulum}
                     onChange={(e) => setNewMapelNameInKurikulum(e.target.value)}
                     placeholder="Contoh: Bahasa Indonesia, Pendidikan Agama"
-                    className="flex-1 px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-[#0F172A]"
+                    className="flex-1 px-4 py-2.5 border border-[#E2E8F0] rounded-lg text-base font-medium focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-[#0F172A] bg-white"
                     onKeyDown={(e) => { if (e.key === 'Enter') handleAddMapelInKurikulum(); }}
                   />
                   <Button onClick={handleAddMapelInKurikulum}>💾 Simpan Mapel</Button>
@@ -738,7 +738,7 @@ export default function KurikulumPage() {
                 const mapel = mapelList.find(m => m.id === e.target.value);
                 setSelectedMapelObj(mapel || null);
               }}
-              className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-sm"
+              className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-base font-medium text-[#0F172A] bg-white"
             >
               <option value="">-- Pilih Mata Pelajaran --</option>
               {mapelList.map(m => <option key={m.id} value={m.id}>{m.nama}</option>)}

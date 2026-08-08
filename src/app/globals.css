@@ -272,39 +272,127 @@ body {
   transform: translateY(-2px);
 }
 
-/* Input Styles */
+/* Input Styles - Professional Mobile Optimized */
 .input-base {
   width: 100%;
   padding: 0.75rem 1rem;
-  font-size: 0.875rem;
-  color: var(--foreground);
+  font-size: 1rem; /* 16px - prevents iOS zoom on focus */
+  font-weight: 500;
+  color: var(--slate-900); /* Explicit dark text for maximum contrast */
   background: white;
   border: 1px solid var(--border-light);
   border-radius: var(--radius-lg);
   transition: all 200ms;
   outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 
-.input-base:hover { border-color: var(--border-medium); }
-.input-base:focus { border-color: var(--primary-500); box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
-.input-base::placeholder { color: var(--foreground-muted); }
+.input-base:hover { 
+  border-color: var(--border-medium); 
+  background: var(--slate-50);
+}
+
+.input-base:focus { 
+  border-color: var(--primary-500); 
+  box-shadow: 0 0 0 3px rgba(79,70,229,0.15);
+  background: white;
+}
+
+.input-base::placeholder { 
+  color: var(--slate-400); 
+  font-weight: 400;
+}
+
+.input-base:disabled,
+.input-base[readonly] {
+  background: var(--slate-100);
+  color: var(--slate-500);
+  cursor: not-allowed;
+}
+
+/* Select specific styles */
+select.input-base {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+/* Textarea specific styles */
+textarea.input-base {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.6;
+}
+
+/* Date input specific */
+input[type="date"].input-base,
+input[type="datetime-local"].input-base {
+  min-height: 44px;
+}
 
 /* Mobile Optimizations */
 @media (max-width: 640px) {
   .mobile-safe-top { padding-top: env(safe-area-inset-top); }
   .mobile-safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
   
-  html { -webkit-text-size-adjust: 100%; }
+  html { 
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  
+  /* Prevent auto-zoom on input focus in iOS */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
   
   * { -webkit-tap-highlight-color: transparent; }
   
-  button, a, [role="button"] {
+  button, a, [role="button"],
+  input, select, textarea, label {
     touch-action: manipulation;
     user-select: none;
     -webkit-user-select: none;
+    -webkit-touch-callout: none;
   }
   
-  .touch-target { min-height: 44px; min-width: 44px; }
+  /* Ensure minimum touch target size */
+  .touch-target { 
+    min-height: 48px; 
+    min-width: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Improve input visibility on mobile - CRITICAL FIX */
+  input, select, textarea {
+    background-color: white !important;
+    color: var(--slate-900) !important;
+    -webkit-text-fill-color: var(--slate-900);
+  }
+  
+  input:focus, select:focus, textarea:focus {
+    font-size: 16px !important;
+    -webkit-text-fill-color: var(--slate-900);
+  }
+  
+  /* Placeholder visibility on mobile */
+  ::placeholder {
+    color: var(--slate-400) !important;
+    opacity: 1;
+  }
+  
+  /* Disabled state clarity on mobile */
+  input:disabled, select:disabled, textarea:disabled {
+    background-color: var(--slate-100) !important;
+    color: var(--slate-500) !important;
+    -webkit-text-fill-color: var(--slate-500);
+  }
 }
 
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
