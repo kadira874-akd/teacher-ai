@@ -352,7 +352,7 @@ function ManajemenContent() {
         return;
       }
       
-      // Simpan absensi dengan status Hadir
+      // Simpan absensi
       const { error } = await supabase.from('absensi').insert({
         siswa_id: scannedData.siswa_id,
         mapel_id: selectedMapel,
@@ -363,12 +363,14 @@ function ManajemenContent() {
       if (error) {
         alert('⚠️ Gagal menyimpan absensi: ' + error.message);
       } else {
-        // Refresh attendance state dan rekap
+        alert(`✅ Absensi ${siswaData.nama} berhasil dicatat!`);
+        setScanningResult({
+          nama: siswaData.nama,
+          waktu: new Date().toLocaleTimeString('id-ID')
+        });
+        
+        // Refresh attendance state
         setAttendance(prev => ({ ...prev, [scannedData.siswa_id]: 'H' }));
-        loadAbsensi();
-        if (absensiSubTab === 'rekap') {
-          loadRekapAbsensi();
-        }
       }
       
       setShowScanner(false);
