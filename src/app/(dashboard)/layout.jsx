@@ -120,10 +120,13 @@ export default function DashboardLayout({ children }) {
           </div>
           <button 
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-red-50 to-red-100 text-red-600 rounded-xl text-sm font-semibold hover:from-red-100 hover:to-red-200 transition-all duration-300 shadow-sm hover:shadow-md"
+            className="group w-full flex items-center justify-center gap-2.5 px-4 py-3 bg-gradient-to-r from-red-50 to-red-100 text-red-600 rounded-xl text-sm font-semibold hover:from-red-100 hover:to-red-200 transition-all duration-300 shadow-sm hover:shadow-md overflow-hidden relative"
           >
-            <span className="text-lg">🚪</span>
-            Keluar
+            <svg className="w-5 h-5 transition-transform duration-300 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            <span className="relative z-10">Keluar</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-red-200/0 via-red-200/0 to-red-200/0 group-hover:from-red-200/20 group-hover:via-red-200/10 group-hover:to-red-200/20 transition-all duration-500"></div>
           </button>
         </div>
       </aside>
@@ -170,13 +173,18 @@ export default function DashboardLayout({ children }) {
                   📅 2025/2026
                 </span>
               </div>
-              {/* Mobile Logout Button - Visible only on mobile */}
+              {/* Mobile Logout Button - Enhanced Elegant Design */}
               <button 
                 onClick={handleLogout}
-                className="sm:hidden p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-all duration-300 shadow-sm active:scale-95"
+                className="sm:hidden group relative p-2.5 rounded-xl bg-gradient-to-br from-red-50 to-red-100 text-red-600 hover:from-red-100 hover:to-red-200 transition-all duration-300 shadow-sm hover:shadow-md active:scale-95 touch-target overflow-hidden"
                 aria-label="Logout"
               >
-                <span className="text-lg">🚪</span>
+                <span className="relative z-10 flex items-center justify-center">
+                  <svg className="w-5 h-5 transition-transform duration-300 group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-br from-red-200/0 to-red-300/0 group-hover:from-red-200/20 group-hover:to-red-300/20 transition-all duration-300"></div>
               </button>
               {/* Desktop Avatar */}
               <div className="hidden sm:flex w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#2D5BE3] to-[#7C3AED] text-white flex items-center justify-center font-bold shadow-lg shadow-blue-500/30 ring-2 ring-white">
