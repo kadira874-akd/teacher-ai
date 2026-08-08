@@ -11,16 +11,21 @@ out/
 # Environment variables
 .env
 .env.local
-*.env.*
+.env.*
 
-# IDE specific
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Editor files
 .vscode/
 .idea/
 *.swp
 *.swo
-
-# Logs
-*.log
+*.tmp
 
 # Python
 __pycache__/
@@ -33,23 +38,26 @@ venv/
 .venv/
 pip-log.txt
 pip-delete-this-directory.txt
-
-# Coverage
+.tox/
 .coverage
-coverage/
-htmlcov/
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.gitattributes
 
-# Temporary files
-*.tmp
-*.temp
-.DS_Store
-Thumbs.db
-
-# MyPy
-.mypy_cache/
-
-# PyTest
-.pytest_cache/
+# Compiled and binary files
+*.exe
+*.dll
+*.so
+*.dylib
+*.o
+*.obj
+*.a
+*.lib
+*.out
 
 # Compressed files
 *.zip
@@ -74,4 +82,9 @@ Thumbs.db
 *.tar.bz2
 *.tar.xz
 *.tar.zst
+
+# Coverage reports
+coverage/
+htmlcov/
+.coverage*
 ```
