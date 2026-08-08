@@ -170,7 +170,16 @@ export default function DashboardLayout({ children }) {
                   📅 2025/2026
                 </span>
               </div>
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#2D5BE3] to-[#7C3AED] text-white flex items-center justify-center font-bold shadow-lg shadow-blue-500/30 ring-2 ring-white">
+              {/* Mobile Logout Button - Visible only on mobile */}
+              <button 
+                onClick={handleLogout}
+                className="sm:hidden p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-all duration-300 shadow-sm active:scale-95"
+                aria-label="Logout"
+              >
+                <span className="text-lg">🚪</span>
+              </button>
+              {/* Desktop Avatar */}
+              <div className="hidden sm:flex w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#2D5BE3] to-[#7C3AED] text-white flex items-center justify-center font-bold shadow-lg shadow-blue-500/30 ring-2 ring-white">
                 {profile?.nama?.charAt(0) || 'G'}
               </div>
             </div>
