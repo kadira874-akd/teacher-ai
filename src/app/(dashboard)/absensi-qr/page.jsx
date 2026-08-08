@@ -65,7 +65,22 @@ export default function AbsensiQRPage() {
       return;
     }
     
-    alert('✅ QR Code Absensi berhasil dibuat!\nMinta siswa untuk scan QR Code ini.');
+    // Simpan sesi absensi ke database
+    const { error } = await supabase.from('sesi_absensi').insert({
+      mapel_id: selectedMapel,
+      tanggal: tanggal,
+      qr_data: qrData,
+      created_by: profile.id,
+      created_at: new Date().toISOString(),
+      is_active: true
+    });
+    
+    if (error) {
+      console.error('Error saving session:', error);
+      // Tetap tampilkan QR code meskipun gagal save session
+    }
+    
+    alert('✅ QR Code Absensi berhasil dibuat!\nMinta siswa untuk scan QR Code ini atau gunakan link di bawah.');
   };
 
   if (loading) {
@@ -148,6 +163,37 @@ export default function AbsensiQRPage() {
                   : 'Loading...'
                 }
               </code>
+            </div>
+            
+            <div className="mt-4 flex gap-2">
+              <button
+                onClick={() => {
+                  const url = `${window.location.origin}/absen-siswa?data=${encodeURIComponent(qrData)}`;
+                  navigator.clipboard.writeText(url);
+                  alert('✅ Link absensi berhasil disalin!');
+                }}
+                className="flex-1 px-4 py-2 bg-[#2D5BE3] text-white rounded-lg hover:bg-[#1E40AF] transition-colors text-sm font-medium"
+              >
+                📋 Salin Link
+              </button>
+              <button
+                onClick={() => {
+                  const url = `${window.location.origin}/absen-siswa?data=${encodeURIComponent(qrData)}`;
+                  if (navigator.share) {
+                    navigator.share({
+                      title: 'Absensi QR Code',
+                      text: 'Scan QR Code untuk absensi',
+                      url: url
+                    });
+                  } else {
+                    navigator.clipboard.writeText(url);
+                    alert('✅ Link disalin! Bagikan ke siswa.');
+                  }
+                }}
+                className="flex-1 px-4 py-2 bg-[#059669] text-white rounded-lg hover:bg-[#047857] transition-colors text-sm font-medium"
+              >
+                🔗 Bagikan
+              </button>
             </div>
           </div>
         )}

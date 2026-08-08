@@ -1,17 +1,21 @@
 'use client';
 import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { supabase } from '@/config/supabase';
 import Button from '@/components/ui/Button';
+import QRScanner from '@/components/QRScanner';
 
 function AbsenSiswaContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [qrData, setQrData] = useState(null);
   const [siswaList, setSiswaList] = useState([]);
   const [selectedSiswa, setSelectedSiswa] = useState('');
   const [status, setStatus] = useState('H');
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
+  const [manualMode, setManualMode] = useState(false);
 
   useEffect(() => {
     const data = searchParams.get('data');
@@ -30,6 +34,21 @@ function AbsenSiswaContent() {
     }
     setLoading(false);
   }, [searchParams]);
+
+  const handleScanSuccess = (decodedText) => {
+    try {
+      const parsed = JSON.parse(decodedText);
+      if (parsed.type === 'ABSENSI') {
+        setQrData(parsed);
+        loadSiswaList(parsed.mapel_id);
+        setShowScanner(false);
+      } else {
+        alert('QR Code tidak valid untuk absensi!');
+      }
+    } catch (e) {
+      alert('Format QR Code tidak dikenali!');
+    }
+  };
 
   const loadSiswaList = async (mapelId) => {
     // Ambil kelas dari mapel
@@ -90,14 +109,65 @@ function AbsenSiswaContent() {
   if (!qrData) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] p-6">
-        <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-8 text-center max-w-md">
+        <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-8 text-center max-w-md w-full">
           <p className="text-4xl mb-4">📱</p>
           <h2 className="text-xl font-bold text-[#0F172A] mb-2">
             Absensi QR Code
           </h2>
-          <p className="text-[#64748B]">
+          <p className="text-[#64748B] mb-6">
             Silakan scan QR Code yang ditampilkan oleh guru untuk melakukan absensi.
           </p>
+          
+          <div className="space-y-3">
+            <Button 
+              onClick={() => setShowScanner(true)}
+              className="w-full"
+            >
+              📷 Scan QR Code dengan Kamera
+            </Button>
+            
+            <button
+              onClick={() => setManualMode(true)}
+              className="w-full px-4 py-3 text-[#2D5BE3] font-semibold hover:bg-[#F8FAFC] rounded-lg transition-colors"
+            >
+              🔗 Atau masukkan link absensi
+            </button>
+          </div>
+          
+          {manualMode && (
+            <div className="mt-6 pt-6 border-t border-[#E2E8F0]">
+              <label className="block text-sm font-medium text-[#64748B] mb-2">
+                Paste Link Absensi:
+              </label>
+              <input
+                type="text"
+                placeholder="https://.../absen-siswa?data=..."
+                className="w-full px-4 py-2 border border-[#E2E8F0] rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-[#2D5BE3]"
+                onChange={(e) => {
+                  const url = new URL(e.target.value);
+                  const dataParam = url.searchParams.get('data');
+                  if (dataParam) {
+                    try {
+                      const parsed = JSON.parse(decodeURIComponent(dataParam));
+                      if (parsed.type === 'ABSENSI') {
+                        setQrData(parsed);
+                        loadSiswaList(parsed.mapel_id);
+                        setManualMode(false);
+                      }
+                    } catch (err) {
+                      alert('Link tidak valid!');
+                    }
+                  }
+                }}
+              />
+              <button
+                onClick={() => setManualMode(false)}
+                className="text-sm text-[#64748B] hover:text-[#2D5BE3]"
+              >
+                Batal
+              </button>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -171,9 +241,27 @@ function AbsenSiswaContent() {
             >
               {submitting ? '⏳ Menyimpan...' : '✅ Kirim Absensi'}
             </Button>
+            
+            <button
+              onClick={() => {
+                setQrData(null);
+                setSelectedSiswa('');
+                setStatus('H');
+              }}
+              className="w-full mt-2 px-4 py-2 text-[#64748B] hover:text-[#2D5BE3] text-sm font-medium"
+            >
+              🔄 Scan QR Code Lain
+            </button>
           </div>
         </div>
       </div>
+      
+      {showScanner && (
+        <QRScanner 
+          onScanSuccess={handleScanSuccess}
+          onClose={() => setShowScanner(false)}
+        />
+      )}
     </div>
   );
 }
