@@ -129,7 +129,7 @@ export default function DashboardLayout({ children }) {
       </aside>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 lg:ml-72 min-h-screen">
+      <main className="flex-1 lg:ml-72 min-h-screen pb-20 lg:pb-0">
         {/* TOPBAR - Enhanced Mobile Design */}
         <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
           <div className="h-16 sm:h-20 flex items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -137,7 +137,7 @@ export default function DashboardLayout({ children }) {
               {/* Mobile Menu Button - Enhanced */}
               <button 
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="lg:hidden relative p-2.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 hover:border-blue-300 transition-all duration-300 shadow-sm hover:shadow-md active:scale-95"
+                className="lg:hidden relative p-2.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 hover:border-blue-300 transition-all duration-300 shadow-sm hover:shadow-md active:scale-95 touch-target"
                 aria-label="Toggle menu"
               >
                 <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -155,7 +155,7 @@ export default function DashboardLayout({ children }) {
                   <span className="text-base">{menuItems.find(m => m.href === pathname)?.icon}</span>
                 </div>
                 <div>
-                  <h2 className="text-base sm:text-lg font-bold text-slate-800">
+                  <h2 className="text-base sm:text-lg font-bold text-slate-800 mobile-h2">
                     {menuItems.find(m => m.href === pathname)?.name || 'Dashboard'}
                   </h2>
                   <p className="text-xs text-slate-500 hidden sm:block">Kelola data kelas dengan mudah</p>
@@ -182,6 +182,23 @@ export default function DashboardLayout({ children }) {
           {children}
         </div>
       </main>
+
+      {/* MOBILE BOTTOM NAVIGATION - App-like Experience */}
+      <nav className="mobile-bottom-nav safe-area-bottom">
+        {menuItems.slice(0, 5).map((item) => {
+          const isActive = pathname === item.href;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`mobile-bottom-nav-item ${isActive ? 'active' : ''}`}
+            >
+              <span className="text-xl">{item.icon}</span>
+              <span>{item.name.split(' ')[0]}</span>
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }
