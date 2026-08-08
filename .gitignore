@@ -1,20 +1,24 @@
 ```
-# Dependencies
-node_modules/
+# Supabase related
+supabase/
 
-# Environment
+# Environment variables
 .env
 .env.local
 .env.*
 
-# Editors
-.vscode/
-.idea/
-
-# Logs and temp files
+# Logs
 *.log
-*.tmp
-*.swp
+
+# Dependencies
+node_modules/
+vendor/
+
+# Build outputs
+dist/
+build/
+target/
+out/
 
 # Python
 __pycache__/
@@ -22,17 +26,64 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
+env/
 venv/
 .venv/
-.env
-.env.local
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.db
+*.db-journal
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Compression
+*.zip
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.gz
+*.rar
+*.7z
+
+# Database
+*.sqlite
+*.sqlite3
+
+# Runtime
+*.out
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Testing
+coverage/
+htmlcov/
 .pytest_cache/
 .mypy_cache/
-.coverage
-htmlcov/
+.hypothesis/
 
-# Build artifacts
-dist/
-build/
-*.egg-info/
+# Documentation
+docs/_build/
 ```
