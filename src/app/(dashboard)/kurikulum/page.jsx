@@ -2,7 +2,14 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/config/supabase';
 import { useAuthStore } from '@/hooks/useAuthStore';
-import { getFaseByKelas, getFaseLabel, getElemenCP } from '@/config/curriculumDatabase';
+import { 
+  getFaseByKelas, 
+  getFaseLabel, 
+  getElemenCP,
+  getMapelListForDropdown,
+  findMatchingMapel,
+  normalizeMapelName
+} from '@/config/curriculumDatabase';
 import Button from '@/components/ui/Button';
 
 // ===== DATA PROFIL PANCASILA (6 DIMENSI + ELEMEN) =====
@@ -103,12 +110,14 @@ export default function KurikulumPage() {
   const [activeTab, setActiveTab] = useState('kurikulum');
 
   // ===== STATE: KURIKULUM (ELEMEN CP → TP) =====
-  const [mapelList, setMapelList] = useState([]);
+  const [mapelList, setMapelList] = useState([]); // Mapel dari database (yang sudah dibuat user)
+  const [availableMapelTemplates, setAvailableMapelTemplates] = useState([]); // Mapel template dari kurikulum database
   const [selectedMapelForKurikulum, setSelectedMapelForKurikulum] = useState('');
   const [selectedMapelObj, setSelectedMapelObj] = useState(null);
   const [showAddMapelInKurikulum, setShowAddMapelInKurikulum] = useState(false);
   const [newMapelNameInKurikulum, setNewMapelNameInKurikulum] = useState('');
   const [collectedMapel, setCollectedMapel] = useState([]); // Track mapel yang sudah dipilih/dikoleksi
+  const [mapelSearchQuery, setMapelSearchQuery] = useState(''); // Untuk filter dropdown
   
   const [elemenList, setElemenList] = useState([]); 
   const [tpList, setTpList] = useState([]);
@@ -377,10 +386,32 @@ export default function KurikulumPage() {
       return;
     }
 
+    // Cek apakah nama mapel cocok dengan template kurikulum
+    const matchResult = findMatchingMapel(newMapelNameInKurikulum.trim(), faseKelas);
+    let finalMapelName = newMapelNameInKurikulum.trim();
+    
+    // Jika ditemukan kecocokan, gunakan nama dari template
+    if (matchResult.found && matchResult.matchedName) {
+      finalMapelName = matchResult.matchedName;
+    } else if (matchResult.suggestions.length > 0) {
+      // Berikan peringatan jika ada saran
+      const suggestionsText = matchResult.suggestions.join(', ');
+      const useCustom = confirm(
+        `⚠️ Nama "${newMapelNameInKurikulum.trim()}" tidak ditemukan dalam template kurikulum.\n\n` +
+        `Mungkin yang Anda maksud: ${suggestionsText}\n\n` +
+        `Klik OK untuk tetap menggunakan nama custom, atau Cancel untuk memilih dari template.`
+      );
+      if (!useCustom) {
+        setNewMapelNameInKurikulum('');
+        setShowAddMapelInKurikulum(false);
+        return;
+      }
+    }
+
     const urutan = mapelList.length > 0 ? Math.max(...mapelList.map(m => m.urutan || 0)) + 1 : 1;
     const { data, error } = await supabase.from('mapel').insert({
       kelas_id: kelasId,
-      nama: newMapelNameInKurikulum.trim(),
+      nama: finalMapelName,
       urutan
     }).select();
 
@@ -393,7 +424,7 @@ export default function KurikulumPage() {
     setSelectedMapelForKurikulum(data[0].id);
     setNewMapelNameInKurikulum('');
     setShowAddMapelInKurikulum(false);
-    alert('✅ Mata pelajaran berhasil ditambahkan!');
+    alert(`✅ Mata pelajaran "${finalMapelName}" berhasil ditambahkan!`);
   };
 
   // ===== HANDLER: PROFIL PANCASILA =====
@@ -570,10 +601,16 @@ export default function KurikulumPage() {
       const { data: kelasData } = await supabase.from('kelas').select('id, fase').eq('guru_id', profile.id).limit(1);
       if (kelasData?.length > 0) {
         setKelasId(kelasData[0].id);
-        setFaseKelas(kelasData[0].fase || 'faseB');
+        const fase = kelasData[0].fase || 'faseB';
+        setFaseKelas(fase);
         
+        // Load mapel yang sudah dibuat user
         const { data: mapel } = await supabase.from('mapel').select('*').eq('kelas_id', kelasData[0].id).order('urutan');
         setMapelList(mapel || []);
+
+        // Load template mapel dari kurikulum database berdasarkan fase
+        const templates = getMapelListForDropdown(fase);
+        setAvailableMapelTemplates(templates);
 
         const { data: siswa } = await supabase.from('siswa').select('id, nama, nisn').eq('kelas_id', kelasData[0].id).order('nama');
         setSiswaList(siswa || []);
@@ -719,16 +756,59 @@ export default function KurikulumPage() {
             {showAddMapelInKurikulum && (
               <div className="bg-[#F8FAFC] p-4 rounded-lg mb-4 border border-[#E2E8F0]">
                 <h4 className="text-sm font-bold text-[#0F172A] mb-3">➕ Tambah Mata Pelajaran Baru</h4>
-                <div className="flex flex-col md:flex-row gap-3">
-                  <input
-                    type="text"
-                    value={newMapelNameInKurikulum}
-                    onChange={(e) => setNewMapelNameInKurikulum(e.target.value)}
-                    placeholder="Contoh: Bahasa Indonesia, Pendidikan Agama"
-                    className="flex-1 px-4 py-2.5 border border-[#E2E8F0] rounded-lg text-base font-medium focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-[#0F172A] bg-white"
-                    onKeyDown={(e) => { if (e.key === 'Enter') handleAddMapelInKurikulum(); }}
-                  />
-                  <Button onClick={handleAddMapelInKurikulum}>💾 Simpan Mapel</Button>
+                <div className="space-y-3">
+                  {/* Dropdown pilihan dari template kurikulum */}
+                  <div>
+                    <label className="block text-xs font-medium text-[#334155] mb-2">
+                      📋 Pilih dari Template Kurikulum {getFaseLabel(faseKelas)}:
+                    </label>
+                    <select
+                      value={mapelSearchQuery || ''}
+                      onChange={(e) => {
+                        setMapelSearchQuery(e.target.value);
+                        if (e.target.value) {
+                          setNewMapelNameInKurikulum(e.target.value);
+                        }
+                      }}
+                      className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg text-base font-medium focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-[#0F172A] bg-white"
+                    >
+                      <option value="">-- Pilih Template Mapel --</option>
+                      {availableMapelTemplates.map((template, idx) => (
+                        <option key={idx} value={template.nama}>
+                          📖 {template.nama} 
+                          {template.is_mapel_agama ? ' (Agama)' : ''}
+                          {' • '}
+                          {template.total_elemen} Elemen, {template.total_tp} TP
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 h-px bg-[#E2E8F0]"></div>
+                    <span className="text-xs text-[#64748B]">atau</span>
+                    <div className="flex-1 h-px bg-[#E2E8F0]"></div>
+                  </div>
+                  
+                  {/* Input manual untuk mapel custom */}
+                  <div>
+                    <label className="block text-xs font-medium text-[#334155] mb-2">
+                      ✏️ Atau ketik nama mapel custom (tidak ada di template):
+                    </label>
+                    <input
+                      type="text"
+                      value={newMapelNameInKurikulum}
+                      onChange={(e) => {
+                        setNewMapelNameInKurikulum(e.target.value);
+                        setMapelSearchQuery(''); // Reset dropdown saat mengetik manual
+                      }}
+                      placeholder="Ketik nama mapel custom..."
+                      className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg text-base font-medium focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-[#0F172A] bg-white"
+                      onKeyDown={(e) => { if (e.key === 'Enter') handleAddMapelInKurikulum(); }}
+                    />
+                  </div>
+                  
+                  <Button onClick={handleAddMapelInKurikulum} className="w-full">💾 Simpan Mapel</Button>
                 </div>
               </div>
             )}
