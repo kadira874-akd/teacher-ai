@@ -59,16 +59,34 @@ function ManajemenContent() {
       if (!profile) await fetchSession();
       if (profile?.id) {
         setLoading(true);
-        const { data: kelasData } = await supabase.from('kelas').select('id').eq('guru_id', profile.id).limit(1);
+        const { data: kelasData, error: kelasError } = await supabase.from('kelas').select('id').eq('guru_id', profile.id).limit(1);
+        
+        if (kelasError) {
+          console.error('Error fetching kelas:', kelasError);
+          alert('Gagal memuat data kelas: ' + kelasError.message);
+          setLoading(false);
+          return;
+        }
+        
         if (kelasData?.length > 0) {
           const cId = kelasData[0].id;
           setKelasId(cId);
 
-          const { data: mapel } = await supabase.from('mapel').select('*').eq('kelas_id', cId).order('urutan');
-          setMapelList(mapel || []);
+          const { data: mapel, error: mapelError } = await supabase.from('mapel').select('*').eq('kelas_id', cId).order('urutan');
+          
+          if (mapelError) {
+            console.error('Error fetching mapel:', mapelError);
+          } else {
+            setMapelList(mapel || []);
+          }
 
-          const { data: siswa } = await supabase.from('siswa').select('id, nama').eq('kelas_id', cId).order('nama');
-          setSiswaList(siswa || []);
+          const { data: siswa, error: siswaError } = await supabase.from('siswa').select('id, nama').eq('kelas_id', cId).order('nama');
+          
+          if (siswaError) {
+            console.error('Error fetching siswa:', siswaError);
+          } else {
+            setSiswaList(siswa || []);
+          }
 
           const mapelParam = searchParams.get('mapel');
           const tabParam = searchParams.get('tab');
@@ -94,18 +112,28 @@ function ManajemenContent() {
       }
 
       // Ambil semua elemen CP untuk mapel ini
-      const { data: elemenData } = await supabase
+      const { data: elemenData, error: elemenError } = await supabase
         .from('elemen_cp')
         .select('id')
         .eq('mapel_id', selectedMapel);
 
+      if (elemenError) {
+        console.error('Error fetching elemen_cp:', elemenError);
+        setTpList([]);
+        return;
+      }
+
       if (elemenData?.length > 0) {
         const elemenIds = elemenData.map(e => e.id);
-        const { data: tpData } = await supabase
+        const { data: tpData, error: tpError } = await supabase
           .from('tujuan_pembelajaran')
           .select('*')
           .in('elemen_cp_id', elemenIds)
           .order('urutan_global');
+          
+        if (tpError) {
+          console.error('Error fetching tujuan_pembelajaran:', tpError);
+        }
         setTpList(tpData || []);
       } else {
         setTpList([]);
@@ -233,7 +261,7 @@ function ManajemenContent() {
         return;
       }
 
-      const { data } = await supabase
+      const { data, error: modulError } = await supabase
         .from('modul_ajar')
         .select(`
           *,
@@ -243,11 +271,23 @@ function ManajemenContent() {
         .eq('tujuan_pembelajaran.elemen_cp_id', selectedMapel)
         .order('created_at', { ascending: false });
 
+      if (modulError) {
+        console.error('Error fetching modul_ajar:', modulError);
+        setModulAjarList([]);
+        return;
+      }
+
       // Filter modul yang sesuai dengan mapel ini
-      const { data: elemenData } = await supabase
+      const { data: elemenData, error: elemenError } = await supabase
         .from('elemen_cp')
         .select('id')
         .eq('mapel_id', selectedMapel);
+
+      if (elemenError) {
+        console.error('Error fetching elemen_cp:', elemenError);
+        setModulAjarList([]);
+        return;
+      }
 
       if (elemenData?.length > 0 && data) {
         const elemenIds = elemenData.map(e => e.id);
