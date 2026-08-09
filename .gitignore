@@ -1,11 +1,21 @@
 ```
-# Database
-*.sql
-
 # Environment variables
-.env
 .env.local
-*.env.*
+
+# Dependencies
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.ENV
+.python-version
 
 # Logs
 *.log
@@ -13,61 +23,43 @@
 # Temporary files
 *.tmp
 *.temp
-
-# OS generated files
+*.bak
+*.swp
+*~
 .DS_Store
 Thumbs.db
 
-# Dependencies
-node_modules/
-venv/
-.venv/
-__pycache__/
-*.egg-info/
+# Build outputs
 dist/
 build/
-target/
-.gradle/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
+*.out
+*.exe
+*.dll
+*.so
+*.a
+*.o
+*.obj
 
 # Coverage
 .coverage
 coverage/
 htmlcov/
 
-# Python specific
-*.pyc
-*.pyo
-*.pyd
-.Python
-*.so
+# Testing
+.pytest_cache/
+.mypy_cache/
+.hypothesis/
 
-# Compressed files
-*.zip
-*.gz
-*.tar
-*.tgz
-*.bz2
-*.xz
-*.7z
-*.rar
-*.zst
-*.lz4
-*.lzh
-*.cab
-*.arj
-*.rpm
-*.deb
-*.Z
-*.lz
-*.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
+# IDE
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+ehthumbs.db
+Icon?
+Thumbs.db
 ```
