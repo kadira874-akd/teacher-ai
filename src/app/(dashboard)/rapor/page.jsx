@@ -67,7 +67,7 @@ export default function RaporPage() {
             if (!sekolahError) setSekolahData(sekolah);
           }
 
-          const { data: guru, error: guruError } = await supabase.from('guru').select('*').eq('id', profile.id).single();
+          const { data: guru, error: guruError } = await supabase.from('profiles').select('*').eq('id', profile.id).single();
           if (!guruError) setGuruData(guru);
         }
         setLoading(false);
