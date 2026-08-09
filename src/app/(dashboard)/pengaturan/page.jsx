@@ -234,11 +234,23 @@ export default function PengaturanPage() {
   };
 
   const handleSaveNamaKelas = async () => {
-    if (!kelasId) { alert('Pilih kelas terlebih dahulu!'); return; }
-    // Kelas sekarang dipilih dari dropdown, jadi tidak perlu update nama
-    // Hanya konfirmasi bahwa kelas sudah aktif
-    alert(`✅ Kelas ${kelasNama} sudah aktif! Fase: ${getFaseLabel(faseKelas)}`);
-    await fetchSession();
+    if (!kelasId) { alert('Pilih atau buat kelas terlebih dahulu!'); return; }
+    if (!kelasNama.trim()) { alert('Nama kelas tidak boleh kosong!'); return; }
+  
+    const faseBaru = detectFaseFromNama(kelasNama.trim());
+  
+    const { error } = await supabase
+      .from('kelas')
+      .update({ nama_kelas: kelasNama.trim(), fase: faseBaru })
+      .eq('id', kelasId);
+  
+    if (error) { alert('Gagal menyimpan nama kelas: ' + error.message); return; }
+  
+    setFaseKelas(faseBaru);
+    // Sinkronkan juga daftar dropdown agar nama baru langsung tampil
+    setKelasOptions(prev => prev.map(k => k.id === kelasId ? { ...k, nama: kelasNama.trim(), fase: faseBaru } : k));
+  
+    alert(`✅ Nama kelas berhasil disimpan! Fase: ${getFaseLabel(faseBaru)}`);
   };
 
   const handleSaveTahunAjaran = async () => {
@@ -521,30 +533,38 @@ export default function PengaturanPage() {
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6">
             <h3 className="text-xs sm:text-sm font-bold text-indigo-700 uppercase tracking-wide mb-4 sm:mb-6">🏫 Identitas Kelas</h3>
             <div className="grid grid-cols-1 gap-3 sm:gap-4">
-              <div>
-                <label className="block text-xs sm:text-sm font-semibold text-slate-800 mb-1.5">Nama Kelas <span className="text-red-600">*</span></label>
-                <select 
-                  value={kelasId} 
-                  onChange={(e) => {
-                    const selectedKelas = kelasOptions.find(k => k.id === e.target.value);
-                    if (selectedKelas) {
-                      setKelasId(selectedKelas.id);
-                      setKelasNama(selectedKelas.nama || '');
-                      setFaseKelas(selectedKelas.fase || detectFaseFromNama(selectedKelas.nama));
-                    }
-                  }}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 text-base font-semibold text-slate-900 bg-white shadow-sm mobile-input-high-contrast"
-                >
-                  {kelasOptions.length === 0 ? (
-                    <option value="">Belum ada kelas terdaftar</option>
-                  ) : (
-                    kelasOptions.map(k => (
+              {kelasOptions.length > 1 && (
+                <div>
+                  <label className="block text-xs sm:text-sm font-semibold text-slate-800 mb-1.5">Beralih ke Kelas Lain</label>
+                  <select 
+                    value={kelasId} 
+                    onChange={(e) => {
+                      const selectedKelas = kelasOptions.find(k => k.id === e.target.value);
+                      if (selectedKelas) {
+                        setKelasId(selectedKelas.id);
+                        setKelasNama(selectedKelas.nama || '');
+                        setFaseKelas(selectedKelas.fase || detectFaseFromNama(selectedKelas.nama));
+                      }
+                    }}
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 text-base font-semibold text-slate-900 bg-white shadow-sm mobile-input-high-contrast"
+                  >
+                    {kelasOptions.map(k => (
                       <option key={k.id} value={k.id}>{k.nama}</option>
-                    ))
-                  )}
-                </select>
-                <p className="text-xs text-slate-500 mt-1">💡 Pilih kelas yang sedang Anda ampuh</p>
-              </div>
+                    ))}
+                  </select>
+                  <p className="text-xs text-slate-500 mt-1">💡 Anda mengampu lebih dari satu kelas — pilih yang ingin diatur</p>
+                </div>
+              )}
+          
+              {/* INI YANG BARU: field untuk benar-benar mengubah nama kelas */}
+              <InputField
+                label="Nama Kelas"
+                value={kelasNama}
+                onChange={(v) => setKelasNama(v)}
+                placeholder="Contoh: Kelas 4A"
+                required
+              />
+          
               <div>
                 <label className="block text-xs sm:text-sm font-semibold text-slate-800 mb-1.5">Fase Kurikulum (Otomatis)</label>
                 <div className="px-4 py-3 bg-emerald-50 border border-emerald-500 rounded-lg text-emerald-700 font-bold flex items-center gap-2 text-sm">
@@ -553,7 +573,7 @@ export default function PengaturanPage() {
               </div>
             </div>
           </div>
-          <div className="flex justify-end"><Button onClick={handleSaveNamaKelas}>✅ Konfirmasi Kelas Aktif</Button></div>
+          <div className="flex justify-end"><Button onClick={handleSaveNamaKelas}>💾 Simpan Nama Kelas</Button></div>
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6">
             <h3 className="text-xs sm:text-sm font-bold text-indigo-700 uppercase tracking-wide mb-4 sm:mb-6">👨‍🏫 Data Diri Wali Kelas</h3>
             <div className="grid grid-cols-1 gap-3 sm:gap-4">
