@@ -11,8 +11,8 @@ RETURNS TRIGGER AS $$
 BEGIN
   INSERT INTO public.guru (
     id,
-    nama_guru,
-    email,
+    nama_lengkap,
+    email_pribadi,
     nip,
     created_at,
     updated_at
