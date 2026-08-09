@@ -332,7 +332,7 @@ export const guruService = {
    */
   async getById(id) {
     return await supabase
-      .from('guru')
+      .from('profiles')
       .select('*')
       .eq('id', id)
       .maybeSingle();
@@ -343,7 +343,7 @@ export const guruService = {
    */
   async update(id, data) {
     return await supabase
-      .from('guru')
+      .from('profiles')
       .update(data)
       .eq('id', id)
       .select()
@@ -355,7 +355,7 @@ export const guruService = {
    */
   async create(data) {
     return await supabase
-      .from('guru')
+      .from('profiles')
       .insert(data)
       .select()
       .single();
