@@ -42,7 +42,7 @@ export const useAuthStore = create((set) => ({
 
       console.log('📡 [AuthStore] Mengambil data profil guru dari database...');
       const { data: profile, error: profileError } = await supabase
-        .from('guru')
+        .from('profiles')
         .select('*')
         .eq('id', session.user.id)
         .maybeSingle(); // maybeSingle lebih aman daripada single
