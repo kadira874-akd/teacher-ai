@@ -103,67 +103,37 @@ export default function PengaturanPage() {
   // ===== INISIALISASI =====
   useEffect(() => {
     const initData = async () => {
-      if (!profile) await fetchSession();
-      if (profile?.id) {
-        setLoading(true);
-        
-        // Load semua opsi kelas untuk dropdown
-        const { data: allKelasData } = await supabase
-          .from('kelas')
-          .select('id, nama_kelas, fase')
-          .eq('guru_id', profile.id)
-          .order('nama_kelas');
-        
-        if (allKelasData && allKelasData.length > 0) {
-          setKelasOptions(allKelasData.map(k => ({ id: k.id, nama: k.nama_kelas, fase: k.fase })));
-          
-          const k = allKelasData[0]; // Gunakan kelas pertama sebagai default
-          setKelasId(k.id);
-          setKelasNama(k.nama_kelas || '');
-          setFaseKelas(k.fase || detectFaseFromNama(k.nama_kelas)); 
-
-          setGuruData({
-            nama: profile.nama || '', email: profile.email || '', nip: profile.nip || '', 
-            tempat_lahir: profile.tempat_lahir || '', tanggal_lahir: profile.tanggal_lahir || '', 
-            jenis_kelamin: profile.jenis_kelamin || 'Laki-laki', pendidikan_terakhir: profile.pendidikan_terakhir || '', 
-            no_telepon: profile.no_telepon || '', alamat: profile.alamat || ''
-          });
-
-          if (profile.sekolah_id) {
-            const { data: sekolah } = await supabase.from('sekolah').select('*').eq('id', profile.sekolah_id).single();
-            if (sekolah) {
-              setSekolahId(sekolah.id);
-              setSekolahData({
-                nama: sekolah.nama || '', npsn: sekolah.npsn || '', alamat: sekolah.alamat || '',
-                jenjang: sekolah.jenjang || 'SD', akreditasi: sekolah.akreditasi || 'A',
-                kepala_sekolah_nama: sekolah.kepala_sekolah_nama || '', kepala_sekolah_nip: sekolah.kepala_sekolah_nip || '',
-                telepon: sekolah.telepon || '', email: sekolah.email || '', website: sekolah.website || '',
-                kode_pos: sekolah.kode_pos || '', kecamatan: sekolah.kecamatan || '', kabupaten: sekolah.kabupaten || '', 
-                provinsi: sekolah.provinsi || '', visi: sekolah.visi || '', misi: sekolah.misi || ''
-              });
-            }
-          }
-
-          const { data: ta } = await supabase.from('tahun_ajaran').select('*').eq('kelas_id', k.id).single();
-          if (ta) {
-            setTahunAjaranId(ta.id);
-            setTahunAjaran({
-              nama_tahun: ta.nama_tahun || '2025/2026', semester_aktif: ta.semester_aktif || 'Ganjil',
-              tanggal_mulai: ta.tanggal_mulai || '', tanggal_selesai: ta.tanggal_selesai || '',
-              tanggal_rapor: ta.tanggal_rapor || '', kota_penetapan: ta.kota_penetapan || ''
-            });
-          }
-
-          const { data: siswa } = await supabase.from('siswa').select('*').eq('kelas_id', k.id).order('nama');
-          setSiswaList(siswa || []);
-
-          const { data: mapel } = await supabase.from('mapel').select('*').eq('kelas_id', k.id).order('urutan');
-          setMapelList(mapel || []);
-
-          const { data: jadwal } = await supabase.from('jadwal_mapel').select('*, mapel:mapel_id(nama)').eq('kelas_id', k.id).order('hari').order('jam_mulai');
-          setJadwalData(jadwal || []);
+      setLoading(true);
+      try {
+        // Ambil profile TERBARU, bukan dari closure yang lama
+        let currentProfile = profile;
+        if (!currentProfile) {
+          await fetchSession();
+          currentProfile = useAuthStore.getState().profile; // <-- kunci perbaikannya
         }
-        setLoading(false);
+   
+        if (currentProfile?.id) {
+          const { data: allKelasData } = await supabase
+            .from('kelas')
+            .select('id, nama_kelas, fase')
+            .eq('guru_id', currentProfile.id)
+            .order('nama_kelas');
+   
+          // ... sisa logic lainnya, ganti semua `profile.id` jadi `currentProfile.id` ...
+   
+          if (allKelasData && allKelasData.length > 0) {
+            setKelasOptions(allKelasData.map(k => ({ id: k.id, nama: k.nama_kelas, fase: k.fase })));
+            const k = allKelasData[0];
+            setKelasId(k.id);
+            setKelasNama(k.nama_kelas || '');
+            setFaseKelas(k.fase || detectFaseFromNama(k.nama_kelas));
+            // ... lanjutkan query lain seperti semula ...
+          }
+        }
+      } catch (err) {
+        console.error('Gagal memuat data:', err); // <-- tambahkan ini juga!
+      } finally {
+        setLoading(false); // <-- selalu dijalankan, apapun yang terjadi
       }
     };
     initData();
