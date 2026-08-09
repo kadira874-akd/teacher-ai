@@ -101,36 +101,84 @@ export default function PengaturanPage() {
   };
 
   // ===== INISIALISASI =====
-  // Effect 1: pastikan session/profile ter-fetch dulu
+// ===== INISIALISASI =====
   useEffect(() => {
-    if (!profile) fetchSession();
-  }, [profile, fetchSession]);
-   
-  // Effect 2: baru jalankan fetch data KETIKA profile sudah benar-benar ada
-  // (ini akan otomatis re-run saat `profile` berubah dari null -> ada isinya)
-  useEffect(() => {
-    if (!profile?.id) return; // tunggu sampai profile siap
-   
     const initData = async () => {
       setLoading(true);
       try {
-        const { data: allKelasData } = await supabase
-          .from('kelas')
-          .select('id, nama_kelas, fase')
-          .eq('guru_id', profile.id)
-          .order('nama_kelas');
-   
-        if (allKelasData && allKelasData.length > 0) {
-          // ... logic seperti semula ...
+        // Ambil profile TERBARU langsung dari store (bukan dari closure yang bisa stale)
+        let currentProfile = profile;
+        if (!currentProfile) {
+          await fetchSession();
+          currentProfile = useAuthStore.getState().profile;
+        }
+
+        if (currentProfile?.id) {
+          // Load semua opsi kelas untuk dropdown
+          const { data: allKelasData } = await supabase
+            .from('kelas')
+            .select('id, nama_kelas, fase')
+            .eq('guru_id', currentProfile.id)
+            .order('nama_kelas');
+
+          if (allKelasData && allKelasData.length > 0) {
+            setKelasOptions(allKelasData.map(k => ({ id: k.id, nama: k.nama_kelas, fase: k.fase })));
+
+            const k = allKelasData[0]; // Gunakan kelas pertama sebagai default
+            setKelasId(k.id);
+            setKelasNama(k.nama_kelas || '');
+            setFaseKelas(k.fase || detectFaseFromNama(k.nama_kelas));
+
+            setGuruData({
+              nama: currentProfile.nama || '', email: currentProfile.email || '', nip: currentProfile.nip || '',
+              tempat_lahir: currentProfile.tempat_lahir || '', tanggal_lahir: currentProfile.tanggal_lahir || '',
+              jenis_kelamin: currentProfile.jenis_kelamin || 'Laki-laki', pendidikan_terakhir: currentProfile.pendidikan_terakhir || '',
+              no_telepon: currentProfile.no_telepon || '', alamat: currentProfile.alamat || ''
+            });
+
+            if (currentProfile.sekolah_id) {
+              const { data: sekolah } = await supabase.from('sekolah').select('*').eq('id', currentProfile.sekolah_id).single();
+              if (sekolah) {
+                setSekolahId(sekolah.id);
+                setSekolahData({
+                  nama: sekolah.nama || '', npsn: sekolah.npsn || '', alamat: sekolah.alamat || '',
+                  jenjang: sekolah.jenjang || 'SD', akreditasi: sekolah.akreditasi || 'A',
+                  kepala_sekolah_nama: sekolah.kepala_sekolah_nama || '', kepala_sekolah_nip: sekolah.kepala_sekolah_nip || '',
+                  telepon: sekolah.telepon || '', email: sekolah.email || '', website: sekolah.website || '',
+                  kode_pos: sekolah.kode_pos || '', kecamatan: sekolah.kecamatan || '', kabupaten: sekolah.kabupaten || '',
+                  provinsi: sekolah.provinsi || '', visi: sekolah.visi || '', misi: sekolah.misi || ''
+                });
+              }
+            }
+
+            const { data: ta } = await supabase.from('tahun_ajaran').select('*').eq('kelas_id', k.id).single();
+            if (ta) {
+              setTahunAjaranId(ta.id);
+              setTahunAjaran({
+                nama_tahun: ta.nama_tahun || '2025/2026', semester_aktif: ta.semester_aktif || 'Ganjil',
+                tanggal_mulai: ta.tanggal_mulai || '', tanggal_selesai: ta.tanggal_selesai || '',
+                tanggal_rapor: ta.tanggal_rapor || '', kota_penetapan: ta.kota_penetapan || ''
+              });
+            }
+
+            const { data: siswa } = await supabase.from('siswa').select('*').eq('kelas_id', k.id).order('nama');
+            setSiswaList(siswa || []);
+
+            const { data: mapel } = await supabase.from('mapel').select('*').eq('kelas_id', k.id).order('urutan');
+            setMapelList(mapel || []);
+
+            const { data: jadwal } = await supabase.from('jadwal_mapel').select('*, mapel:mapel_id(nama)').eq('kelas_id', k.id).order('hari').order('jam_mulai');
+            setJadwalData(jadwal || []);
+          }
         }
       } catch (err) {
-        console.error('Gagal memuat data:', err);
+        console.error('Gagal memuat data pengaturan:', err);
       } finally {
         setLoading(false);
       }
     };
     initData();
-  }, [profile?.id]); // <-- dependency lebih spesifik, hanya re-run saat id berubah
+  }, [profile, fetchSession]);
 
   // ===== HANDLERS =====
   const handleSaveSekolah = async () => {
