@@ -7,7 +7,7 @@
 export interface User {
   id: string;
   email: string;
-  nama_lengkap: string;
+  nama: string;
   nip?: string;
   role: 'guru' | 'admin' | 'wali_kelas';
   created_at?: string;
@@ -40,7 +40,7 @@ export interface Siswa {
   id: string;
   nis: string;
   nisn: string;
-  nama_lengkap: string;
+  nama: string;
   kelas_id: string;
   tanggal_lahir?: string;
   tempat_lahir?: string;
