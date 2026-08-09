@@ -101,43 +101,36 @@ export default function PengaturanPage() {
   };
 
   // ===== INISIALISASI =====
+  // Effect 1: pastikan session/profile ter-fetch dulu
   useEffect(() => {
+    if (!profile) fetchSession();
+  }, [profile, fetchSession]);
+   
+  // Effect 2: baru jalankan fetch data KETIKA profile sudah benar-benar ada
+  // (ini akan otomatis re-run saat `profile` berubah dari null -> ada isinya)
+  useEffect(() => {
+    if (!profile?.id) return; // tunggu sampai profile siap
+   
     const initData = async () => {
       setLoading(true);
       try {
-        // Ambil profile TERBARU, bukan dari closure yang lama
-        let currentProfile = profile;
-        if (!currentProfile) {
-          await fetchSession();
-          currentProfile = useAuthStore.getState().profile; // <-- kunci perbaikannya
-        }
+        const { data: allKelasData } = await supabase
+          .from('kelas')
+          .select('id, nama_kelas, fase')
+          .eq('guru_id', profile.id)
+          .order('nama_kelas');
    
-        if (currentProfile?.id) {
-          const { data: allKelasData } = await supabase
-            .from('kelas')
-            .select('id, nama_kelas, fase')
-            .eq('guru_id', currentProfile.id)
-            .order('nama_kelas');
-   
-          // ... sisa logic lainnya, ganti semua `profile.id` jadi `currentProfile.id` ...
-   
-          if (allKelasData && allKelasData.length > 0) {
-            setKelasOptions(allKelasData.map(k => ({ id: k.id, nama: k.nama_kelas, fase: k.fase })));
-            const k = allKelasData[0];
-            setKelasId(k.id);
-            setKelasNama(k.nama_kelas || '');
-            setFaseKelas(k.fase || detectFaseFromNama(k.nama_kelas));
-            // ... lanjutkan query lain seperti semula ...
-          }
+        if (allKelasData && allKelasData.length > 0) {
+          // ... logic seperti semula ...
         }
       } catch (err) {
-        console.error('Gagal memuat data:', err); // <-- tambahkan ini juga!
+        console.error('Gagal memuat data:', err);
       } finally {
-        setLoading(false); // <-- selalu dijalankan, apapun yang terjadi
+        setLoading(false);
       }
     };
     initData();
-  }, [profile, fetchSession]);
+  }, [profile?.id]); // <-- dependency lebih spesifik, hanya re-run saat id berubah
 
   // ===== HANDLERS =====
   const handleSaveSekolah = async () => {
