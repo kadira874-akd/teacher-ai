@@ -1,6 +1,24 @@
 import { create } from 'zustand';
 import { supabase } from '@/config/supabase';
 
+/**
+ * @typedef {import('@/types/jsdoc-typedefs').User} User
+ * @typedef {import('@/types/jsdoc-typedefs').ApiResponse} ApiResponse
+ */
+
+/**
+ * @typedef {Object} AuthStoreState
+ * @property {User | null} user
+ * @property {any | null} profile
+ * @property {boolean} loading
+ * @property {(user: User | null) => void} setUser
+ * @property {(profile: any | null) => void} setProfile
+ * @property {(loading: boolean) => void} setLoading
+ * @property {() => Promise<void>} fetchSession
+ * @property {() => Promise<void>} signOut
+ */
+
+/** @type {import('zustand').StoreApi<AuthStoreState>} */
 export const useAuthStore = create((set) => ({
   user: null,
   profile: null,
@@ -20,7 +38,7 @@ export const useAuthStore = create((set) => ({
 
     if (session?.user) {
       console.log('✅ [AuthStore] Sesi ditemukan untuk:', session.user.email);
-      set({ user: session.user, loading: false });
+      set({ user: /** @type {User} */ (session.user), loading: false });
 
       console.log('📡 [AuthStore] Mengambil data profil guru dari database...');
       const { data: profile, error: profileError } = await supabase
