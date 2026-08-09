@@ -42,20 +42,33 @@ export default function RaporPage() {
       if (!profile) await fetchSession();
       if (profile?.id) {
         setLoading(true);
-        const { data: kelasData } = await supabase.from('kelas').select('id, nama_kelas, fase').eq('guru_id', profile.id).limit(1);
+        const { data: kelasData, error: kelasError } = await supabase.from('kelas').select('id, nama_kelas, fase').eq('guru_id', profile.id).limit(1);
+        
+        if (kelasError) {
+          console.error('Error fetching kelas:', kelasError);
+          alert('Gagal memuat data kelas: ' + kelasError.message);
+          setLoading(false);
+          return;
+        }
+        
         if (kelasData && kelasData.length > 0) {
           setKelasId(kelasData[0].id);
-          const { data: siswaData } = await supabase.from('siswa').select('*').eq('kelas_id', kelasData[0].id).order('nama');
-          setSiswaList(siswaData || []);
-          if (siswaData && siswaData.length > 0) setSelectedSiswaId(siswaData[0].id);
-
-          if (profile?.sekolah_id) {
-            const { data: sekolah } = await supabase.from('sekolah').select('*').eq('id', profile.sekolah_id).single();
-            setSekolahData(sekolah);
+          const { data: siswaData, error: siswaError } = await supabase.from('siswa').select('*').eq('kelas_id', kelasData[0].id).order('nama');
+          
+          if (siswaError) {
+            console.error('Error fetching siswa:', siswaError);
+          } else {
+            setSiswaList(siswaData || []);
+            if (siswaData && siswaData.length > 0) setSelectedSiswaId(siswaData[0].id);
           }
 
-          const { data: guru } = await supabase.from('guru').select('*').eq('id', profile.id).single();
-          setGuruData(guru);
+          if (profile?.sekolah_id) {
+            const { data: sekolah, error: sekolahError } = await supabase.from('sekolah').select('*').eq('id', profile.sekolah_id).single();
+            if (!sekolahError) setSekolahData(sekolah);
+          }
+
+          const { data: guru, error: guruError } = await supabase.from('guru').select('*').eq('id', profile.id).single();
+          if (!guruError) setGuruData(guru);
         }
         setLoading(false);
       }
@@ -74,23 +87,38 @@ export default function RaporPage() {
       const agamaSiswa = siswa?.agama || 'Umum';
 
       // 1. Ambil Mapel
-      const { data: mapelList } = await supabase.from('mapel').select('*').eq('kelas_id', kelasId).order('urutan');
+      const { data: mapelList, error: mapelError } = await supabase.from('mapel').select('*').eq('kelas_id', kelasId).order('urutan');
+      
+      if (mapelError) {
+        console.error('Error fetching mapel:', mapelError);
+        return;
+      }
       
       // 2. Ambil Data Nilai Baru
-      const { data: nilaiLMData } = await supabase.from('nilai_lingkup_materi').select('*').eq('siswa_id', selectedSiswaId);
-      const { data: nilaiSASData } = await supabase.from('nilai_sas').select('*').eq('siswa_id', selectedSiswaId);
-      const { data: absensiData } = await supabase.from('absensi').select('*').eq('siswa_id', selectedSiswaId);
-      const { data: pancasilaData } = await supabase.from('profil_pancasila').select('*').eq('siswa_id', selectedSiswaId);
-      const { data: ekskulData } = await supabase.from('nilai_ekskul').select('*, ekskul:ekskul_id(nama, jenis)').eq('siswa_id', selectedSiswaId);
-      const { data: raporExisting } = await supabase.from('rapor').select('*').eq('siswa_id', selectedSiswaId).eq('semester', 'Ganjil').limit(1);
+      const { data: nilaiLMData, error: lmError } = await supabase.from('nilai_lingkup_materi').select('*').eq('siswa_id', selectedSiswaId);
+      const { data: nilaiSASData, error: sasError } = await supabase.from('nilai_sas').select('*').eq('siswa_id', selectedSiswaId);
+      const { data: absensiData, error: absenError } = await supabase.from('absensi').select('*').eq('siswa_id', selectedSiswaId);
+      const { data: pancasilaData, error: pancasilaError } = await supabase.from('profil_pancasila').select('*').eq('siswa_id', selectedSiswaId);
+      const { data: ekskulData, error: ekskulError } = await supabase.from('nilai_ekskul').select('*, ekskul:ekskul_id(nama, jenis)').eq('siswa_id', selectedSiswaId);
+      const { data: raporExisting, error: raporError } = await supabase.from('rapor').select('*').eq('siswa_id', selectedSiswaId).eq('semester', 'Ganjil').limit(1);
 
       const nilaiPerMapel = [];
 
       // 3. Proses Per Mapel
       for (const mapel of mapelList || []) {
         // Ambil LM & TP untuk mapel ini
-        const { data: lmList } = await supabase.from('lingkup_materi').select('*').eq('mapel_id', mapel.id).order('urutan');
-        const { data: tpList } = await supabase.from('tujuan_pembelajaran').select('*').in('lingkup_materi_id', (lmList || []).map(l => l.id)).order('urutan');
+        const { data: lmList, error: lmDetailError } = await supabase.from('lingkup_materi').select('*').eq('mapel_id', mapel.id).order('urutan');
+        
+        if (lmDetailError) {
+          console.error(`Error fetching lingkup_materi for mapel ${mapel.id}:`, lmDetailError);
+          continue;
+        }
+        
+        const { data: tpList, error: tpError } = await supabase.from('tujuan_pembelajaran').select('*').in('lingkup_materi_id', (lmList || []).map(l => l.id)).order('urutan');
+        
+        if (tpError) {
+          console.error(`Error fetching tujuan_pembelajaran:`, tpError);
+        }
 
         // Filter LM sesuai agama siswa
         const relevantLMs = (lmList || []).filter(lm => lm.kategori === agamaSiswa || lm.kategori === 'Umum');
