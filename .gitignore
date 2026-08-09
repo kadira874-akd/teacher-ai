@@ -1,21 +1,21 @@
 ```
-# Environment variables
-.env.local
+# Test files
+**/__tests__/
+**/*.test.*
+**/*.spec.*
 
-# Dependencies
+# Coverage reports
+coverage/
+.nyc_output/
+.jest/
+
+# Node modules (if this is a JS/TS project)
 node_modules/
 
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-env/
-venv/
-.venv/
-.ENV
-.python-version
+# Environment files
+.env
+.env.local
+.env.*
 
 # Logs
 *.log
@@ -23,43 +23,15 @@ venv/
 # Temporary files
 *.tmp
 *.temp
-*.bak
-*.swp
-*~
-.DS_Store
-Thumbs.db
 
-# Build outputs
-dist/
-build/
-*.out
-*.exe
-*.dll
-*.so
-*.a
-*.o
-*.obj
-
-# Coverage
-.coverage
-coverage/
-htmlcov/
-
-# Testing
-.pytest_cache/
-.mypy_cache/
-.hypothesis/
-
-# IDE
+# IDE files
 .vscode/
 .idea/
-*.iml
-*.ipr
-*.iws
+*.swp
+*.swo
 
-# OS
-.DS_Store
-ehthumbs.db
-Icon?
-Thumbs.db
+# Build outputs (if applicable)
+dist/
+build/
+target/
 ```
