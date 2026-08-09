@@ -423,7 +423,7 @@ export default function PengaturanPage() {
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6">
             <h3 className="text-xs sm:text-sm font-bold text-indigo-700 uppercase tracking-wide mb-4 sm:mb-6">Informasi Utama Sekolah</h3>
             <div className="grid grid-cols-1 gap-3 sm:gap-4">
-              <div><InputField label="Nama Sekolah" value={sekolahData.nama} onChange={(v) => setSekolahData({...sekolahData, nama: v})} placeholder="SDN 01 Jakarta" required /></div>
+              <InputField label="Nama Sekolah" value={sekolahData.nama} onChange={(v) => setSekolahData({...sekolahData, nama: v})} placeholder="SDN 01 Jakarta" required />
               <div className="grid grid-cols-2 gap-2 sm:gap-4">
                 <InputField label="NPSN" value={sekolahData.npsn} onChange={(v) => setSekolahData({...sekolahData, npsn: v})} placeholder="20123456" />
                 <InputField label="Jenjang" value={sekolahData.jenjang} onChange={(v) => setSekolahData({...sekolahData, jenjang: v})} options={['SD', 'SMP', 'SMA', 'MI', 'MTs', 'MA']} />
@@ -432,10 +432,36 @@ export default function PengaturanPage() {
                 <InputField label="Akreditasi" value={sekolahData.akreditasi} onChange={(v) => setSekolahData({...sekolahData, akreditasi: v})} options={['A', 'B', 'C', 'Belum Terakreditasi']} />
                 <InputField label="Telepon" value={sekolahData.telepon} onChange={(v) => setSekolahData({...sekolahData, telepon: v})} placeholder="(021) 1234567" />
               </div>
-              <div><InputField label="Email Sekolah" value={sekolahData.email} onChange={(v) => setSekolahData({...sekolahData, email: v})} placeholder="sdn01@sekolah.id" /></div>
-              <div><InputField label="Alamat Lengkap" value={sekolahData.alamat} onChange={(v) => setSekolahData({...sekolahData, alamat: v})} placeholder="Jl. Merdeka No. 1" required rows={2} /></div>
+              <InputField label="Email Sekolah" value={sekolahData.email} onChange={(v) => setSekolahData({...sekolahData, email: v})} placeholder="sdn01@sekolah.id" />
+              <InputField label="Website" value={sekolahData.website} onChange={(v) => setSekolahData({...sekolahData, website: v})} placeholder="https://sdn01.sch.id" />
+              <InputField label="Alamat Lengkap" value={sekolahData.alamat} onChange={(v) => setSekolahData({...sekolahData, alamat: v})} placeholder="Jl. Merdeka No. 1" required rows={2} />
+              <div className="grid grid-cols-2 gap-2 sm:gap-4">
+                <InputField label="Kode Pos" value={sekolahData.kode_pos} onChange={(v) => setSekolahData({...sekolahData, kode_pos: v})} placeholder="12345" />
+                <InputField label="Kecamatan" value={sekolahData.kecamatan} onChange={(v) => setSekolahData({...sekolahData, kecamatan: v})} />
+              </div>
+              <div className="grid grid-cols-2 gap-2 sm:gap-4">
+                <InputField label="Kabupaten/Kota" value={sekolahData.kabupaten} onChange={(v) => setSekolahData({...sekolahData, kabupaten: v})} />
+                <InputField label="Provinsi" value={sekolahData.provinsi} onChange={(v) => setSekolahData({...sekolahData, provinsi: v})} />
+              </div>
             </div>
           </div>
+      
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6">
+            <h3 className="text-xs sm:text-sm font-bold text-indigo-700 uppercase tracking-wide mb-4 sm:mb-6">Kepala Sekolah</h3>
+            <div className="grid grid-cols-1 gap-3 sm:gap-4">
+              <InputField label="Nama Kepala Sekolah" value={sekolahData.kepala_sekolah_nama} onChange={(v) => setSekolahData({...sekolahData, kepala_sekolah_nama: v})} />
+              <InputField label="NIP Kepala Sekolah" value={sekolahData.kepala_sekolah_nip} onChange={(v) => setSekolahData({...sekolahData, kepala_sekolah_nip: v})} />
+            </div>
+          </div>
+      
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6">
+            <h3 className="text-xs sm:text-sm font-bold text-indigo-700 uppercase tracking-wide mb-4 sm:mb-6">Visi & Misi</h3>
+            <div className="grid grid-cols-1 gap-3 sm:gap-4">
+              <InputField label="Visi Sekolah" value={sekolahData.visi} onChange={(v) => setSekolahData({...sekolahData, visi: v})} rows={3} />
+              <InputField label="Misi Sekolah" value={sekolahData.misi} onChange={(v) => setSekolahData({...sekolahData, misi: v})} rows={4} />
+            </div>
+          </div>
+      
           <div className="flex justify-end"><Button onClick={handleSaveSekolah}>💾 Simpan Data Sekolah</Button></div>
         </div>
       )}
