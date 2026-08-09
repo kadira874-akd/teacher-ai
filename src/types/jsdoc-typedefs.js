@@ -7,7 +7,7 @@
  * @typedef {Object} User
  * @property {string} id
  * @property {string} email
- * @property {string} nama_lengkap
+ * @property {string} nama
  * @property {string} [nip]
  * @property {'guru' | 'admin' | 'wali_kelas'} role
  * @property {string} [created_at]
@@ -31,7 +31,7 @@
  * @property {string} id
  * @property {string} nis
  * @property {string} nisn
- * @property {string} nama_lengkap
+ * @property {string} nama
  * @property {string} kelas_id
  * @property {string} [tanggal_lahir]
  * @property {string} [tempat_lahir]

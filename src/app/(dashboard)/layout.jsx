@@ -35,6 +35,8 @@ export default function DashboardLayout({ children }) {
     { name: 'Dashboard', href: '/dashboard', icon: '🏠' },
     { name: 'Input Data', href: '/pengaturan', icon: '⚙️' },
     { name: 'Manajemen Kelas', href: '/manajemen', icon: '🏫' },
+    { name: 'Absensi QR', href: '/absensi', icon: '📷' },
+    { name: 'Kartu Siswa', href: '/kartu-siswa', icon: '🪪' },
     { name: 'Kurikulum', href: '/kurikulum', icon: '📖' },
     { name: 'Modul & Bahan Ajar', href: '/bahan-ajar', icon: '📚' },
     { name: 'Riwayat & Rekap Nilai', href: '/riwayat-rekap', icon: '📊' },
@@ -45,7 +47,7 @@ export default function DashboardLayout({ children }) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F8FAFC] to-[#F1F5F9]">
         <div className="text-center animate-fade-in-up">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#2D5BE3] to-[#7C3AED] rounded-2xl mb-4 shadow-lg animate-pulse">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#4F46E5] to-[#7C3AED] rounded-2xl mb-4 shadow-lg animate-pulse">
             <span className="text-3xl">📚</span>
           </div>
           <p className="text-slate-500 font-medium">Memuat data guru...</p>
