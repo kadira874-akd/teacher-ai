@@ -177,7 +177,8 @@ export default function PengaturanPage() {
         const { data, error } = await supabase.from('sekolah').insert(sekolahData).select('id').single();
         if (error) throw error;
         setSekolahId(data.id);
-        await supabase.from('guru').update({ sekolah_id: data.id }).eq('id', profile.id);
+        // await supabase.from('guru').update({ sekolah_id: data.id }).eq('id', profile.id);
+        await supabase.from('profiles').update({ sekolah_id: data.id }).eq('id', profile.id);
       } else {
         await supabase.from('sekolah').update(sekolahData).eq('id', sekolahId);
       }
@@ -187,7 +188,7 @@ export default function PengaturanPage() {
   };
 
   const handleSaveGuru = async () => {
-    const { error } = await supabase.from('guru').update(guruData).eq('id', profile.id);
+    const { error } = await supabase.from('profiles').update(guruData).eq('id', profile.id);
     if (error) alert('Gagal: ' + error.message);
     else { alert('✅ Data guru berhasil disimpan!'); await fetchSession(); }
   };
