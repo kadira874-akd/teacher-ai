@@ -7,6 +7,30 @@ import Button from '@/components/ui/Button';
 import * as XLSX from 'xlsx';
 import { QRCodeSVG } from 'qrcode.react';
 
+// Daftar tingkat kelas — hanya yang datanya sudah tersedia di KURIKULUM_DATABASE
+const TINGKAT_KELAS_OPTIONS = [
+  { value: '1', label: 'Kelas 1', jenjang: 'SD', tersedia: true },
+  { value: '2', label: 'Kelas 2', jenjang: 'SD', tersedia: true },
+  { value: '3', label: 'Kelas 3', jenjang: 'SD', tersedia: true },
+  { value: '4', label: 'Kelas 4', jenjang: 'SD', tersedia: true },
+  { value: '5', label: 'Kelas 5', jenjang: 'SD', tersedia: true },
+  { value: '6', label: 'Kelas 6', jenjang: 'SD', tersedia: true },
+  { value: '7', label: 'Kelas 7', jenjang: 'SMP', tersedia: true },
+  { value: '8', label: 'Kelas 8', jenjang: 'SMP', tersedia: true },
+  { value: '9', label: 'Kelas 9', jenjang: 'SMP', tersedia: true },
+  { value: '10', label: 'Kelas 10', jenjang: 'SMA', tersedia: false },
+  { value: '11', label: 'Kelas 11', jenjang: 'SMA', tersedia: false },
+  { value: '12', label: 'Kelas 12', jenjang: 'SMA', tersedia: false },
+];
+
+// Pecah "Kelas 4A" menjadi { tingkat: '4', rombel: 'A' } untuk mengisi ulang dropdown saat edit
+const parseNamaKelas = (nama) => {
+  if (!nama) return { tingkat: '', rombel: '' };
+  const match = String(nama).match(/(\d+)\s*(.*)$/);
+  if (!match) return { tingkat: '', rombel: '' };
+  return { tingkat: match[1], rombel: match[2].trim() };
+};
+
 // Input Field Component - Mobile Optimized with High Contrast
 const InputField = ({ label, value, onChange, type = 'text', placeholder = '', required = false, options = [], rows }) => (
   <div>
@@ -102,28 +126,37 @@ export default function PengaturanPage() {
 
   // ===== HANDLER: BUAT KELAS BARU =====
   const [showAddKelas, setShowAddKelas] = useState(false);
-  const [newKelasNama, setNewKelasNama] = useState('');
+  const [newKelasTingkat, setNewKelasTingkat] = useState('');
+  const [newKelasRombel, setNewKelasRombel] = useState('');
+  
+  // State untuk edit nama kelas di tab Wali
+  const [editTingkatKelas, setEditTingkatKelas] = useState('');
+  const [editRombelKelas, setEditRombelKelas] = useState('');
   
   const handleCreateKelas = async () => {
-    if (!newKelasNama.trim()) { alert('Nama kelas wajib diisi!'); return; }
-    const fase = detectFaseFromNama(newKelasNama.trim());
+    if (!newKelasTingkat) { alert('Pilih tingkat kelas terlebih dahulu!'); return; }
+  
+    const namaKelas = `Kelas ${newKelasTingkat}${newKelasRombel.trim()}`.trim();
+    const fase = getFaseByKelas(newKelasTingkat); // langsung dari data kurikulum, tidak menebak-nebak
   
     const { data, error } = await supabase
       .from('kelas')
-      .insert({ nama_kelas: newKelasNama.trim(), guru_id: profile.id, fase })
+      .insert({ nama_kelas: namaKelas, guru_id: profile.id, fase })
       .select('id, nama_kelas, fase')
       .single();
   
     if (error) { alert('Gagal membuat kelas: ' + error.message); return; }
   
-    // Update daftar opsi & langsung pilih kelas baru
     setKelasOptions(prev => [...prev, { id: data.id, nama: data.nama_kelas, fase: data.fase }]);
     setKelasId(data.id);
     setKelasNama(data.nama_kelas);
     setFaseKelas(data.fase);
-    setNewKelasNama('');
+    setEditTingkatKelas(newKelasTingkat);
+    setEditRombelKelas(newKelasRombel.trim());
+    setNewKelasTingkat('');
+    setNewKelasRombel('');
     setShowAddKelas(false);
-    alert('✅ Kelas berhasil dibuat! Silakan lanjutkan mengisi data.');
+    alert('✅ Kelas berhasil dibuat!');
   };
 
   // ===== INISIALISASI =====
@@ -153,6 +186,9 @@ export default function PengaturanPage() {
             setKelasId(k.id);
             setKelasNama(k.nama_kelas || '');
             setFaseKelas(k.fase || detectFaseFromNama(k.nama_kelas));
+            const parsed = parseNamaKelas(k.nama_kelas);
+            setEditTingkatKelas(parsed.tingkat);
+            setEditRombelKelas(parsed.rombel);
 
             setGuruData({
               nama: currentProfile.nama || '', email: currentProfile.email || '', nip: currentProfile.nip || '',
@@ -235,20 +271,21 @@ export default function PengaturanPage() {
 
   const handleSaveNamaKelas = async () => {
     if (!kelasId) { alert('Pilih atau buat kelas terlebih dahulu!'); return; }
-    if (!kelasNama.trim()) { alert('Nama kelas tidak boleh kosong!'); return; }
+    if (!editTingkatKelas) { alert('Pilih tingkat kelas!'); return; }
   
-    const faseBaru = detectFaseFromNama(kelasNama.trim());
+    const namaBaru = `Kelas ${editTingkatKelas}${editRombelKelas.trim()}`.trim();
+    const faseBaru = getFaseByKelas(editTingkatKelas);
   
     const { error } = await supabase
       .from('kelas')
-      .update({ nama_kelas: kelasNama.trim(), fase: faseBaru })
+      .update({ nama_kelas: namaBaru, fase: faseBaru })
       .eq('id', kelasId);
   
     if (error) { alert('Gagal menyimpan nama kelas: ' + error.message); return; }
   
+    setKelasNama(namaBaru);
     setFaseKelas(faseBaru);
-    // Sinkronkan juga daftar dropdown agar nama baru langsung tampil
-    setKelasOptions(prev => prev.map(k => k.id === kelasId ? { ...k, nama: kelasNama.trim(), fase: faseBaru } : k));
+    setKelasOptions(prev => prev.map(k => k.id === kelasId ? { ...k, nama: namaBaru, fase: faseBaru } : k));
   
     alert(`✅ Nama kelas berhasil disimpan! Fase: ${getFaseLabel(faseBaru)}`);
   };
@@ -390,14 +427,32 @@ export default function PengaturanPage() {
       <div className="max-w-md mx-auto mt-12 bg-white rounded-xl border border-slate-200 shadow-sm p-6 text-center">
         <p className="text-4xl mb-3">🏫</p>
         <h2 className="text-lg font-bold text-slate-900 mb-2">Belum Ada Kelas</h2>
-        <p className="text-sm text-slate-500 mb-4">Buat kelas terlebih dahulu untuk mulai mengisi data sekolah, siswa, dan lainnya.</p>
-        <input
-          type="text"
-          value={newKelasNama}
-          onChange={(e) => setNewKelasNama(e.target.value)}
-          placeholder="Contoh: Kelas 4A"
-          className="w-full px-4 py-3 border border-slate-300 rounded-lg mb-3 text-base font-semibold"
-        />
+        <p className="text-sm text-slate-500 mb-4">Buat kelas terlebih dahulu untuk mulai mengisi data.</p>
+  
+        <div className="grid grid-cols-2 gap-2 mb-3">
+          <select
+            value={newKelasTingkat}
+            onChange={(e) => setNewKelasTingkat(e.target.value)}
+            className="px-4 py-3 border border-slate-300 rounded-lg text-base font-semibold"
+          >
+            <option value="">Pilih Tingkat</option>
+            {TINGKAT_KELAS_OPTIONS.map(t => (
+              <option key={t.value} value={t.value} disabled={!t.tersedia}>
+                {t.label} {!t.tersedia ? '(segera hadir)' : ''}
+              </option>
+            ))}
+          </select>
+          <input
+            type="text"
+            value={newKelasRombel}
+            onChange={(e) => setNewKelasRombel(e.target.value)}
+            placeholder="Rombel, mis. A"
+            maxLength={3}
+            className="px-4 py-3 border border-slate-300 rounded-lg text-base font-semibold"
+          />
+        </div>
+        <p className="text-xs text-slate-400 mb-4">Rombel opsional — kosongkan jika tidak ada kelas paralel</p>
+  
         <Button onClick={handleCreateKelas} className="w-full">➕ Buat Kelas</Button>
       </div>
     );
@@ -535,24 +590,32 @@ export default function PengaturanPage() {
             <div className="grid grid-cols-1 gap-3 sm:gap-4">
               {kelasOptions.length > 1 && (
                 <div>
-                  <label className="block text-xs sm:text-sm font-semibold text-slate-800 mb-1.5">Beralih ke Kelas Lain</label>
-                  <select 
-                    value={kelasId} 
-                    onChange={(e) => {
-                      const selectedKelas = kelasOptions.find(k => k.id === e.target.value);
-                      if (selectedKelas) {
-                        setKelasId(selectedKelas.id);
-                        setKelasNama(selectedKelas.nama || '');
-                        setFaseKelas(selectedKelas.fase || detectFaseFromNama(selectedKelas.nama));
-                      }
-                    }}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 text-base font-semibold text-slate-900 bg-white shadow-sm mobile-input-high-contrast"
-                  >
-                    {kelasOptions.map(k => (
-                      <option key={k.id} value={k.id}>{k.nama}</option>
-                    ))}
-                  </select>
-                  <p className="text-xs text-slate-500 mt-1">💡 Anda mengampu lebih dari satu kelas — pilih yang ingin diatur</p>
+                  <label className="block text-xs sm:text-sm font-semibold text-slate-800 mb-1.5">
+                    Nama Kelas <span className="text-red-600">*</span>
+                  </label>
+                  <div className="grid grid-cols-2 gap-2 sm:gap-4">
+                    <select
+                      value={editTingkatKelas}
+                      onChange={(e) => setEditTingkatKelas(e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 text-base font-semibold text-slate-900 bg-white shadow-sm mobile-input-high-contrast"
+                    >
+                      <option value="">Pilih Tingkat</option>
+                      {TINGKAT_KELAS_OPTIONS.map(t => (
+                        <option key={t.value} value={t.value} disabled={!t.tersedia}>
+                          {t.label} {!t.tersedia ? '(segera hadir)' : ''}
+                        </option>
+                      ))}
+                    </select>
+                    <input
+                      type="text"
+                      value={editRombelKelas}
+                      onChange={(e) => setEditRombelKelas(e.target.value)}
+                      placeholder="Rombel, mis. A"
+                      maxLength={3}
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 text-base font-semibold text-slate-900 bg-white shadow-sm mobile-input-high-contrast"
+                    />
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1">💡 Fase kurikulum otomatis mengikuti tingkat yang dipilih</p>
                 </div>
               )}
           
