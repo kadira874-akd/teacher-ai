@@ -1,3 +1,12 @@
+/**
+ * @typedef {import('@/types/jsdoc-typedefs').ButtonProps} ButtonProps
+ */
+
+/**
+ * Button Component dengan dukungan variant, size, dan loading state
+ * @param {ButtonProps} props
+ * @returns {JSX.Element}
+ */
 export default function Button({ 
   children, 
   onClick, 
