@@ -100,8 +100,33 @@ export default function PengaturanPage() {
     return getFaseByKelas(angkaKelas);
   };
 
+  // ===== HANDLER: BUAT KELAS BARU =====
+  const [showAddKelas, setShowAddKelas] = useState(false);
+  const [newKelasNama, setNewKelasNama] = useState('');
+  
+  const handleCreateKelas = async () => {
+    if (!newKelasNama.trim()) { alert('Nama kelas wajib diisi!'); return; }
+    const fase = detectFaseFromNama(newKelasNama.trim());
+  
+    const { data, error } = await supabase
+      .from('kelas')
+      .insert({ nama_kelas: newKelasNama.trim(), guru_id: profile.id, fase })
+      .select('id, nama_kelas, fase')
+      .single();
+  
+    if (error) { alert('Gagal membuat kelas: ' + error.message); return; }
+  
+    // Update daftar opsi & langsung pilih kelas baru
+    setKelasOptions(prev => [...prev, { id: data.id, nama: data.nama_kelas, fase: data.fase }]);
+    setKelasId(data.id);
+    setKelasNama(data.nama_kelas);
+    setFaseKelas(data.fase);
+    setNewKelasNama('');
+    setShowAddKelas(false);
+    alert('✅ Kelas berhasil dibuat! Silakan lanjutkan mengisi data.');
+  };
+
   // ===== INISIALISASI =====
-// ===== INISIALISASI =====
   useEffect(() => {
     const initData = async () => {
       setLoading(true);
@@ -183,15 +208,17 @@ export default function PengaturanPage() {
   // ===== HANDLERS =====
   const handleSaveSekolah = async () => {
     if (!sekolahData.nama || !sekolahData.alamat) { alert('Nama dan alamat sekolah wajib diisi!'); return; }
+    const cleanSekolah = { ...sekolahData };
+    Object.keys(cleanSekolah).forEach(k => { if (cleanSekolah[k] === '') cleanSekolah[k] = null; });
     try {
       if (!sekolahId) {
-        const { data, error } = await supabase.from('sekolah').insert(sekolahData).select('id').single();
+        const { data, error } = await supabase.from('sekolah').insert(cleanSekolah).select('id').single();
         if (error) throw error;
         setSekolahId(data.id);
         // await supabase.from('guru').update({ sekolah_id: data.id }).eq('id', profile.id);
         await supabase.from('profiles').update({ sekolah_id: data.id }).eq('id', profile.id);
       } else {
-        await supabase.from('sekolah').update(sekolahData).eq('id', sekolahId);
+        await supabase.from('sekolah').update(cleanSekolah).eq('id', sekolahId);
       }
       alert('✅ Data sekolah berhasil disimpan!');
       await fetchSession();
@@ -199,7 +226,9 @@ export default function PengaturanPage() {
   };
 
   const handleSaveGuru = async () => {
-    const { error } = await supabase.from('profiles').update(guruData).eq('id', profile.id);
+    const cleanGuru = { ...guruData };
+    Object.keys(cleanGuru).forEach(k => { if (cleanGuru[k] === '') cleanGuru[k] = null; });
+    const { error } = await supabase.from('profiles').update(cleanGuru).eq('id', profile.id);
     if (error) alert('Gagal: ' + error.message);
     else { alert('✅ Data guru berhasil disimpan!'); await fetchSession(); }
   };
@@ -214,6 +243,7 @@ export default function PengaturanPage() {
 
   const handleSaveTahunAjaran = async () => {
     const payload = { kelas_id: kelasId, ...tahunAjaran };
+    Object.keys(payload).forEach(k => { if (payload[k] === '') payload[k] = null; });
     if (tahunAjaranId) {
       const { error } = await supabase.from('tahun_ajaran').update(payload).eq('id', tahunAjaranId);
       if (error) alert('Gagal: ' + error.message);
@@ -340,7 +370,26 @@ export default function PengaturanPage() {
   };
 
   // ===== RENDER =====
-  if (loading || !profile || !kelasId) return <div className="flex items-center justify-center h-[60vh]"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div></div>;
+  if (loading || !profile) return <div className="flex items-center justify-center h-[60vh]"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div></div>;
+
+  // Jika belum ada kelas sama sekali, tampilkan form buat kelas — JANGAN return spinner
+  if (!kelasId) {
+    return (
+      <div className="max-w-md mx-auto mt-12 bg-white rounded-xl border border-slate-200 shadow-sm p-6 text-center">
+        <p className="text-4xl mb-3">🏫</p>
+        <h2 className="text-lg font-bold text-slate-900 mb-2">Belum Ada Kelas</h2>
+        <p className="text-sm text-slate-500 mb-4">Buat kelas terlebih dahulu untuk mulai mengisi data sekolah, siswa, dan lainnya.</p>
+        <input
+          type="text"
+          value={newKelasNama}
+          onChange={(e) => setNewKelasNama(e.target.value)}
+          placeholder="Contoh: Kelas 4A"
+          className="w-full px-4 py-3 border border-slate-300 rounded-lg mb-3 text-base font-semibold"
+        />
+        <Button onClick={handleCreateKelas} className="w-full">➕ Buat Kelas</Button>
+      </div>
+    );
+  }
 
   const tabs = [
     { id: 'sekolah', label: 'Sekolah', icon: '🏫', done: !!sekolahData.nama },
@@ -511,6 +560,12 @@ export default function PengaturanPage() {
               <InputField label="Nama Lengkap" value={guruData.nama} onChange={(v) => setGuruData({...guruData, nama: v})} required />
               <InputField label="Email" value={guruData.email} onChange={(v) => setGuruData({...guruData, email: v})} type="email" />
               <InputField label="NIP" value={guruData.nip} onChange={(v) => setGuruData({...guruData, nip: v})} placeholder="198501012010011001" />
+              <div className="grid grid-cols-2 gap-2 sm:gap-4">
+                <InputField label="Tempat Lahir" value={guruData.tempat_lahir} onChange={(v) => setGuruData({...guruData, tempat_lahir: v})} />
+                <InputField label="Tanggal Lahir" value={guruData.tanggal_lahir} onChange={(v) => setGuruData({...guruData, tanggal_lahir: v})} type="date" />
+              </div>
+              <InputField label="Jenis Kelamin" value={guruData.jenis_kelamin} onChange={(v) => setGuruData({...guruData, jenis_kelamin: v})} options={['Laki-laki', 'Perempuan']} />
+              <InputField label="Pendidikan Terakhir" value={guruData.pendidikan_terakhir} onChange={(v) => setGuruData({...guruData, pendidikan_terakhir: v})} options={['D3', 'S1', 'S2', 'S3']} />
               <InputField label="No. Telepon" value={guruData.no_telepon} onChange={(v) => setGuruData({...guruData, no_telepon: v})} placeholder="081234567890" />
               <InputField label="Alamat" value={guruData.alamat} onChange={(v) => setGuruData({...guruData, alamat: v})} rows={2} />
             </div>
@@ -561,7 +616,7 @@ export default function PengaturanPage() {
             {showAddSiswa && (
               <div className="bg-slate-50 p-4 sm:p-6 rounded-lg mb-4 sm:mb-6 border border-slate-200">
                 <h4 className="text-sm font-bold text-slate-900 mb-4">{editingSiswa ? '✏️ Edit Data Siswa' : '➕ Data Siswa Baru'}</h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
                   <InputField label="Nama Lengkap" value={newSiswa.nama} onChange={(v) => setNewSiswa({...newSiswa, nama: v})} required />
                   <InputField label="NISN" value={newSiswa.nisn} onChange={(v) => setNewSiswa({...newSiswa, nisn: v})} placeholder="10 digit" />
                   <InputField label="NIS (Lokal)" value={newSiswa.nis} onChange={(v) => setNewSiswa({...newSiswa, nis: v})} />
@@ -569,6 +624,34 @@ export default function PengaturanPage() {
                   <InputField label="Tanggal Lahir" value={newSiswa.tanggal_lahir} onChange={(v) => setNewSiswa({...newSiswa, tanggal_lahir: v})} type="date" />
                   <InputField label="Jenis Kelamin" value={newSiswa.jenis_kelamin} onChange={(v) => setNewSiswa({...newSiswa, jenis_kelamin: v})} options={['Laki-laki', 'Perempuan']} />
                   <InputField label="Agama" value={newSiswa.agama} onChange={(v) => setNewSiswa({...newSiswa, agama: v})} options={['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Konghucu']} />
+                  <InputField label="Golongan Darah" value={newSiswa.golongan_darah} onChange={(v) => setNewSiswa({...newSiswa, golongan_darah: v})} options={['A', 'B', 'AB', 'O', '-']} />
+                  <InputField label="No. Telepon Siswa" value={newSiswa.no_telepon} onChange={(v) => setNewSiswa({...newSiswa, no_telepon: v})} />
+                  <InputField label="Tinggi Badan (cm)" value={newSiswa.tinggi_badan} onChange={(v) => setNewSiswa({...newSiswa, tinggi_badan: v})} type="number" />
+                  <InputField label="Berat Badan (kg)" value={newSiswa.berat_badan} onChange={(v) => setNewSiswa({...newSiswa, berat_badan: v})} type="number" />
+                  <InputField label="Anak Ke-" value={newSiswa.anak_ke} onChange={(v) => setNewSiswa({...newSiswa, anak_ke: v})} type="number" />
+                  <InputField label="Jumlah Saudara" value={newSiswa.jumlah_saudara} onChange={(v) => setNewSiswa({...newSiswa, jumlah_saudara: v})} type="number" />
+                  <InputField label="Alamat Siswa" value={newSiswa.alamat} onChange={(v) => setNewSiswa({...newSiswa, alamat: v})} rows={2} />
+                </div>
+                
+                <h5 className="text-xs font-bold text-slate-600 uppercase mt-4 mb-2">Data Orang Tua</h5>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
+                  <InputField label="Nama Ayah" value={newSiswa.nama_ayah} onChange={(v) => setNewSiswa({...newSiswa, nama_ayah: v})} />
+                  <InputField label="Pendidikan Ayah" value={newSiswa.pendidikan_ayah} onChange={(v) => setNewSiswa({...newSiswa, pendidikan_ayah: v})} />
+                  <InputField label="Pekerjaan Ayah" value={newSiswa.pekerjaan_ayah} onChange={(v) => setNewSiswa({...newSiswa, pekerjaan_ayah: v})} />
+                  <InputField label="Penghasilan Ayah" value={newSiswa.penghasilan_ayah} onChange={(v) => setNewSiswa({...newSiswa, penghasilan_ayah: v})} />
+                  <InputField label="Nama Ibu" value={newSiswa.nama_ibu} onChange={(v) => setNewSiswa({...newSiswa, nama_ibu: v})} />
+                  <InputField label="Pendidikan Ibu" value={newSiswa.pendidikan_ibu} onChange={(v) => setNewSiswa({...newSiswa, pendidikan_ibu: v})} />
+                  <InputField label="Pekerjaan Ibu" value={newSiswa.pekerjaan_ibu} onChange={(v) => setNewSiswa({...newSiswa, pekerjaan_ibu: v})} />
+                  <InputField label="Penghasilan Ibu" value={newSiswa.penghasilan_ibu} onChange={(v) => setNewSiswa({...newSiswa, penghasilan_ibu: v})} />
+                  <InputField label="No. Telepon Ortu" value={newSiswa.no_telepon_ortu} onChange={(v) => setNewSiswa({...newSiswa, no_telepon_ortu: v})} />
+                  <InputField label="Alamat Ortu" value={newSiswa.alamat_ortu} onChange={(v) => setNewSiswa({...newSiswa, alamat_ortu: v})} rows={2} />
+                </div>
+                
+                <h5 className="text-xs font-bold text-slate-600 uppercase mt-4 mb-2">Data Wali (Opsional)</h5>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
+                  <InputField label="Nama Wali" value={newSiswa.nama_wali} onChange={(v) => setNewSiswa({...newSiswa, nama_wali: v})} />
+                  <InputField label="Pekerjaan Wali" value={newSiswa.pekerjaan_wali} onChange={(v) => setNewSiswa({...newSiswa, pekerjaan_wali: v})} />
+                  <InputField label="Alamat Wali" value={newSiswa.alamat_wali} onChange={(v) => setNewSiswa({...newSiswa, alamat_wali: v})} />
                 </div>
                 <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-200">
                   <Button onClick={handleSaveSiswa}>💾 {editingSiswa ? 'Update' : 'Simpan'}</Button>
