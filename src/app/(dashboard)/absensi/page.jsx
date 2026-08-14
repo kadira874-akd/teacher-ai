@@ -170,9 +170,36 @@ export default function AbsensiPage() {
         .single();
       
       if (existingAbsen) {
-        const statusLabel = existingAbsen.status;
-        alert(`ℹ️ ${siswaData.nama} sudah absen dengan status: ${statusLabel}`);
-        setShowScanner(false);
+        // Update status menjadi Hadir saat scan QR ulang
+        const { error: updateError } = await supabase
+          .from('absensi')
+          .update({ status: 'Hadir', sumber: 'qr', updated_at: new Date().toISOString() })
+          .eq('id', existingAbsen.id);
+        
+        if (updateError) {
+          console.error('Gagal update status:', updateError);
+          alert('⚠️ Gagal memperbarui status: ' + updateError.message);
+          setProcessing(false);
+          return;
+        }
+        
+        // Refresh data dan tampilkan pesan sukses
+        loadAbsensiHistory();
+        const scanRecord = {
+          nama: siswaData.nama,
+          nis: siswaData.nis,
+          waktu: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+          status: 'Hadir (diperbarui)'
+        };
+        
+        setScannedSiswa(scanRecord);
+        setRecentScans(prev => [scanRecord, ...prev.slice(0, 9)]);
+        
+        setTimeout(() => {
+          setShowScanner(false);
+          setScannedSiswa(null);
+        }, 2000);
+        
         setProcessing(false);
         return;
       }
