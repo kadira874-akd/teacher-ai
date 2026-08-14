@@ -235,17 +235,33 @@ export default function AbsensiPage() {
       'A': 'Alpha'
     };
     
-    // Buat payload dengan menentukan sumber berdasarkan apakah siswa sudah ada di history atau belum
+    // Buat payload dengan menentukan sumber berdasarkan mode yang aktif
     const payload = Object.entries(attendance).map(([siswaId, status]) => {
       // Cek apakah ini absensi baru atau update
       const existingAbsen = absensiHistory.find(a => a.siswa_id === siswaId);
+      
+      // Tentukan sumber: jika sudah ada di history, pertahankan sumber lama
+      // Jika baru, tentukan berdasarkan apakah ada di recentScans (QR) atau tidak (manual)
+      let sumberValue = 'manual'; // default
+      if (existingAbsen) {
+        sumberValue = existingAbsen.sumber || 'manual';
+      } else {
+        // Data baru - cek apakah dari QR scan atau manual
+        // Kita anggap semua yang di-set via attendance state adalah dari mode yang sedang aktif
+        sumberValue = scanMode === 'qr' ? 'qr' : 'manual';
+      }
+      
+      // Pastikan status dikonversi dengan benar
+      const statusLengkap = statusMap[status] || status;
+      
+      console.log(`Siswa ${siswaId}: status=${status} -> ${statusLengkap}, sumber=${sumberValue}`);
       
       return {
         siswa_id: siswaId,
         mapel_id: selectedMapel,
         tanggal: tanggal,
-        status: statusMap[status] || status,
-        sumber: existingAbsen ? existingAbsen.sumber || 'manual' : 'qr' // Jika sudah ada, pertahankan sumber lama, jika baru set qr
+        status: statusLengkap,
+        sumber: sumberValue
       };
     });
     
