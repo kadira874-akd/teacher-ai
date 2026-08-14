@@ -222,11 +222,21 @@ export default function AbsensiPage() {
   const handleManualAbsen = async (siswaId, status) => {
     setProcessing(true);
     
+    // Konversi kode status ke nilai lengkap
+    const statusMap = {
+      'H': 'Hadir',
+      'S': 'Sakit',
+      'I': 'Izin',
+      'A': 'Alpha'
+    };
+    
+    const fullStatus = statusMap[status] || status;
+    
     const { error } = await supabase.from('absensi').upsert({
       siswa_id: siswaId,
       mapel_id: selectedMapel,
       tanggal: tanggal,
-      status: status,
+      status: fullStatus,
       sumber: 'manual'
     }, {
       onConflict: 'siswa_id,mapel_id,tanggal'
@@ -244,11 +254,19 @@ export default function AbsensiPage() {
 
   // Save all manual attendance
   const handleSaveAllAttendance = async () => {
+    // Konversi kode status ke nilai lengkap
+    const statusMap = {
+      'H': 'Hadir',
+      'S': 'Sakit',
+      'I': 'Izin',
+      'A': 'Alpha'
+    };
+    
     const payload = Object.entries(attendance).map(([siswaId, status]) => ({
       siswa_id: siswaId,
       mapel_id: selectedMapel,
       tanggal: tanggal,
-      status,
+      status: statusMap[status] || status,
       sumber: 'manual'
     }));
     
