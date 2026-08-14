@@ -44,8 +44,10 @@ function ManajemenContent() {
   const [sasNilai, setSasNilai] = useState({});
   const [savingSAS, setSavingSAS] = useState(false);
   
-  // Filter penilaian
+  // Filter penilaian - menggunakan dropdown untuk TP, STS, SAS, ALL
   const [jenisPenilaian, setJenisPenilaian] = useState(''); // '' = belum pilih, 'tp_X', 'sts', 'sas', 'all'
+  const [selectedJenisDropdown, setSelectedJenisDropdown] = useState('ALL'); // 'TP', 'STS', 'SAS', 'ALL'
+  const [selectedTPForDropdown, setSelectedTPForDropdown] = useState('');
 
   // ===== STATE MATERI =====
   const [modulAjarList, setModulAjarList] = useState([]);
@@ -1222,53 +1224,35 @@ function ManajemenContent() {
       {/* ===== TAB PENILAIAN ===== */}
       {activeTab === 'penilaian' && (
         <div className="space-y-4">
-          {/* Filter Buttons */}
+          {/* Filter Dropdown - TP | STS | SAS | ALL (Rekap) */}
           <div className="bg-white p-4 rounded-xl border border-[#E2E8F0] shadow-sm">
-            <h3 className="text-sm font-bold text-[#334155] mb-3">Pilih Jenis Penilaian:</h3>
-            <div className="flex flex-wrap gap-2">
-              {tpList.map(tp => (
-                <button
-                  key={tp.id}
-                  onClick={() => setJenisPenilaian(`tp_${tp.id}`)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    jenisPenilaian === `tp_${tp.id}`
-                      ? 'bg-[#2D5BE3] text-white'
-                      : 'bg-[#F8FAFC] text-[#64748B] hover:bg-[#EFF6FF] hover:text-[#2D5BE3]'
-                  }`}
-                >
-                  {tp.kode_tp}
-                </button>
-              ))}
-              <button
-                onClick={() => setJenisPenilaian('sts')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  jenisPenilaian === 'sts'
-                    ? 'bg-[#D97706] text-white'
-                    : 'bg-[#FEF3C7] text-[#92400E] hover:bg-[#FDE68A]'
-                }`}
+            <h3 className="text-sm font-bold text-[#334155] mb-3">Jenis Penilaian:</h3>
+            <div className="flex flex-wrap gap-3 items-center">
+              <select
+                value={selectedJenisDropdown}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setSelectedJenisDropdown(val);
+                  if (val === 'STS') {
+                    setJenisPenilaian('sts');
+                  } else if (val === 'SAS') {
+                    setJenisPenilaian('sas');
+                  } else if (val === 'ALL') {
+                    setJenisPenilaian('all');
+                  } else if (val.startsWith('TP_')) {
+                    const tpId = val.replace('TP_', '');
+                    setJenisPenilaian(`tp_${tpId}`);
+                  }
+                }}
+                className="px-4 py-2.5 border border-slate-300 rounded-lg text-sm font-semibold text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-600"
               >
-                STS
-              </button>
-              <button
-                onClick={() => setJenisPenilaian('sas')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  jenisPenilaian === 'sas'
-                    ? 'bg-[#DC2626] text-white'
-                    : 'bg-[#FEE2E2] text-[#991B1B] hover:bg-[#FECACA]'
-                }`}
-              >
-                SAS
-              </button>
-              <button
-                onClick={() => setJenisPenilaian('all')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  jenisPenilaian === 'all'
-                    ? 'bg-[#059669] text-white'
-                    : 'bg-[#F0FDF4] text-[#065F46] hover:bg-[#DCFCE7]'
-                }`}
-              >
-                📊 ALL (Rekap)
-              </button>
+                <option value="ALL">📊 ALL (Rekap)</option>
+                <option value="STS">STS</option>
+                <option value="SAS">SAS</option>
+                {tpList.map(tp => (
+                  <option key={tp.id} value={`TP_${tp.id}`}>TP - {tp.kode_tp}</option>
+                ))}
+              </select>
             </div>
           </div>
 

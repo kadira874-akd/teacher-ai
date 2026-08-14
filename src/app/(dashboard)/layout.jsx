@@ -33,7 +33,7 @@ export default function DashboardLayout({ children }) {
 
   const menuItems = [
     { name: 'Dashboard', href: '/dashboard', icon: '🏠' },
-    { name: 'Input Data', href: '/pengaturan', icon: '⚙️' },
+    { name: 'Setup Data', href: '/pengaturan', icon: '⚙️' },
     { name: 'Manajemen Kelas', href: '/manajemen', icon: '🏫' },
     { name: 'Kurikulum', href: '/kurikulum', icon: '📖' },
     { name: 'Modul & Bahan Ajar', href: '/bahan-ajar', icon: '📚' },

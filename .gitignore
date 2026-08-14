@@ -2,19 +2,10 @@
 # Dependencies
 node_modules/
 
-# Logs and temp files
-*.log
-*.tmp
-*.swp
-
-# Environment
-.env
-.env.local
-*.env.*
-
-# Editors
-.vscode/
-.idea/
+# Build outputs
+dist/
+build/
+target/
 
 # Python
 __pycache__/
@@ -22,32 +13,124 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
-*.so
+env/
+venv/
+.venv/
+.ENV
+.venv.bak/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
 .coverage
-htmlcov/
 .coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+.MF
+tags
+TAGS
+.idlemod.pkl
+idlemod.pkl
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 .pytest_cache/
 .mypy_cache/
+.hypothesis/
 
-# Build outputs
-dist/
-build/
-*.egg-info/
-.eggs/
+# Node.js
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+node_modules/
+.jscs
+.jshint
+.npm
+.nyc_output
+.nyc
+.repl_history
+.snyk
+.yarn-integrity
+.yarn-metadata.json
+appveyor.yml
+.travis.yml
+circle.yml
+.nyc_output
+coverage/
+.nyc_output/
+istanbul/
+lcov-report/
+.nyc
+.coverage
+.coverage.*
+.pytest_cache/
+.pytype/
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.local
+.env.*
+!.env.example
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
 
 # OS generated files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
-# Compression
+# Compiled files
+*.exe
+*.dll
+*.so
+*.dylib
+*.o
+*.obj
+*.out
+*.a
+*.lib
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+*.ipr
+*.iws
+*.orig
+
+# Archives
 *.zip
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.rar
+*.7z
 *.gz
-*.tar
-*.tgz
 *.bz2
 *.xz
-*.7z
-*.rar
 *.zst
 *.lz4
 *.lzh
@@ -58,8 +141,20 @@ Thumbs.db
 *.Z
 *.lz
 *.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
+
+# Coverage directory used by tools like istanbul
+coverage/
+htmlcov/
+
+# Testing
+.rultor.yml
+.rultor
+.werckerignore
+wercker.yml
+.travis.yml
+.appveyor.yml
+.circleci
+.lgtm.yml
+.codecov.yml
+codecov.yml
 ```
