@@ -247,14 +247,24 @@ export default function PengaturanPage() {
     const cleanSekolah = { ...sekolahData };
     Object.keys(cleanSekolah).forEach(k => { if (cleanSekolah[k] === '') cleanSekolah[k] = null; });
     try {
+      // Pastikan kita punya profile yang valid
+      let currentProfile = profile;
+      if (!currentProfile || !currentProfile.id) {
+        await fetchSession();
+        currentProfile = useAuthStore.getState().profile;
+      }
+      if (!currentProfile || !currentProfile.id) {
+        throw new Error('User belum login atau profile tidak ditemukan');
+      }
+      
       if (!sekolahId) {
         // Tambahkan user_id untuk memenuhi RLS policy
-        const sekolahWithUser = { ...cleanSekolah, user_id: profile.id };
+        const sekolahWithUser = { ...cleanSekolah, user_id: currentProfile.id };
         const { data, error } = await supabase.from('sekolah').insert(sekolahWithUser).select('id').single();
         if (error) throw error;
         setSekolahId(data.id);
         // await supabase.from('guru').update({ sekolah_id: data.id }).eq('id', profile.id);
-        await supabase.from('profiles').update({ sekolah_id: data.id }).eq('id', profile.id);
+        await supabase.from('profiles').update({ sekolah_id: data.id }).eq('id', currentProfile.id);
       } else {
         await supabase.from('sekolah').update(cleanSekolah).eq('id', sekolahId);
       }
