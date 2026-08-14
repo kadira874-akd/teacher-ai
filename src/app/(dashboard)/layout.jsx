@@ -35,8 +35,6 @@ export default function DashboardLayout({ children }) {
     { name: 'Dashboard', href: '/dashboard', icon: '🏠' },
     { name: 'Input Data', href: '/pengaturan', icon: '⚙️' },
     { name: 'Manajemen Kelas', href: '/manajemen', icon: '🏫' },
-    { name: 'Absensi QR', href: '/absensi', icon: '📷' },
-    { name: 'Kartu Siswa', href: '/kartu-siswa', icon: '🪪' },
     { name: 'Kurikulum', href: '/kurikulum', icon: '📖' },
     { name: 'Modul & Bahan Ajar', href: '/bahan-ajar', icon: '📚' },
     { name: 'Riwayat & Rekap Nilai', href: '/riwayat-rekap', icon: '📊' },
