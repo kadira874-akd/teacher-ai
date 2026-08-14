@@ -1,160 +1,41 @@
-```gitignore
+```
 # Dependencies
 node_modules/
+.pnpm-store/
+.npm/
+.yarn/
 
 # Build outputs
 dist/
 build/
-target/
-
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-env/
-venv/
-.venv/
-.ENV
-.venv.bak/
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.log
-*.pot
-*.pyc
-*.pyo
-*.pyd
-.MF
-tags
-TAGS
-.idlemod.pkl
-idlemod.pkl
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-.pytest_cache/
-.mypy_cache/
-.hypothesis/
-
-# Node.js
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-node_modules/
-.jscs
-.jshint
-.npm
-.nyc_output
-.nyc
-.repl_history
-.snyk
-.yarn-integrity
-.yarn-metadata.json
-appveyor.yml
-.travis.yml
-circle.yml
-.nyc_output
-coverage/
-.nyc_output/
-istanbul/
-lcov-report/
-.nyc
-.coverage
-.coverage.*
-.pytest_cache/
-.pytype/
-.vscode/
-.idea/
+.next/
+out/
+public/build/
 
 # Logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # Environment variables
 .env
 .env.local
-.env.*
-!.env.example
+.env.development.local
+.env.test.local
+.env.production.local
 
-# Temporary files
-*.tmp
-*.temp
+# IDE
+.vscode/
+.idea/
 *.swp
 *.swo
 
-# OS generated files
+# OS
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 
-# Compiled files
-*.exe
-*.dll
-*.so
-*.dylib
-*.o
-*.obj
-*.out
-*.a
-*.lib
-*.class
-*.jar
-*.war
-*.ear
-*.iml
-*.ipr
-*.iws
-*.orig
-
-# Archives
-*.zip
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.rar
-*.7z
-*.gz
-*.bz2
-*.xz
-*.zst
-*.lz4
-*.lzh
-*.cab
-*.arj
-*.rpm
-*.deb
-*.Z
-*.lz
-*.lzo
-
-# Coverage directory used by tools like istanbul
+# Coverage
 coverage/
-htmlcov/
-
-# Testing
-.rultor.yml
-.rultor
-.werckerignore
-wercker.yml
-.travis.yml
-.appveyor.yml
-.circleci
-.lgtm.yml
-.codecov.yml
-codecov.yml
+.nyc_output/
 ```
