@@ -244,8 +244,11 @@ export default function PengaturanPage() {
   // ===== HANDLERS =====
   const handleSaveSekolah = async () => {
     if (!sekolahData.nama || !sekolahData.alamat) { alert('Nama dan alamat sekolah wajib diisi!'); return; }
+    if (!kelasId) { alert('Anda harus membuat kelas terlebih dahulu sebelum menyimpan data sekolah!'); return; }
+    
     const cleanSekolah = { ...sekolahData };
     Object.keys(cleanSekolah).forEach(k => { if (cleanSekolah[k] === '') cleanSekolah[k] = null; });
+    
     try {
       // Pastikan kita punya profile yang valid
       let currentProfile = profile;
@@ -258,12 +261,12 @@ export default function PengaturanPage() {
       }
       
       if (!sekolahId) {
-        // Tambahkan user_id untuk memenuhi RLS policy
-        const sekolahWithUser = { ...cleanSekolah, user_id: currentProfile.id };
-        const { data, error } = await supabase.from('sekolah').insert(sekolahWithUser).select('id').single();
+        // Tambahkan kelas_id untuk memenuhi RLS policy is_owner_of_kelas(kelas_id)
+        const sekolahWithKelas = { ...cleanSekolah, kelas_id: kelasId };
+        const { data, error } = await supabase.from('sekolah').insert(sekolahWithKelas).select('id').single();
         if (error) throw error;
         setSekolahId(data.id);
-        // await supabase.from('guru').update({ sekolah_id: data.id }).eq('id', profile.id);
+        // Update profile dengan sekolah_id yang baru
         await supabase.from('profiles').update({ sekolah_id: data.id }).eq('id', currentProfile.id);
       } else {
         await supabase.from('sekolah').update(cleanSekolah).eq('id', sekolahId);

@@ -1,50 +1,33 @@
 ```
+# Database
+*.sql
+
 # Dependencies
 node_modules/
-
-# Python
+venv/
+.venv/
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-*.py~
-*.py.class
-*.py.backup
-*.py.swp
-*.py.swo
-*.py.tmp
-*.py.log
-*.py.env
-*.py.env.local
-*.py.env.*
-*.env
-*.env.local
-*.env.*
-
-# Build outputs
+.mypy_cache/
+.pytest_cache/
 dist/
 build/
-*.out
-*.exe
-*.dll
-*.so
-*.a
-*.obj
+target/
+.gradle/
 
-# Logs
-*.log
+# Environment
+.env
+.env.local
+*.env.*
 
-# Temporary files
-*.tmp
+# Editors
+.vscode/
+.idea/
 *.swp
 *.swo
 
-# IDE
-.vscode/
-.idea/
-*.iml
-*.ipr
-*.iws
+# Logs and temp files
+*.log
+*.tmp
 
 # OS
 .DS_Store
@@ -54,12 +37,6 @@ Thumbs.db
 coverage/
 htmlcov/
 .coverage
-
-# MyPy
-.mypy_cache/
-
-# PyTest
-.pytest_cache/
 
 # Compressed files
 *.zip
