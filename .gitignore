@@ -1,1 +1,1352 @@
-Nothing should be ignored since only a source code file (`.jsx`) was modified and no build artifacts, dependencies, or temporary files were present in the changes.
+```gitignore
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.local
+*.env.*
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.coverage
+htmlcov/
+.coverage.*
+.pytest_cache/
+.mypy_cache/
+.pyre/
+.pytype/
+.ipynb_checkpoints/
+
+# Node.js
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Compiled files
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.class
+*.jar
+*.war
+*.ear
+*.out
+
+# Compressed files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
+
+# Coverage reports
+coverage/
+coverage.xml
+*.lcov
+*.info
+
+# Authentication
+*.key
+*.pem
+*.crt
+*.cert
+
+# Database
+*.db
+*.db-journal
+
+# Local configuration
+local.properties
+config/local.*
+!config/default.*
+
+# Test files
+*.test.js
+*.spec.js
+*.test.ts
+*.spec.ts
+
+# Documentation
+docs/_build/
+docs/build/
+
+# CI/CD
+.github/workflows/cache/
+.circleci/cache/
+
+# Mobile
+*.ipa
+*.apk
+*.aab
+*.appx
+
+# Web
+.svelte-kit/
+.vercel/
+.now/
+
+# Rust
+target/
+
+# Go
+*.mod
+*.sum
+
+# Java
+*.iml
+*.iws
+*.ipr
+*.jar
+*.war
+*.ear
+hs_err_pid*
+
+# C/C++
+*.ilk
+*.pdb
+*.gch
+*.gtest
+*.cache
+*.stackdump
+
+# Ruby
+*.gem
+*.rbc
+.bundle/
+vendor/bundle/
+.ruby-version
+
+# PHP
+vendor/
+
+# .NET
+bin/
+obj/
+*.userprefs
+*.pidb
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# Elixir
+.eex.swp
+.beam
+.elixir_ls/
+.coverdata
+
+# Julia
+.julia/
+
+# Zig
+zig-cache/
+zig-out/
+
+# Dart
+.dart_tool/
+.build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+web/.dart_tool/
+web/.packages
+
+# Unity
+Library/
+Temp/
+Obj/
+Build/
+Logs/
+MemoryCaptures/
+Packages/packages-lock.json
+
+# Unreal Engine
+Binaries/
+Intermediate/
+Saved/
+DerivedDataCache/
+.vs/
+
+# CMake
+CMakeFiles/
+cmake_install.cmake
+CMakeCache.txt
+*.cmake
+Makefile
+
+# Gradle
+.gradle/
+build/
+
+# Maven
+target/
+
+# SBT
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/target/
+**/*.sbt.bak
+
+# Leiningen
+target/
+.repl-diagrams/
+
+# Haskell
+dist-newstyle/
+cabal.project.local
+cabal.project.local~
+.cabal-sandbox/
+*.o
+*.hi
+*.chi
+*.chs.h
+*.dyn_o
+*.dyn_hi
+
+# Clojure
+target/
+.classpath
+.project
+.clj-kondo/
+
+# Erlang
+ebin/
+.erlang.cookie
+.rebar3/
+_rebuild/
+
+# Scala
+target/
+.bsp/
+metals.sbt
+project/metals.sbt
+
+# Nix
+.result
+
+# Terraform
+*.tfstate
+*.tfstate.*
+*.tfvars
+.terraform/
+
+# Ansible
+.retry
+
+# Vagrant
+.vagrant/
+
+# Docker
+.dockerignore
+docker-compose*.yml
+!docker-compose.yml
+!docker-compose.override.yml
+
+# Kubernetes
+.kube/
+
+# Ansible Tower/AWX
+.ssh/
+
+# Puppet
+.gitmodules
+.gitignore
+manifests/files/
+
+# SaltStack
+.gitignore
+salt/pki/
+
+# Chef
+.gitignore
+cookbooks/*/files/default/.gitignore
+cookbooks/*/templates/default/.gitignore
+
+# Jenkins
+jobs/
+nodes/
+secrets/
+credentials.xml
+config.xml
+jenkins.install.InstallUtil.lastExecVersion
+jenkins.install.UpgradeWizard.state
+jenkins.model.Jenkins.slaveAgentPort
+jenkins.model.Jenkins.version
+jenkins.security.UpdateSiteStats
+org.jenkinsci.plugins.workflow.libs.GlobalLibraries
+org.jenkinsci.plugins.pipeline_model_definition.config.DefaultModelConfig
+
+# TeamCity
+.teamcity/vcsSettings.xml
+
+# AppVeyor
+appveyor.yml
+
+# Travis CI
+.travis.yml
+
+# CircleCI
+.circleci/
+
+# GitLab CI
+.gitlab-ci.yml
+
+# GitHub Actions
+.github/
+
+# Bitbucket Pipelines
+bitbucket-pipelines.yml
+
+# AWS
+.aws/
+.serverless/
+serverless-state.json
+
+# Azure
+.azure/
+
+# Google Cloud
+.gcloud/
+.gcp/
+
+# Heroku
+Procfile
+requirements.txt
+runtime.txt
+Aptfile
+.profile.d/
+
+# Netlify
+.netlify/
+
+# Vercel
+.vercel/
+
+# Firebase
+.firebase/
+
+# Expo
+.expo/
+web-build/
+
+# React Native
+.rn_metadata
+ReactAndroid/src/main/java/com/facebook/react/uimanager/ViewDefaults.java
+ReactAndroid/src/main/java/com/facebook/react/views/text/ReactBaseTextShadowNode.java
+ReactAndroid/src/main/java/com/facebook/react/views/text/TextAttributeProps.java
+ReactAndroid/src/main/java/com/facebook/react/views/textinput/ReactTextInputManager.java
+ReactAndroid/src/main/java/com/facebook/react/views/textinput/ReactTextInputShadowNode.java
+ReactAndroid/src/main/java/com/facebook/react/views/view/ReactViewBackgroundManager.java
+ReactAndroid/src/main/java/com/facebook/react/views/webview/ReactWebViewManager.java
+
+# Ionic
+ionic.config.json
+.platforms/
+plugins/
+
+# Cordova
+config.xml
+hooks/
+platforms/
+plugins/
+
+# Electron
+electron-builder.yaml
+dist_electron/
+release/
+
+# Tauri
+src-tauri/target/
+src-tauri/tauri.conf.json
+
+# Capacitor
+capacitor.config.json
+ios/
+android/
+
+# Flutter
+flutter/
+.dart_tool/
+.fvm/
+packages/flutter_tools/
+packages/flutter/
+bin/cache/
+
+# NativeScript
+.nativescript/
+platforms/
+hooks/
+
+# Quasar
+quasar.config.js
+dist/
+.node-version
+.pnp/
+.pnp.js
+
+# Nuxt
+.nuxt/
+.output/
+dist/
+generate/
+.nitro/
+.cache/
+
+# Next.js
+.next/
+out/
+.next/cache/
+
+# Gatsby
+.cache/
+public/
+gatsby-config.js
+gatsby-node.js
+gatsby-browser.js
+gatsby-ssr.js
+
+# Remix
+node_modules/
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+.env.*
+!.env.example
+!.env.defaults
+!.env.schema
+!.env.sample
+!.env.template
+!.env.example.local
+!.env.local.example
+!.env.dev
+!.env.prod
+!.env.staging
+!.env.uat
+!.env.live
+!.env.backup
+!.env.save
+!.env.copy
+!.env.dist
+!.env.default
+!.env.prod.local
+!.env.dev.local
+!.env.test.local
+!.env.backup.*
+!.env.save.*
+!.env.copy.*
+!.env.dist.*
+!.env.default.*
+!.env.prod.*
+!.env.dev.*
+!.env.test.*
+!.env.local.*
+!.env.backup
+!.env.save
+!.env.copy
+!.env.dist
+!.env.default
+!.env.prod
+!.env.dev
+!.env.test
+!.env.local
+!.env.backup.*
+!.env.save.*
+!.env.copy.*
+!.env.dist.*
+!.env.default.*
+!.env.prod.*
+!.env.dev.*
+!.env.test.*
+!.env.local.*
+
+# Vue
+.vuepress/dist/
+.vuepress/.cache/
+.vuepress/.temp/
+dist/
+.output/
+.nuxt/
+.vue/
+
+# Angular
+.angular/
+dist/
+.tmp/
+vendor/
+
+# Svelte
+.svelte-kit/
+.output/
+
+# Astro
+.dist/
+.output/
+.astrowatch.json
+node_modules/
+
+# SolidStart
+.solid/
+.output/
+
+# Qwik
+.qwik/
+dist/
+
+# Nitro
+.output/
+nitro.json
+
+# AdonisJS
+japaFile.js
+.adonisrc.json
+ace-manifest.json
+start/kernel.js
+providersManifest.json
+tests/.adonisjs/
+tests/fixtures/
+tests/unit/
+tests/functional/
+
+# Fastify
+.fastify/
+dist/
+
+# NestJS
+dist/
+node_modules/
+.env
+logs/
+*.log
+.nyc_output
+coverage
+.nyc_output/
+coverage/
+
+# LoopBack
+.deps/
+.node_modules
+.nyc_output/
+coverage/
+
+# Feathers
+.feathers/
+dist/
+
+# Keystone
+.keystone/
+dist/
+
+# Strapi
+.strapi/
+dist/
+build/
+
+# Directus
+.directus/
+dist/
+
+# Payload CMS
+.payload/
+dist/
+
+# Prisma
+prisma/migrations/
+*.prisma
+
+# TypeORM
+typeorm/
+typeorm.config.json
+ormconfig.json
+data-source.js
+data-source.json
+data-source.ts
+
+# Sequelize
+sequelize/
+sequelize.config.json
+config/config.json
+
+# Mongoose
+mongoose/
+mongoose.config.json
+
+# GraphQL
+.graphql/
+.graphqlrc.json
+.graphqlrc.js
+.graphqlrc.ts
+.graphqlrc.toml
+.graphqlrc.yaml
+.graphqlrc.yml
+
+# Apollo
+.apollo/
+apollo.config.json
+
+# Hasura
+.hasura/
+hasura/
+
+# PostGraphile
+.graphile-migrate/
+postgraphile/
+postgraphile.config.json
+
+# Drizzle
+.drizzle/
+drizzle.config.json
+
+# Supabase
+.supabase/
+supabase/
+
+# Firebase
+.firebase/
+functions/node_modules/
+firebase-debug.log
+firebase-debug.*.log
+
+# Amplify
+.amplify/
+amplify/
+
+# Auth0
+.auth0/
+auth0/
+
+# Okta
+.okta/
+okta/
+
+# Clerk
+.clerk/
+clerk/
+
+# Authelia
+.authelia/
+authelia/
+
+# Keycloak
+.keycloak/
+keycloak/
+
+# Kong
+.kong/
+kong/
+
+# Traefik
+.traefik/
+traefik/
+
+# nginx
+.nginx/
+nginx/
+
+# Apache
+.apache/
+apache/
+
+# IIS
+.iis/
+iis/
+
+# Docker Compose
+.docker/
+docker/
+
+# Podman
+.podman/
+podman/
+
+# Kubernetes Helm
+.helm/
+helm/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+*.tf.json
+*.tfplan
+*.tfprovider
+*.tfplugin
+*.tfbackend
+
+# Pulumi
+.pulumi/
+pulumi/
+
+# Serverless Framework
+.serverless/
+serverless/
+
+# AWS SAM
+.sam/
+sam/
+
+# OpenFaaS
+.openfaas/
+openfaas/
+
+# Knative
+.knative/
+knative/
+
+# KNative
+.knative/
+knative/
+
+# Tekton
+.tekton/
+tekton/
+
+# Jenkins X
+.jx/
+jx/
+
+# Argo CD
+.argocd/
+argocd/
+
+# Flux CD
+.flux/
+flux/
+
+# Crossplane
+.crossplane/
+crossplane/
+
+# Rancher
+.rancher/
+rancher/
+
+# RKE
+.rke/
+rke/
+
+# K3s
+.k3s/
+k3s/
+
+# MicroK8s
+.microk8s/
+microk8s/
+
+# Kind
+.kind/
+kind/
+
+# Minikube
+.minikube/
+minikube/
+
+# Skaffold
+.skaffold/
+skaffold/
+
+# Telepresence
+.telepresence/
+telepresence/
+
+# Okteto
+.okteto/
+okteto/
+
+# Draft
+.draft/
+draft/
+
+# Garden
+.garden/
+garden/
+
+# Brigade
+.brigade/
+brigade/
+
+# Porter
+.porter/
+porter/
+
+# Dapr
+.dapr/
+dapr/
+
+# Service Mesh Interface
+.smi/
+smi/
+
+# Istio
+.istio/
+istio/
+
+# Linkerd
+.linkerd/
+linkerd/
+
+# Consul
+.consul/
+consul/
+
+# Vault
+.vault/
+vault/
+
+# Nomad
+.nomad/
+nomad/
+
+# Packer
+.packer/
+packer/
+
+# Vagrant
+.vagrant/
+vagrant/
+
+# Packer
+.packer/
+packer/
+
+# Ansible
+.ansible/
+ansible/
+
+# Chef
+.chef/
+chef/
+
+# Puppet
+.puppet/
+puppet/
+
+# Salt
+.salt/
+salt/
+
+# Terraform
+.terraform/
+terraform/
+
+# Pulumi
+.pulumi/
+pulumi/
+
+# AWS CDK
+.cdk.out/
+cdk.out/
+cdk.context.json
+.cdk.staging/
+*.cdk.out
+
+# Azure Resource Manager
+.azure/
+azure/
+
+# Google Cloud Deployment Manager
+.gcloud/
+gcloud/
+
+# CloudFormation
+.cloudformation/
+cloudformation/
+
+# Bicep
+.bicep/
+bicep/
+
+# ARM Templates
+.arm/
+arm/
+
+# Pulumi
+.pulumi/
+pulumi/
+
+# Terragrunt
+.terragrunt-cache/
+terragrunt-cache/
+
+# OpenTofu
+.opentofu/
+opentofu/
+
+# Scalr
+.scalr/
+scalr/
+
+# Sceptre
+.sceptre/
+sceptre/
+
+# Terragrunt
+.terragrunt-cache/
+terragrunt-cache/
+
+# KitchenCI
+.kitchen/
+kitchen/
+
+# TestInfra
+.testinfra/
+testinfra/
+
+# Molecule
+.molecule/
+molecule/
+
+# InSpec
+.inspec/
+inspec/
+
+# Serverspec
+.serverspec/
+serverspec/
+
+# Goss
+.goss/
+goss/
+
+# Bats
+.bats/
+bats/
+
+# Shpec
+.shpec/
+shpec/
+
+# Cucumber
+.cucumber/
+cucumber/
+
+# Behave
+.behave/
+behave/
+
+# Lettuce
+.lettuce/
+lettuce/
+
+# Pytest
+.pytest_cache/
+pytest/
+
+# Nose
+.noseids
+.nosetests
+
+# Unittest
+.unittest/
+unittest/
+
+# JUnit
+.junit/
+junit/
+
+# TestNG
+.testng/
+testng/
+
+# Mocha
+.mocha/
+mocha/
+
+# Jest
+.jest/
+jest/
+
+# Vitest
+.vitest/
+vitest/
+
+# Ava
+.ava/
+ava/
+
+# Tap
+.tap/
+tap/
+
+# Tape
+.tape/
+tape/
+
+# QUnit
+.qunit/
+qunit/
+
+# Karma
+.karma/
+karma/
+
+# Protractor
+.protractor/
+protractor/
+
+# Cypress
+.cypress/
+cypress/
+
+# Playwright
+.playwright/
+playwright/
+
+# Puppeteer
+.puppeteer/
+puppeteer/
+
+# Selenium
+.selenium/
+selenium/
+
+# WebdriverIO
+.webdriverio/
+webdriverio/
+
+# Nightwatch
+.nightwatch/
+nightwatch/
+
+# CasperJS
+.casperjs/
+casperjs/
+
+# PhantomJS
+.phantomjs/
+phantomjs/
+
+# SlimerJS
+.slimerjs/
+slimerjs/
+
+# CasperJS
+.casperjs/
+casperjs/
+
+# Zombie
+.zombie/
+zombie/
+
+# Enzyme
+.enzyme/
+enzyme/
+
+# React Testing Library
+.react-testing-library/
+react-testing-library/
+
+# Vue Test Utils
+.vue-test-utils/
+vue-test-utils/
+
+# Angular Testing
+.angular/
+angular/
+
+# Jasmine
+.jasmine/
+jasmine/
+
+# Chai
+.chai/
+chai/
+
+# Sinon
+.sinon/
+sinon/
+
+# Lodash
+.lodash/
+lodash/
+
+# Underscore
+.underscore/
+underscore/
+
+# Ramda
+.ramda/
+ramda/
+
+# RxJS
+.rxjs/
+rxjs/
+
+# MobX
+.mobx/
+mobx/
+
+# Redux
+.redux/
+redux/
+
+# Vuex
+.vuex/
+vuex/
+
+# Pinia
+.pinia/
+pinia/
+
+# Zustand
+.zustand/
+zustand/
+
+# Jotai
+.jotai/
+jotai/
+
+# Recoil
+.recoil/
+recoil/
+
+# Zustand
+.zustand/
+zustand/
+
+# Valtio
+.valtio/
+valtio/
+
+# Zustand
+.zustand/
+zustand/
+
+# Jotai
+.jotai/
+jotai/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zustand/
+zustand/
+
+# Zustand
+.zust......
+```
