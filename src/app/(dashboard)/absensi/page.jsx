@@ -130,7 +130,7 @@ export default function AbsensiPage() {
     }
   };
 
-  // Handle QR Code scan dari kartu siswa
+  // Handle QR Code scan dari kartu siswa - MASUK KE DAFTAR SEMENTARA
   const handleScanSuccess = async (decodedText) => {
     try {
       console.log('QR Code terdeteksi:', decodedText);
@@ -160,50 +160,6 @@ export default function AbsensiPage() {
         return;
       }
       
-      // Cek apakah sudah absen hari ini
-      const { data: existingAbsen } = await supabase
-        .from('absensi')
-        .select('id, status')
-        .eq('siswa_id', scannedData.siswa_id)
-        .eq('mapel_id', selectedMapel)
-        .eq('tanggal', tanggal)
-        .single();
-      
-      if (existingAbsen) {
-        // Update status menjadi Hadir saat scan QR ulang
-        const { error: updateError } = await supabase
-          .from('absensi')
-          .update({ status: 'Hadir', sumber: 'qr', updated_at: new Date().toISOString() })
-          .eq('id', existingAbsen.id);
-        
-        if (updateError) {
-          console.error('Gagal update status:', updateError);
-          alert('⚠️ Gagal memperbarui status: ' + updateError.message);
-          setProcessing(false);
-          return;
-        }
-        
-        // Refresh data dan tampilkan pesan sukses
-        loadAbsensiHistory();
-        const scanRecord = {
-          nama: siswaData.nama,
-          nis: siswaData.nis,
-          waktu: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
-          status: 'Hadir (diperbarui)'
-        };
-        
-        setScannedSiswa(scanRecord);
-        setRecentScans(prev => [scanRecord, ...prev.slice(0, 9)]);
-        
-        setTimeout(() => {
-          setShowScanner(false);
-          setScannedSiswa(null);
-        }, 2000);
-        
-        setProcessing(false);
-        return;
-      }
-      
       // Validasi data yang di-scan
       if (!scannedData.siswa_id) {
         console.error('QR Code tidak valid: siswa_id kosong');
@@ -220,53 +176,29 @@ export default function AbsensiPage() {
         return;
       }
       
-      // Simpan absensi dengan status Hadir
-      const payload = {
-        siswa_id: scannedData.siswa_id,
-        mapel_id: selectedMapel,
-        tanggal: tanggal,
-        status: 'Hadir',
-        sumber: 'qr'
-      };
-      console.log('Payload absensi:', JSON.stringify(payload));
-      console.log('Tanggal format:', tanggal, 'Type:', typeof tanggal);
-      console.log('Siswa ID:', scannedData.siswa_id, 'Type:', typeof scannedData.siswa_id);
-      console.log('Mapel ID:', selectedMapel, 'Type:', typeof selectedMapel);
+      // TAMBAHKAN KE DAFTAR SEMENTARA dengan status default 'Hadir'
+      // Guru masih bisa mengubah status sebelum simpan semua
+      setAttendance(prev => ({
+        ...prev,
+        [siswaData.id]: 'H' // Default status Hadir (kode H)
+      }));
       
-      // Validasi sebelum insert
-      if (!payload.siswa_id || !payload.mapel_id || !payload.tanggal || !payload.status || !payload.sumber) {
-        console.error('Validasi gagal - ada field yang kosong:', payload);
-        alert('⚠️ Data tidak lengkap. Periksa kembali input.');
-        setProcessing(false);
-        return;
-      }
-      
-      const { error: insertError } = await supabase.from('absensi').insert(payload);
-      
-      if (insertError) {
-        console.error('Error insert absensi:', insertError);
-        alert('⚠️ Gagal menyimpan absensi: ' + insertError.message);
-        setProcessing(false);
-        return;
-      }
-      
-      // Success - update state
+      // Tampilkan notifikasi sukses
       const scanRecord = {
         nama: siswaData.nama,
         nis: siswaData.nis,
         waktu: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
-        status: 'Hadir'
+        status: 'Hadir (sementara)'
       };
       
       setScannedSiswa(scanRecord);
       setRecentScans(prev => [scanRecord, ...prev.slice(0, 9)]);
-      loadAbsensiHistory();
       
       // Auto close scanner setelah sukses
       setTimeout(() => {
         setShowScanner(false);
         setScannedSiswa(null);
-      }, 2000);
+      }, 1500);
       
       setProcessing(false);
       
@@ -278,42 +210,16 @@ export default function AbsensiPage() {
     }
   };
 
-  // Handle manual absen per siswa
-  const handleManualAbsen = async (siswaId, status) => {
-    setProcessing(true);
-    
-    // Konversi kode status ke nilai lengkap
-    const statusMap = {
-      'H': 'Hadir',
-      'S': 'Sakit',
-      'I': 'Izin',
-      'A': 'Alpha'
-    };
-    
-    const fullStatus = statusMap[status] || status;
-    
-    const { error } = await supabase.from('absensi').upsert({
-      siswa_id: siswaId,
-      mapel_id: selectedMapel,
-      tanggal: tanggal,
-      status: fullStatus,
-      sumber: 'manual'
-    }, {
-      onConflict: 'siswa_id,mapel_id,tanggal'
-    });
-    
-    if (error) {
-      alert('Gagal menyimpan absensi: ' + error.message);
-    } else {
-      loadAbsensiHistory();
-      setAttendance(prev => ({ ...prev, [siswaId]: status }));
-    }
-    
-    setProcessing(false);
+  // Handle manual absen per siswa - HANYA UPDATE STATE SEMENTARA
+  const handleManualAbsen = (siswaId, status) => {
+    // Update state attendance tanpa langsung simpan ke database
+    setAttendance(prev => ({ ...prev, [siswaId]: status }));
   };
 
-  // Save all manual attendance
+  // Save all attendance (QR scan + manual) ke database
   const handleSaveAllAttendance = async () => {
+    setProcessing(true);
+    
     // Konversi kode status ke nilai lengkap
     const statusMap = {
       'H': 'Hadir',
@@ -327,11 +233,12 @@ export default function AbsensiPage() {
       mapel_id: selectedMapel,
       tanggal: tanggal,
       status: statusMap[status] || status,
-      sumber: 'manual'
+      sumber: 'qr' // Default sumber qr untuk semua yang di-scan
     }));
     
     if (payload.length === 0) {
       alert('Tidak ada absensi yang diisi');
+      setProcessing(false);
       return;
     }
     
@@ -344,7 +251,12 @@ export default function AbsensiPage() {
     } else {
       alert('✅ Absensi berhasil disimpan!');
       loadAbsensiHistory();
+      // Reset recent scans setelah simpan
+      setRecentScans([]);
+      setScannedSiswa(null);
     }
+    
+    setProcessing(false);
   };
 
   // Export to Excel
@@ -505,9 +417,9 @@ export default function AbsensiPage() {
           </div>
         )}
 
-        {/* Mode QR Scanner */}
+        {/* Mode QR Scanner - DENGAN DAFTAR SEMENTARA */}
         {scanMode === 'qr' && (
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="space-y-6">
             {/* Scanner Panel */}
             <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-6">
               <div className="flex justify-between items-center mb-4">
@@ -566,46 +478,120 @@ export default function AbsensiPage() {
               )}
             </div>
 
-            {/* History & Summary Panel */}
-            <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold text-[#0F172A]">📊 Ringkasan Absensi</h2>
-                <button
-                  onClick={exportToExcel}
-                  className="text-xs px-3 py-1.5 bg-[#059669] text-white rounded-lg hover:bg-[#047857] transition-colors font-medium"
-                >
-                  📥 Export Excel
-                </button>
+            {/* DAFTAR SISWA YANG SUDAH DI-SCAN (EDITABLE) */}
+            {Object.keys(attendance).length > 0 && (
+              <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-6">
+                <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
+                  <div>
+                    <h2 className="text-lg font-semibold text-[#0F172A]">📝 Daftar Kehadiran Sementara</h2>
+                    <p className="text-sm text-[#64748B]">
+                      {Object.keys(attendance).length} siswa sudah di-scan. Edit status jika perlu sebelum menyimpan.
+                    </p>
+                  </div>
+                  <Button 
+                    onClick={handleSaveAllAttendance}
+                    className="bg-[#059669] hover:bg-[#047857]"
+                    disabled={processing || Object.keys(attendance).length === 0}
+                  >
+                    💾 Simpan Semua Absensi
+                  </Button>
+                </div>
+
+                {/* Summary */}
+                <div className="grid grid-cols-4 gap-3 mb-6">
+                  <div className="p-3 bg-[#DCFCE7] rounded-lg text-center">
+                    <p className="text-xs text-[#059669]">Hadir</p>
+                    <p className="text-xl font-bold text-[#059669]">
+                      {Object.values(attendance).filter(s => s === 'H').length}
+                    </p>
+                  </div>
+                  <div className="p-3 bg-[#FEF3C7] rounded-lg text-center">
+                    <p className="text-xs text-[#D97706]">Sakit</p>
+                    <p className="text-xl font-bold text-[#D97706]">
+                      {Object.values(attendance).filter(s => s === 'S').length}
+                    </p>
+                  </div>
+                  <div className="p-3 bg-[#DBEAFE] rounded-lg text-center">
+                    <p className="text-xs text-[#0369A1]">Izin</p>
+                    <p className="text-xl font-bold text-[#0369A1]">
+                      {Object.values(attendance).filter(s => s === 'I').length}
+                    </p>
+                  </div>
+                  <div className="p-3 bg-[#FEE2E2] rounded-lg text-center">
+                    <p className="text-xs text-[#DC2626]">Alpha</p>
+                    <p className="text-xl font-bold text-[#DC2626]">
+                      {Object.values(attendance).filter(s => s === 'A').length}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Table siswa yang sudah di-scan */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-[#F8FAFC] border-b-2 border-[#E2E8F0]">
+                      <tr>
+                        <th className="px-4 py-3 text-left font-medium text-[#64748B]">No</th>
+                        <th className="px-4 py-3 text-left font-medium text-[#64748B]">Nama Siswa</th>
+                        <th className="px-4 py-3 text-left font-medium text-[#64748B]">NIS/NISN</th>
+                        <th className="px-4 py-3 text-center font-medium text-[#64748B]">Status Kehadiran</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#E2E8F0]">
+                      {siswaList.filter(s => attendance[s.id]).map((siswa, idx) => (
+                        <tr key={siswa.id} className="hover:bg-[#F8FAFC] transition-colors">
+                          <td className="px-4 py-3 text-[#64748B] font-medium">{idx + 1}</td>
+                          <td className="px-4 py-3 font-semibold text-[#0F172A]">{siswa.nama}</td>
+                          <td className="px-4 py-3 text-[#64748B]">
+                            <div className="text-xs">
+                              <div>NIS: {siswa.nis || '-'}</div>
+                              <div>NISN: {siswa.nisn || '-'}</div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex justify-center gap-2">
+                              {[
+                                { code: 'H', label: 'Hadir', color: 'bg-[#059669]', hover: 'hover:bg-[#047857]' },
+                                { code: 'S', label: 'Sakit', color: 'bg-[#D97706]', hover: 'hover:bg-[#B45309]' },
+                                { code: 'I', label: 'Izin', color: 'bg-[#0369A1]', hover: 'hover:bg-[#075985]' },
+                                { code: 'A', label: 'Alpha', color: 'bg-[#DC2626]', hover: 'hover:bg-[#B91C1C]' }
+                              ].map(status => (
+                                <button
+                                  key={status.code}
+                                  onClick={() => handleManualAbsen(siswa.id, status.code)}
+                                  title={status.label}
+                                  className={`w-12 h-12 rounded-xl text-base font-bold transition-all transform hover:scale-105 ${
+                                    attendance[siswa.id] === status.code
+                                      ? `${status.color} text-white shadow-md`
+                                      : 'bg-[#F8FAFC] text-[#64748B] border-2 border-[#E2E8F0] hover:border-[#2D5BE3]'
+                                  }`}
+                                >
+                                  {status.code}
+                                </button>
+                              ))}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-              
-              {/* Summary Cards */}
-              <div className="grid grid-cols-4 gap-3 mb-6">
-                <div className="p-3 bg-gradient-to-br from-[#DCFCE7] to-[#BBF7D0] rounded-xl border border-[#059669] text-center">
-                  <p className="text-xs text-[#059669] font-medium">Hadir</p>
-                  <p className="text-2xl font-bold text-[#059669]">{summary.hadir}</p>
+            )}
+
+            {/* History & Summary Panel (untuk data yang sudah tersimpan) */}
+            {absensiHistory.length > 0 && (
+              <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-lg font-semibold text-[#0F172A]">📊 Riwayat Absensi Tersimpan</h2>
+                  <button
+                    onClick={exportToExcel}
+                    className="text-xs px-3 py-1.5 bg-[#059669] text-white rounded-lg hover:bg-[#047857] transition-colors font-medium"
+                  >
+                    📥 Export Excel
+                  </button>
                 </div>
-                <div className="p-3 bg-gradient-to-br from-[#FEF3C7] to-[#FDE68A] rounded-xl border border-[#D97706] text-center">
-                  <p className="text-xs text-[#D97706] font-medium">Sakit</p>
-                  <p className="text-2xl font-bold text-[#D97706]">{summary.sakit}</p>
-                </div>
-                <div className="p-3 bg-gradient-to-br from-[#DBEAFE] to-[#BFDBFE] rounded-xl border border-[#0369A1] text-center">
-                  <p className="text-xs text-[#0369A1] font-medium">Izin</p>
-                  <p className="text-2xl font-bold text-[#0369A1]">{summary.izin}</p>
-                </div>
-                <div className="p-3 bg-gradient-to-br from-[#FEE2E2] to-[#FECACA] rounded-xl border border-[#DC2626] text-center">
-                  <p className="text-xs text-[#DC2626] font-medium">Alpha</p>
-                  <p className="text-2xl font-bold text-[#DC2626]">{summary.alpha}</p>
-                </div>
-              </div>
-              
-              {/* Absensi List */}
-              {absensiHistory.length === 0 ? (
-                <div className="text-center py-12 text-[#64748B]">
-                  <p className="text-5xl mb-3">📭</p>
-                  <p className="text-sm">Belum ada siswa yang absen</p>
-                  <p className="text-xs mt-1">Mulai scan QR Code kartu siswa</p>
-                </div>
-              ) : (
+                
+                {/* Absensi List */}
                 <div className="space-y-2 max-h-80 overflow-y-auto">
                   {absensiHistory.map((item) => (
                     <div key={item.id} className="flex justify-between items-center p-3 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0] hover:shadow-sm transition-shadow">
@@ -616,20 +602,18 @@ export default function AbsensiPage() {
                         </p>
                       </div>
                       <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                        item.status === 'H' ? 'bg-[#DCFCE7] text-[#059669]' :
-                        item.status === 'S' ? 'bg-[#FEF3C7] text-[#D97706]' :
-                        item.status === 'I' ? 'bg-[#DBEAFE] text-[#0369A1]' :
+                        item.status === 'Hadir' ? 'bg-[#DCFCE7] text-[#059669]' :
+                        item.status === 'Sakit' ? 'bg-[#FEF3C7] text-[#D97706]' :
+                        item.status === 'Izin' ? 'bg-[#DBEAFE] text-[#0369A1]' :
                         'bg-[#FEE2E2] text-[#DC2626]'
                       }`}>
-                        {item.status === 'H' ? 'Hadir' :
-                         item.status === 'S' ? 'Sakit' :
-                         item.status === 'I' ? 'Izin' : 'Alpha'}
+                        {item.status}
                       </span>
                     </div>
                   ))}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         )}
 
