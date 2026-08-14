@@ -1,1 +1,45 @@
-Nothing should be ignored since the changes only include source code files (.jsx) and no build artifacts, dependencies, or temporary files.
+```
+# Dependencies
+node_modules/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git/refs/original/
+install_manifest.txt
+.pytest_cache/
+.mypy_cache/
+.hypothesis/
+.DS_Store
+Thumbs.db
+```

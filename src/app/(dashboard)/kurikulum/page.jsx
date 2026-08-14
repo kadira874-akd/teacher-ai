@@ -116,6 +116,8 @@ export default function KurikulumPage() {
   const [selectedMapelObj, setSelectedMapelObj] = useState(null);
   const [showAddMapelInKurikulum, setShowAddMapelInKurikulum] = useState(false);
   const [newMapelNameInKurikulum, setNewMapelNameInKurikulum] = useState('');
+  const [newMapelKategori, setNewMapelKategori] = useState('Wajib');
+  const [newMapelJamPelajaran, setNewMapelJamPelajaran] = useState(2);
   const [collectedMapel, setCollectedMapel] = useState([]); // Track mapel yang sudah dipilih/dikoleksi
   const [mapelSearchQuery, setMapelSearchQuery] = useState(''); // Untuk filter dropdown
   
@@ -412,6 +414,8 @@ export default function KurikulumPage() {
     const { data, error } = await supabase.from('mapel').insert({
       kelas_id: kelasId,
       nama: finalMapelName,
+      kategori: newMapelKategori,
+      jam_pelajaran: newMapelJamPelajaran,
       urutan
     }).select();
 
@@ -423,6 +427,8 @@ export default function KurikulumPage() {
     setMapelList([...mapelList, data[0]]);
     setSelectedMapelForKurikulum(data[0].id);
     setNewMapelNameInKurikulum('');
+    setNewMapelKategori('Wajib');
+    setNewMapelJamPelajaran(2);
     setShowAddMapelInKurikulum(false);
     alert(`✅ Mata pelajaran "${finalMapelName}" berhasil ditambahkan!`);
   };
@@ -791,21 +797,54 @@ export default function KurikulumPage() {
                   </div>
                   
                   {/* Input manual untuk mapel custom */}
-                  <div>
-                    <label className="block text-xs font-medium text-[#334155] mb-2">
-                      ✏️ Atau ketik nama mapel custom (tidak ada di template):
-                    </label>
-                    <input
-                      type="text"
-                      value={newMapelNameInKurikulum}
-                      onChange={(e) => {
-                        setNewMapelNameInKurikulum(e.target.value);
-                        setMapelSearchQuery(''); // Reset dropdown saat mengetik manual
-                      }}
-                      placeholder="Ketik nama mapel custom..."
-                      className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg text-base font-medium focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-[#0F172A] bg-white"
-                      onKeyDown={(e) => { if (e.key === 'Enter') handleAddMapelInKurikulum(); }}
-                    />
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-medium text-[#334155] mb-2">
+                        ✏️ Nama mapel custom:
+                      </label>
+                      <input
+                        type="text"
+                        value={newMapelNameInKurikulum}
+                        onChange={(e) => {
+                          setNewMapelNameInKurikulum(e.target.value);
+                          setMapelSearchQuery('');
+                        }}
+                        placeholder="Ketik nama mapel custom..."
+                        className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg text-base font-medium focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-[#0F172A] bg-white"
+                        onKeyDown={(e) => { if (e.key === 'Enter') handleAddMapelInKurikulum(); }}
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-medium text-[#334155] mb-2">
+                          📚 Kategori:
+                        </label>
+                        <select
+                          value={newMapelKategori}
+                          onChange={(e) => setNewMapelKategori(e.target.value)}
+                          className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg text-base font-medium focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-[#0F172A] bg-white"
+                        >
+                          <option value="Wajib">Wajib</option>
+                          <option value="Muatan Lokal">Muatan Lokal</option>
+                          <option value="Pilihan">Pilihan</option>
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-xs font-medium text-[#334155] mb-2">
+                          ⏰ Jam Pelajaran:
+                        </label>
+                        <input
+                          type="number"
+                          value={newMapelJamPelajaran}
+                          onChange={(e) => setNewMapelJamPelajaran(parseInt(e.target.value) || 0)}
+                          min="0"
+                          max="20"
+                          className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-lg text-base font-medium focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] text-[#0F172A] bg-white"
+                        />
+                      </div>
+                    </div>
                   </div>
                   
                   <Button onClick={handleAddMapelInKurikulum} className="w-full">💾 Simpan Mapel</Button>
