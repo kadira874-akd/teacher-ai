@@ -123,8 +123,15 @@ export default function AbsensiPage() {
         .eq('tanggal', tanggal);
       
       const attendanceMap = {};
+      // Konversi status dari database ke kode singkat agar konsisten dengan tombol
+      const statusToCode = {
+        'Hadir': 'H',
+        'Sakit': 'S',
+        'Izin': 'I',
+        'Alpha': 'A'
+      };
       absensi?.forEach(a => {
-        attendanceMap[a.siswa_id] = a.status;
+        attendanceMap[a.siswa_id] = statusToCode[a.status] || a.status;
       });
       setAttendance(attendanceMap);
     }
