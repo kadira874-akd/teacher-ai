@@ -45,8 +45,8 @@ function ManajemenContent() {
   const [savingSAS, setSavingSAS] = useState(false);
   
   // Filter penilaian - menggunakan dropdown untuk TP, STS, SAS, ALL
-  const [jenisPenilaian, setJenisPenilaian] = useState(''); // '' = belum pilih, 'tp_X', 'sts', 'sas', 'all'
-  const [selectedJenisDropdown, setSelectedJenisDropdown] = useState('ALL'); // 'TP', 'STS', 'SAS', 'ALL'
+  const [jenisPenilaian, setJenisPenilaian] = useState('all'); // default 'all'
+  const [selectedJenisDropdown, setSelectedJenisDropdown] = useState('ALL'); // default 'ALL'
   const [selectedTPForDropdown, setSelectedTPForDropdown] = useState('');
 
   // ===== STATE MATERI =====
@@ -1247,11 +1247,15 @@ function ManajemenContent() {
                 className="px-4 py-2.5 border border-slate-300 rounded-lg text-sm font-semibold text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-600"
               >
                 <option value="ALL">📊 ALL (Rekap)</option>
-                <option value="STS">STS</option>
-                <option value="SAS">SAS</option>
-                {tpList.map(tp => (
-                  <option key={tp.id} value={`TP_${tp.id}`}>TP - {tp.kode_tp}</option>
-                ))}
+                <optgroup label="Sumatif">
+                  <option value="STS">📝 STS (Tengah Semester)</option>
+                  <option value="SAS">📝 SAS (Akhir Semester)</option>
+                </optgroup>
+                <optgroup label="Formatif (TP)">
+                  {tpList.map(tp => (
+                    <option key={tp.id} value={`TP_${tp.id}`}>TP - {tp.kode_tp}</option>
+                  ))}
+                </optgroup>
               </select>
             </div>
           </div>
