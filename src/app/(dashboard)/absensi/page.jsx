@@ -177,6 +177,22 @@ export default function AbsensiPage() {
         return;
       }
       
+      // Validasi data yang di-scan
+      if (!scannedData.siswa_id) {
+        console.error('QR Code tidak valid: siswa_id kosong');
+        alert('⚠️ QR Code tidak valid atau rusak');
+        setShowScanner(false);
+        setProcessing(false);
+        return;
+      }
+      
+      if (!selectedMapel) {
+        alert('⚠️ Pilih mata pelajaran terlebih dahulu');
+        setShowScanner(false);
+        setProcessing(false);
+        return;
+      }
+      
       // Simpan absensi dengan status Hadir
       const payload = {
         siswa_id: scannedData.siswa_id,
@@ -185,7 +201,18 @@ export default function AbsensiPage() {
         status: 'Hadir',
         sumber: 'qr'
       };
-      console.log('Payload absensi:', payload);
+      console.log('Payload absensi:', JSON.stringify(payload));
+      console.log('Tanggal format:', tanggal, 'Type:', typeof tanggal);
+      console.log('Siswa ID:', scannedData.siswa_id, 'Type:', typeof scannedData.siswa_id);
+      console.log('Mapel ID:', selectedMapel, 'Type:', typeof selectedMapel);
+      
+      // Validasi sebelum insert
+      if (!payload.siswa_id || !payload.mapel_id || !payload.tanggal || !payload.status || !payload.sumber) {
+        console.error('Validasi gagal - ada field yang kosong:', payload);
+        alert('⚠️ Data tidak lengkap. Periksa kembali input.');
+        setProcessing(false);
+        return;
+      }
       
       const { error: insertError } = await supabase.from('absensi').insert(payload);
       
