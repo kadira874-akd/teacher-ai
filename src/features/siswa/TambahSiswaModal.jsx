@@ -7,7 +7,7 @@ export default function TambahSiswaModal({ isOpen, onClose, onSuccess, kelasId }
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     nama: '', nisn: '', nis: '', tempat_lahir: '', tanggal_lahir: '',
-    jenis_kelamin: 'Laki-laki', agama: 'Islam', alamat: '', no_telepon: '',
+    jenis_kelamin: 'L', agama: 'Islam', alamat: '', no_telepon: '',
     nama_ayah: '', nama_ibu: '', pekerjaan_ayah: '', pekerjaan_ibu: ''
   });
 
@@ -38,7 +38,7 @@ export default function TambahSiswaModal({ isOpen, onClose, onSuccess, kelasId }
       // Reset form
       setFormData({
         nama: '', nisn: '', nis: '', tempat_lahir: '', tanggal_lahir: '',
-        jenis_kelamin: 'Laki-laki', agama: 'Islam', alamat: '', no_telepon: '',
+        jenis_kelamin: 'L', agama: 'Islam', alamat: '', no_telepon: '',
         nama_ayah: '', nama_ibu: '', pekerjaan_ayah: '', pekerjaan_ibu: ''
       });
       onSuccess(); // Refresh tabel di halaman utama
@@ -76,8 +76,8 @@ export default function TambahSiswaModal({ isOpen, onClose, onSuccess, kelasId }
           <div className="mb-4">
             <label className="block text-sm font-medium text-[#334155] mb-1.5">Jenis Kelamin <span className="text-[#DC2626]">*</span></label>
             <select name="jenis_kelamin" value={formData.jenis_kelamin} onChange={handleChange} className="w-full px-4 py-3 border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] mobile-input-high-contrast min-h-[48px]">
-              <option>Laki-laki</option>
-              <option>Perempuan</option>
+              <option value="L">Laki-laki</option>
+              <option value="P">Perempuan</option>
             </select>
           </div>
 

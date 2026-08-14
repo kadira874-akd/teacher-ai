@@ -145,12 +145,12 @@ export default function ImportSiswaModal({ isOpen, onClose, onSuccess, kelasId }
   };
 
   const parseJenisKelamin = (value) => {
-    if (!value) return 'Laki-laki';
+    if (!value) return 'L';
     const str = String(value).toLowerCase().trim();
     if (['p', 'perempuan', 'wanita', 'female'].some(s => str.includes(s))) {
-      return 'Perempuan';
+      return 'P';
     }
-    return 'Laki-laki';
+    return 'L';
   };
 
   const parseNoTelepon = (value) => {
