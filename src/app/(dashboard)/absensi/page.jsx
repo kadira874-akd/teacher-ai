@@ -133,7 +133,9 @@ export default function AbsensiPage() {
   // Handle QR Code scan dari kartu siswa
   const handleScanSuccess = async (decodedText) => {
     try {
+      console.log('QR Code terdeteksi:', decodedText);
       const scannedData = JSON.parse(decodedText);
+      console.log('Data QR Code:', scannedData);
       
       // Validasi tipe QR Code - harus dari kartu siswa
       if (scannedData.type !== 'SISWA') {
@@ -176,15 +178,19 @@ export default function AbsensiPage() {
       }
       
       // Simpan absensi dengan status Hadir
-      const { error: insertError } = await supabase.from('absensi').insert({
+      const payload = {
         siswa_id: scannedData.siswa_id,
         mapel_id: selectedMapel,
         tanggal: tanggal,
         status: 'Hadir',
         sumber: 'qr'
-      });
+      };
+      console.log('Payload absensi:', payload);
+      
+      const { error: insertError } = await supabase.from('absensi').insert(payload);
       
       if (insertError) {
+        console.error('Error insert absensi:', insertError);
         alert('⚠️ Gagal menyimpan absensi: ' + insertError.message);
         setProcessing(false);
         return;
