@@ -168,9 +168,7 @@ export default function AbsensiPage() {
         .single();
       
       if (existingAbsen) {
-        const statusLabel = existingAbsen.status === 'H' ? 'Hadir' :
-                           existingAbsen.status === 'S' ? 'Sakit' :
-                           existingAbsen.status === 'I' ? 'Izin' : 'Alpha';
+        const statusLabel = existingAbsen.status;
         alert(`ℹ️ ${siswaData.nama} sudah absen dengan status: ${statusLabel}`);
         setShowScanner(false);
         setProcessing(false);
@@ -182,7 +180,8 @@ export default function AbsensiPage() {
         siswa_id: scannedData.siswa_id,
         mapel_id: selectedMapel,
         tanggal: tanggal,
-        status: 'H'
+        status: 'Hadir',
+        sumber: 'qr'
       });
       
       if (insertError) {
@@ -227,7 +226,8 @@ export default function AbsensiPage() {
       siswa_id: siswaId,
       mapel_id: selectedMapel,
       tanggal: tanggal,
-      status: status
+      status: status,
+      sumber: 'manual'
     }, {
       onConflict: 'siswa_id,mapel_id,tanggal'
     });
@@ -248,7 +248,8 @@ export default function AbsensiPage() {
       siswa_id: siswaId,
       mapel_id: selectedMapel,
       tanggal: tanggal,
-      status
+      status,
+      sumber: 'manual'
     }));
     
     if (payload.length === 0) {
@@ -277,7 +278,7 @@ export default function AbsensiPage() {
     
     const data = absensiHistory.map(item => ({
       'Nama Siswa': item.siswa?.nama || '-',
-      'Status': item.status === 'H' ? 'Hadir' : item.status === 'S' ? 'Sakit' : item.status === 'I' ? 'Izin' : 'Alpha',
+      'Status': item.status,
       'Waktu Absen': new Date(item.created_at).toLocaleString('id-ID')
     }));
     
@@ -289,10 +290,10 @@ export default function AbsensiPage() {
 
   // Calculate summary
   const summary = {
-    hadir: absensiHistory.filter(a => a.status === 'H').length,
-    sakit: absensiHistory.filter(a => a.status === 'S').length,
-    izin: absensiHistory.filter(a => a.status === 'I').length,
-    alpha: absensiHistory.filter(a => a.status === 'A').length
+    hadir: absensiHistory.filter(a => a.status === 'Hadir').length,
+    sakit: absensiHistory.filter(a => a.status === 'Sakit').length,
+    izin: absensiHistory.filter(a => a.status === 'Izin').length,
+    alpha: absensiHistory.filter(a => a.status === 'Alpha').length
   };
 
   if (loading) {
