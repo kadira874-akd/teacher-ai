@@ -235,13 +235,19 @@ export default function AbsensiPage() {
       'A': 'Alpha'
     };
     
-    const payload = Object.entries(attendance).map(([siswaId, status]) => ({
-      siswa_id: siswaId,
-      mapel_id: selectedMapel,
-      tanggal: tanggal,
-      status: statusMap[status] || status,
-      sumber: 'qr' // Default sumber qr untuk semua yang di-scan
-    }));
+    // Buat payload dengan menentukan sumber berdasarkan apakah siswa sudah ada di history atau belum
+    const payload = Object.entries(attendance).map(([siswaId, status]) => {
+      // Cek apakah ini absensi baru atau update
+      const existingAbsen = absensiHistory.find(a => a.siswa_id === siswaId);
+      
+      return {
+        siswa_id: siswaId,
+        mapel_id: selectedMapel,
+        tanggal: tanggal,
+        status: statusMap[status] || status,
+        sumber: existingAbsen ? existingAbsen.sumber || 'manual' : 'qr' // Jika sudah ada, pertahankan sumber lama, jika baru set qr
+      };
+    });
     
     if (payload.length === 0) {
       alert('Tidak ada absensi yang diisi');
@@ -249,13 +255,17 @@ export default function AbsensiPage() {
       return;
     }
     
-    const { error } = await supabase.from('absensi').upsert(payload, {
+    console.log('Payload yang akan dikirim:', payload);
+    
+    const { data, error } = await supabase.from('absensi').upsert(payload, {
       onConflict: 'siswa_id,mapel_id,tanggal'
     });
     
     if (error) {
+      console.error('Error detail:', error);
       alert('Gagal menyimpan: ' + error.message);
     } else {
+      console.log('Berhasil menyimpan:', data);
       alert('✅ Absensi berhasil disimpan!');
       loadAbsensiHistory();
       // Reset recent scans setelah simpan
