@@ -248,7 +248,9 @@ export default function PengaturanPage() {
     Object.keys(cleanSekolah).forEach(k => { if (cleanSekolah[k] === '') cleanSekolah[k] = null; });
     try {
       if (!sekolahId) {
-        const { data, error } = await supabase.from('sekolah').insert(cleanSekolah).select('id').single();
+        // Tambahkan user_id untuk memenuhi RLS policy
+        const sekolahWithUser = { ...cleanSekolah, user_id: profile.id };
+        const { data, error } = await supabase.from('sekolah').insert(sekolahWithUser).select('id').single();
         if (error) throw error;
         setSekolahId(data.id);
         // await supabase.from('guru').update({ sekolah_id: data.id }).eq('id', profile.id);
