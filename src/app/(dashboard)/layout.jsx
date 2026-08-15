@@ -1,14 +1,73 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/hooks/useAuthStore';
+
+// Sidebar width in px — must match the `w-72` Tailwind class on <aside>.
+const SIDEBAR_WIDTH = 288;
+// How far you must drag (px) before release counts as "open" / "close".
+const SWIPE_COMMIT_THRESHOLD = 80;
+// Only enable swipe gestures below this width — on desktop the sidebar is
+// always visible and `sidebarOpen` no longer controls its position.
+const MOBILE_BREAKPOINT = 1024;
 
 export default function DashboardLayout({ children }) {
   const router = useRouter();
   const pathname = usePathname();
   const [profile, setProfile] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // --- Swipe-to-open / swipe-to-close sidebar (native app feel) ---
+  // Edge-swipe from the left screen edge opens the sidebar; swiping left
+  // anywhere while it's open closes it. The sidebar follows the finger in
+  // real time, then snaps open/closed on release.
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragX, setDragX] = useState(0);
+  const touch = useRef({ x: 0, y: 0, active: false });
+
+  const handleTouchStart = (e) => {
+    if (window.innerWidth >= MOBILE_BREAKPOINT) return;
+    const t = e.touches[0];
+    // Only start tracking if this could plausibly become our gesture:
+    // near the left edge (to open) or anywhere while already open (to close).
+    if (!sidebarOpen && t.clientX > 24) return;
+    touch.current = { x: t.clientX, y: t.clientY, active: true };
+  };
+
+  const handleTouchMove = (e) => {
+    if (!touch.current.active) return;
+    const t = e.touches[0];
+    const dx = t.clientX - touch.current.x;
+    const dy = t.clientY - touch.current.y;
+
+    if (!isDragging) {
+      if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return; // not enough movement yet
+      // Lock to horizontal gestures only; let vertical scrolling pass through.
+      if (Math.abs(dy) > Math.abs(dx)) { touch.current.active = false; return; }
+      // Wrong direction for the current state — ignore.
+      if (!sidebarOpen && dx < 0) { touch.current.active = false; return; }
+      if (sidebarOpen && dx > 0) { touch.current.active = false; return; }
+      setIsDragging(true);
+    }
+
+    const clamped = sidebarOpen
+      ? Math.max(dx, -SIDEBAR_WIDTH)
+      : Math.min(dx, SIDEBAR_WIDTH);
+    setDragX(clamped);
+  };
+
+  const handleTouchEnd = () => {
+    if (isDragging) {
+      if (!sidebarOpen && dragX > SWIPE_COMMIT_THRESHOLD) setSidebarOpen(true);
+      if (sidebarOpen && dragX < -SWIPE_COMMIT_THRESHOLD) setSidebarOpen(false);
+    }
+    setIsDragging(false);
+    setDragX(0);
+    touch.current.active = false;
+  };
+
+  const sidebarBaseX = sidebarOpen ? 0 : -SIDEBAR_WIDTH;
   
   useEffect(() => {
     const initAuth = async () => {
@@ -55,19 +114,33 @@ export default function DashboardLayout({ children }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F8FAFC] via-[#F1F5F9] to-[#E0E7FF] flex">
+    <div
+      className="min-h-screen bg-gradient-to-br from-[#F8FAFC] via-[#F1F5F9] to-[#E0E7FF] flex"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
+    >
       {/* OVERLAY untuk mobile dengan blur */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300"
+      {(sidebarOpen || (isDragging && dragX > 0)) && (
+        <div
+          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 lg:hidden"
+          style={
+            isDragging
+              ? { opacity: Math.min((sidebarBaseX + dragX) / SIDEBAR_WIDTH, 1), transition: 'none' }
+              : { transition: 'opacity 300ms' }
+          }
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* SIDEBAR - Enhanced Mobile Design */}
-      <aside className={`w-72 bg-white/80 backdrop-blur-xl border-r border-white/20 flex flex-col fixed h-full transition-all duration-500 ease-out z-50 shadow-2xl lg:shadow-none ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-      }`}>
+      <aside
+        className={`w-72 bg-white/80 backdrop-blur-xl border-r border-white/20 flex flex-col fixed h-full ease-out z-50 shadow-2xl lg:shadow-none lg:!transform-none ${
+          isDragging ? '' : 'transition-all duration-500'
+        } ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
+        style={isDragging ? { transform: `translateX(${sidebarBaseX + dragX}px)` } : undefined}
+      >
         {/* Logo Section */}
         <div className="relative p-6 border-b border-slate-200/50 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-[#2D5BE3]/5 to-[#7C3AED]/5"></div>
