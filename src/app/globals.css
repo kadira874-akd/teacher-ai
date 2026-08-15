@@ -96,17 +96,14 @@
   --mobile-gap: 0.75rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0F172A;
-    --background-secondary: #1E293B;
-    --background-tertiary: #334155;
-    --foreground: #F8FAFC;
-    --foreground-secondary: #E2E8F0;
-    --border-light: #334155;
-    --border-medium: #475569;
-  }
-}
+/* NOTE: automatic `prefers-color-scheme: dark` override intentionally
+   disabled. The app has no `.dark`-class theming — every card, modal and
+   input below is hard-coded with a WHITE background. Flipping only
+   --foreground to near-white (as this block used to do) left text
+   invisible on every still-white surface, which was the exact cause of
+   the "teks tidak terlihat di modal login/signup" bug on any phone with
+   system dark mode on. Re-enable this only after every component gets a
+   real `dark:` background pass, gated behind an explicit toggle. */
 
 @theme inline {
   --color-background: var(--background);
@@ -136,6 +133,31 @@ body {
   text-rendering: optimizeLegibility;
   line-height: 1.6;
   overflow-x: hidden;
+}
+
+/* GLOBAL FORM-FIELD CONTRAST SAFETY NET
+   Every input/select/textarea gets its own explicit color pair instead of
+   inheriting `body`'s color. This guarantees visible text regardless of
+   OS color-scheme, browser autofill styling, or a component forgetting
+   to set its own text color — the exact bug reported on login/signup. */
+input,
+select,
+textarea {
+  color: var(--slate-900);
+  background-color: #FFFFFF;
+}
+input::placeholder,
+textarea::placeholder {
+  color: var(--slate-400);
+}
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill {
+  -webkit-text-fill-color: var(--slate-900) !important;
+  -webkit-box-shadow: 0 0 0px 1000px #FFFFFF inset !important;
+  caret-color: var(--slate-900);
+  transition: background-color 9999s ease-in-out 0s;
 }
 
 /* ========================================
@@ -361,13 +383,17 @@ body {
   left: 0;
   right: 0;
   background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  /* bg is already 95% opaque, so a heavy 24px blur added GPU cost on a
+     fixed, always-visible element for almost no visible difference.
+     8px keeps the frosted edge while being far cheaper to repaint. */
+  backdrop-filter: blur(8px) saturate(180%);
+  -webkit-backdrop-filter: blur(8px) saturate(180%);
   border-top: 1px solid var(--border-light);
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
   padding: calc(env(safe-area-inset-bottom, 0) + 0.5rem) 0 env(safe-area-inset-bottom, 0);
   z-index: 100;
   display: none;
+  will-change: transform;
 }
 
 @media (max-width: 1024px) {
@@ -406,6 +432,21 @@ body {
     width: 1.375rem;
     height: 1.375rem;
     margin-bottom: 0.125rem;
+  }
+}
+
+/* Cheaper backdrop-blur on mobile/tablet.
+   `backdrop-filter: blur()` is one of the most expensive paint
+   operations on mid/low-end mobile GPUs. It is used here on elements
+   that are sticky/fixed (header, sidebar, bottom nav) and therefore
+   repaint on every scroll or drag frame — the main source of janky,
+   unprofessional-feeling motion on non-desktop devices. Desktop keeps
+   the full frosted-glass look; mobile gets a lighter blur radius that
+   is visually close but far cheaper to render every frame. */
+@media (max-width: 1024px) {
+  .backdrop-blur-xl {
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
   }
 }
 
@@ -511,6 +552,24 @@ body {
   .mobile-gap-4 { gap: 1rem; }
 }
 
+/* Horizontal-scroll table wrapper.
+   Fixes: swiping left inside a wide table dragged the ENTIRE page/window
+   instead of just the table content. Cause: plain `overflow-x-auto` has
+   no `overscroll-behavior-x`, so once the touch drag reaches the
+   scrollable edge, the gesture "leaks" out of the container and gets
+   picked up by the browser's own edge-swipe navigation / page rubber-
+   banding. `overscroll-behavior-x: contain` stops that leak at the
+   wrapper's boundary; `touch-action: pan-x` tells the browser up front
+   that this element only handles horizontal panning, so it doesn't wait
+   to decide between scrolling the table vs. the page. */
+.table-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
+}
+
 /* Smooth Scrollbar Hide */
 .scrollbar-hide { 
   -ms-overflow-style: none; 
@@ -606,17 +665,34 @@ body {
 .stagger-4 { animation-delay: 240ms; }
 .stagger-5 { animation-delay: 320ms; }
 
-/* Skeleton Loading */
+/* Skeleton Loading
+   Rebuilt to animate `transform` on a pseudo-element instead of animating
+   `background-position` on the whole box. background-position changes
+   force the browser to repaint the element every frame; with a full
+   skeleton page (dashboard/table skeletons render 10-30 of these at
+   once) that repaint cost stacked up and was the actual source of the
+   "animasi loading tidak smooth" complaint on mid/low-end Android. A
+   transform-based shimmer is handled by the compositor (GPU) and stays
+   smooth no matter how many skeleton blocks are on screen. */
 .skeleton {
-  background: linear-gradient(90deg, var(--slate-100) 0%, var(--slate-200) 50%, var(--slate-100) 100%);
-  background-size: 200% 100%;
-  animation: skeleton-loading 1.8s infinite;
+  position: relative;
+  overflow: hidden;
+  background: var(--slate-100);
   border-radius: var(--radius-md);
 }
 
-@keyframes skeleton-loading {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.65), transparent);
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes skeleton-shimmer {
+  100% { transform: translateX(100%); }
 }
 
 /* Badge System - Desktop */
