@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/config/supabase';
 import { useAuthStore } from '@/hooks/useAuthStore';
 import Link from 'next/link';
+import { SkeletonDashboardPage } from '@/components/ui/Skeleton';
 
 export default function DashboardPage() {
   const { profile, fetchSession } = useAuthStore();
@@ -95,14 +96,7 @@ export default function DashboardPage() {
   }
 
   if (loading || !profile) {
-    return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-[#2D5BE3] mb-3"></div>
-          <p className="text-[#64748B]">Memuat dashboard...</p>
-        </div>
-      </div>
-    );
+    return <SkeletonDashboardPage />;
   }
 
   return (
