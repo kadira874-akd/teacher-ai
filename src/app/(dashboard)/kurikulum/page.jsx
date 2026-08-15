@@ -698,14 +698,19 @@ export default function KurikulumPage() {
         <p className="text-[#64748B]">Kelola Capaian Pembelajaran, Profil Pancasila, dan Ekstrakurikuler.</p>
       </div>
 
-      {/* TABS */}
-      <div className="flex gap-2 border-b border-[#E2E8F0]">
+      {/* TABS — horizontally scrollable on narrow screens instead of
+          overflowing/cutting off the 3rd tab (was a bare `flex` with no
+          wrap and no scroll fallback, so "Ekstrakurikuler" got clipped
+          on phones under ~380px wide). scrollbar-hide keeps the native
+          scrollbar off while table-scroll's touch-action rules keep the
+          swipe contained to the tab strip, same fix as the grade table. */}
+      <div className="flex gap-2 border-b border-[#E2E8F0] overflow-x-auto scrollbar-hide table-scroll -mx-3 px-3 sm:mx-0 sm:px-0">
         {[
           { id: 'kurikulum', label: '📖 Kurikulum (CP & TP)' },
           { id: 'pancasila', label: '🇮🇩 Profil Pancasila' },
           { id: 'ekskul', label: '🏅 Ekstrakurikuler' }
         ].map(tab => (
-          <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`px-6 py-3 text-sm font-medium rounded-t-lg transition-colors ${activeTab === tab.id ? 'bg-[#2D5BE3] text-white' : 'bg-[#F8FAFC] text-[#64748B] hover:bg-[#F1F5F9]'}`}>
+          <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-3 text-sm font-medium rounded-t-lg transition-colors ${activeTab === tab.id ? 'bg-[#2D5BE3] text-white' : 'bg-[#F8FAFC] text-[#64748B] hover:bg-[#F1F5F9]'}`}>
             {tab.label}
           </button>
         ))}
@@ -815,7 +820,7 @@ export default function KurikulumPage() {
                       />
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-xs font-medium text-[#334155] mb-2">
                           📚 Kategori:
