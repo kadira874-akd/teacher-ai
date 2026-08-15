@@ -136,8 +136,8 @@ export default function DashboardLayout({ children }) {
 
       {/* SIDEBAR - Enhanced Mobile Design */}
       <aside
-        className={`w-72 bg-white/80 backdrop-blur-xl border-r border-white/20 flex flex-col fixed h-full ease-out z-50 shadow-2xl lg:shadow-none lg:!transform-none ${
-          isDragging ? '' : 'transition-all duration-500'
+        className={`w-72 bg-white/80 backdrop-blur-xl border-r border-white/20 flex flex-col fixed h-full ease-out z-50 shadow-2xl lg:shadow-none lg:!transform-none will-change-transform ${
+          isDragging ? '' : 'transition-transform duration-500'
         } ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
         style={isDragging ? { transform: `translateX(${sidebarBaseX + dragX}px)` } : undefined}
       >
