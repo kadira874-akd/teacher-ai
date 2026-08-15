@@ -6,6 +6,7 @@ import { PDFDownloadLink } from '@react-pdf/renderer';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import RaporPDF from '@/components/RaporPDF';
+import { SkeletonManagementPage } from '@/components/ui/Skeleton';
 import RaporPDFTemplate from '@/components/RaporPDFTemplate';
 import Button from '@/components/ui/Button';
 import ImportSiswaModal from '@/features/siswa/ImportSiswaModal';
@@ -239,7 +240,7 @@ export default function RaporPage() {
     return { label: 'D', text: 'Perlu Bimbingan', color: 'bg-[#FEF2F2] text-[#DC2626]' };
   };
 
-    if (loading || !profile || !kelasId) return <div className="flex items-center justify-center h-[60vh]"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#2D5BE3]"></div></div>;
+    if (loading || !profile || !kelasId) return <SkeletonManagementPage />;
   
   const selectedSiswa = siswaList.find(s => s.id === selectedSiswaId);
 
