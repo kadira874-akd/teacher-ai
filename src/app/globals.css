@@ -114,8 +114,9 @@
   --font-sans: var(--font-plus-jakarta);
 }
 
-/* Import Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+/* Font is now loaded via next/font in layout.jsx (self-hosted, no
+   render-blocking network request, no CLS). The old @import url(...) here
+   caused a visible font swap flash on every load and has been removed. */
 
 * {
   box-sizing: border-box;
