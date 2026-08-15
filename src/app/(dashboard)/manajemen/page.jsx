@@ -7,6 +7,7 @@ import Button from '@/components/ui/Button';
 import QRScanner from '@/components/QRScanner';
 import { QRCodeSVG } from 'qrcode.react';
 import * as XLSX from 'xlsx';
+import { SkeletonManagementPage, SkeletonTable } from '@/components/ui/Skeleton';
 
 function ManajemenContent() {
   const searchParams = useSearchParams();
@@ -703,11 +704,7 @@ function ManajemenContent() {
   };
 
   if (loading || !profile || !kelasId) {
-    return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#2D5BE3]"></div>
-      </div>
-    );
+    return <SkeletonManagementPage />;
   }
 
   if (mapelList.length === 0) {
@@ -1161,9 +1158,7 @@ function ManajemenContent() {
               </div>
 
               {loadingRekap ? (
-                <div className="flex justify-center py-12">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2D5BE3]"></div>
-                </div>
+                <SkeletonTable rows={6} cols={6} />
               ) : rekapAbsensi.length === 0 ? (
                 <div className="text-center py-12 text-[#64748B]">
                   <p className="text-4xl mb-3">📭</p>
@@ -1492,8 +1487,9 @@ function ManajemenContent() {
                     📎 Bahan Ajar Pendukung ({bahanAjarList.length})
                   </h5>
                   {loadingMateri ? (
-                    <div className="flex justify-center py-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2D5BE3]"></div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="skeleton h-16 rounded-lg" />
+                      <div className="skeleton h-16 rounded-lg" />
                     </div>
                   ) : bahanAjarList.length === 0 ? (
                     <div className="text-center py-8 text-[#64748B] bg-[#F8FAFC] rounded-lg border border-dashed border-[#E2E8F0]">
@@ -1612,13 +1608,7 @@ function RekapNilaiView({ selectedMapel, tpList, siswaList, onExport }) {
   }, [selectedMapel, tpList, siswaList]);
 
   if (loading) {
-    return (
-      <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-6">
-        <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2D5BE3]"></div>
-        </div>
-      </div>
-    );
+    return <SkeletonTable rows={6} cols={5} />;
   }
 
   return (
