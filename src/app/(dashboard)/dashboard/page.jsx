@@ -115,40 +115,42 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* STATISTIK CEPAT - Mobile Optimized Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+      {/* STATISTIK CEPAT - 2 columns from mobile up so cards don't eat the
+          whole screen height stacked full-width like before; 3rd (most
+          actionable/red) card spans both columns as a highlight row. */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-4">
         <div className="mobile-stat-card">
-          <div className="flex items-center gap-3 sm:gap-4">
-            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center shadow-sm">
-              <span className="text-2xl sm:text-3xl">👨‍🎓</span>
+          <div className="flex items-center gap-2.5 sm:gap-4">
+            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-lg sm:rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center shadow-sm shrink-0">
+              <span className="text-lg sm:text-3xl">👨‍🎓</span>
             </div>
-            <div>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium mb-0.5">Total Siswa</p>
-              <p className="text-2xl sm:text-3xl font-bold text-slate-900">{totalSiswa}</p>
+            <div className="min-w-0">
+              <p className="text-[11px] sm:text-sm text-slate-500 font-medium mb-0.5 truncate">Total Siswa</p>
+              <p className="text-xl sm:text-3xl font-bold text-slate-900">{totalSiswa}</p>
             </div>
           </div>
         </div>
 
         <div className="mobile-stat-card">
-          <div className="flex items-center gap-3 sm:gap-4">
-            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-purple-50 to-pink-100 flex items-center justify-center shadow-sm">
-              <span className="text-2xl sm:text-3xl">📚</span>
+          <div className="flex items-center gap-2.5 sm:gap-4">
+            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-lg sm:rounded-2xl bg-gradient-to-br from-purple-50 to-pink-100 flex items-center justify-center shadow-sm shrink-0">
+              <span className="text-lg sm:text-3xl">📚</span>
             </div>
-            <div>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium mb-0.5">Mata Pelajaran</p>
-              <p className="text-2xl sm:text-3xl font-bold text-slate-900">{totalMapel}</p>
+            <div className="min-w-0">
+              <p className="text-[11px] sm:text-sm text-slate-500 font-medium mb-0.5 truncate">Mata Pelajaran</p>
+              <p className="text-xl sm:text-3xl font-bold text-slate-900">{totalMapel}</p>
             </div>
           </div>
         </div>
 
-        <div className="mobile-stat-card">
-          <div className="flex items-center gap-3 sm:gap-4">
-            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-red-50 to-orange-100 flex items-center justify-center shadow-sm">
-              <span className="text-2xl sm:text-3xl">📅</span>
+        <div className="mobile-stat-card col-span-2 lg:col-span-1">
+          <div className="flex items-center gap-2.5 sm:gap-4">
+            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-lg sm:rounded-2xl bg-gradient-to-br from-red-50 to-orange-100 flex items-center justify-center shadow-sm shrink-0">
+              <span className="text-lg sm:text-3xl">📅</span>
             </div>
-            <div>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium mb-0.5">Belum Absen Hari Ini</p>
-              <p className="text-2xl sm:text-3xl font-bold text-red-600">{belumAbsenHariIni}</p>
+            <div className="min-w-0">
+              <p className="text-[11px] sm:text-sm text-slate-500 font-medium mb-0.5 truncate">Belum Absen Hari Ini</p>
+              <p className="text-xl sm:text-3xl font-bold text-red-600">{belumAbsenHariIni}</p>
             </div>
           </div>
         </div>
@@ -215,32 +217,34 @@ export default function DashboardPage() {
           <span>⚡</span>
           <span>Akses Cepat</span>
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        {/* 2 columns from mobile up — previously 1 column made each quick-
+            action tile full-width/oversized on phones for no reason. */}
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-4">
           <Link href="/pengaturan">
-            <div className="group p-4 border-2 border-slate-100 rounded-xl sm:rounded-2xl hover:border-indigo-200 hover:bg-gradient-to-br hover:from-indigo-50 hover:to-purple-50 transition-all duration-300 cursor-pointer active:scale-97">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-                <p className="text-xl sm:text-2xl">⚙️</p>
+            <div className="group h-full p-3 sm:p-4 border-2 border-slate-100 rounded-xl sm:rounded-2xl hover:border-indigo-200 hover:bg-gradient-to-br hover:from-indigo-50 hover:to-purple-50 transition-all duration-300 cursor-pointer active:scale-97">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center mb-2 sm:mb-3 group-hover:scale-110 transition-transform duration-300">
+                <p className="text-lg sm:text-2xl">⚙️</p>
               </div>
-              <p className="text-sm sm:text-base font-semibold text-slate-900">Pengaturan Kelas</p>
-              <p className="text-xs text-slate-500 mt-1 line-clamp-2">Setup sekolah, siswa, kurikulum & jadwal</p>
+              <p className="text-xs sm:text-base font-semibold text-slate-900">Pengaturan Kelas</p>
+              <p className="hidden sm:block text-xs text-slate-500 mt-1 line-clamp-2">Setup sekolah, siswa, kurikulum & jadwal</p>
             </div>
           </Link>
           <Link href="/manajemen">
-            <div className="group p-4 border-2 border-slate-100 rounded-xl sm:rounded-2xl hover:border-blue-200 hover:bg-gradient-to-br hover:from-blue-50 hover:to-cyan-50 transition-all duration-300 cursor-pointer active:scale-97">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-100 to-cyan-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-                <p className="text-xl sm:text-2xl">📚</p>
+            <div className="group h-full p-3 sm:p-4 border-2 border-slate-100 rounded-xl sm:rounded-2xl hover:border-blue-200 hover:bg-gradient-to-br hover:from-blue-50 hover:to-cyan-50 transition-all duration-300 cursor-pointer active:scale-97">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-blue-100 to-cyan-100 flex items-center justify-center mb-2 sm:mb-3 group-hover:scale-110 transition-transform duration-300">
+                <p className="text-lg sm:text-2xl">📚</p>
               </div>
-              <p className="text-sm sm:text-base font-semibold text-slate-900">Manajemen Kelas</p>
-              <p className="text-xs text-slate-500 mt-1 line-clamp-2">Absensi & penilaian terpadu per mapel</p>
+              <p className="text-xs sm:text-base font-semibold text-slate-900">Manajemen Kelas</p>
+              <p className="hidden sm:block text-xs text-slate-500 mt-1 line-clamp-2">Absensi & penilaian terpadu per mapel</p>
             </div>
           </Link>
-          <Link href="/rapor">
-            <div className="group p-4 border-2 border-slate-100 rounded-xl sm:rounded-2xl hover:border-green-200 hover:bg-gradient-to-br hover:from-green-50 hover:to-emerald-50 transition-all duration-300 cursor-pointer active:scale-97">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-                <p className="text-xl sm:text-2xl">📄</p>
+          <Link href="/rapor" className="col-span-2 lg:col-span-1">
+            <div className="group h-full p-3 sm:p-4 border-2 border-slate-100 rounded-xl sm:rounded-2xl hover:border-green-200 hover:bg-gradient-to-br hover:from-green-50 hover:to-emerald-50 transition-all duration-300 cursor-pointer active:scale-97">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center mb-2 sm:mb-3 group-hover:scale-110 transition-transform duration-300">
+                <p className="text-lg sm:text-2xl">📄</p>
               </div>
-              <p className="text-sm sm:text-base font-semibold text-slate-900">Cetak Rapor</p>
-              <p className="text-xs text-slate-500 mt-1 line-clamp-2">Generate & download rapor PDF</p>
+              <p className="text-xs sm:text-base font-semibold text-slate-900">Cetak Rapor</p>
+              <p className="hidden sm:block text-xs text-slate-500 mt-1 line-clamp-2">Generate & download rapor PDF</p>
             </div>
           </Link>
         </div>
