@@ -4,6 +4,7 @@ import { supabase } from '@/config/supabase';
 import { useAuthStore } from '@/hooks/useAuthStore';
 import Button from '@/components/ui/Button';
 import * as XLSX from 'xlsx';
+import { SkeletonManagementPage } from '@/components/ui/Skeleton';
 
 export default function RiwayatRekapPage() {
   const { profile, fetchSession } = useAuthStore();
@@ -241,7 +242,7 @@ export default function RiwayatRekapPage() {
     XLSX.writeFile(wb, fileName);
   };
 
-  if (loading && !siswaList.length) return <div className="flex items-center justify-center h-[60vh]"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#2D5BE3]"></div></div>;
+  if (loading && !siswaList.length) return <SkeletonManagementPage />;
 
   return (
     <div className="space-y-6">
