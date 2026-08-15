@@ -235,13 +235,35 @@ export default function AbsensiPage() {
       'A': 'Alpha'
     };
     
-    const payload = Object.entries(attendance).map(([siswaId, status]) => ({
-      siswa_id: siswaId,
-      mapel_id: selectedMapel,
-      tanggal: tanggal,
-      status: statusMap[status] || status,
-      sumber: 'qr' // Default sumber qr untuk semua yang di-scan
-    }));
+    // Buat payload dengan menentukan sumber berdasarkan mode yang aktif
+    const payload = Object.entries(attendance).map(([siswaId, status]) => {
+      // Cek apakah ini absensi baru atau update
+      const existingAbsen = absensiHistory.find(a => a.siswa_id === siswaId);
+      
+      // Tentukan sumber: jika sudah ada di history, pertahankan sumber lama
+      // Jika baru, tentukan berdasarkan apakah ada di recentScans (QR) atau tidak (manual)
+      let sumberValue = 'manual'; // default
+      if (existingAbsen) {
+        sumberValue = existingAbsen.sumber || 'manual';
+      } else {
+        // Data baru - cek apakah dari QR scan atau manual
+        // Kita anggap semua yang di-set via attendance state adalah dari mode yang sedang aktif
+        sumberValue = scanMode === 'qr' ? 'qr' : 'manual';
+      }
+      
+      // Pastikan status dikonversi dengan benar
+      const statusLengkap = statusMap[status] || status;
+      
+      console.log(`Siswa ${siswaId}: status=${status} -> ${statusLengkap}, sumber=${sumberValue}`);
+      
+      return {
+        siswa_id: siswaId,
+        mapel_id: selectedMapel,
+        tanggal: tanggal,
+        status: statusLengkap,
+        sumber: sumberValue
+      };
+    });
     
     if (payload.length === 0) {
       alert('Tidak ada absensi yang diisi');
@@ -249,13 +271,17 @@ export default function AbsensiPage() {
       return;
     }
     
-    const { error } = await supabase.from('absensi').upsert(payload, {
+    console.log('Payload yang akan dikirim:', payload);
+    
+    const { data, error } = await supabase.from('absensi').upsert(payload, {
       onConflict: 'siswa_id,mapel_id,tanggal'
     });
     
     if (error) {
+      console.error('Error detail:', error);
       alert('Gagal menyimpan: ' + error.message);
     } else {
+      console.log('Berhasil menyimpan:', data);
       alert('✅ Absensi berhasil disimpan!');
       loadAbsensiHistory();
       // Reset recent scans setelah simpan
