@@ -130,9 +130,9 @@ export default function SignUpPage() {
     <div className="min-h-screen bg-gradient-to-br from-[#2D5BE3] via-[#4F46E5] to-[#7C3AED] flex items-center justify-center p-4 relative overflow-hidden">
       {/* Animated Background Pattern */}
       <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-10 left-10 w-72 h-72 bg-white/30 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple-300/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-blue-300/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-10 left-10 w-72 h-72 bg-white/30 rounded-full blur-xl sm:blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple-300/30 rounded-full blur-xl sm:blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="hidden sm:block absolute top-1/2 left-1/2 w-64 h-64 bg-blue-300/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
       </div>
 
       {/* Glass Card */}
@@ -182,7 +182,7 @@ export default function SignUpPage() {
                 placeholder="guru@contoh.com"
                 required
                 disabled={loading || success}
-                className="w-full px-4 py-3.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] focus:border-transparent transition-all bg-white/50 hover:bg-white disabled:opacity-50"
+                className="w-full px-4 py-3.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] focus:border-transparent transition-all bg-white/50 hover:bg-white text-slate-900 placeholder:text-slate-400 disabled:opacity-50"
               />
             </div>
 
@@ -199,7 +199,7 @@ export default function SignUpPage() {
                 placeholder="Dr. Budi Santoso, S.Pd., M.Pd."
                 required
                 disabled={loading || success}
-                className="w-full px-4 py-3.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] focus:border-transparent transition-all bg-white/50 hover:bg-white disabled:opacity-50"
+                className="w-full px-4 py-3.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] focus:border-transparent transition-all bg-white/50 hover:bg-white text-slate-900 placeholder:text-slate-400 disabled:opacity-50"
               />
             </div>
 
@@ -216,7 +216,7 @@ export default function SignUpPage() {
                 placeholder="Contoh: 123456789"
                 required
                 disabled={loading || success}
-                className="w-full px-4 py-3.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] focus:border-transparent transition-all bg-white/50 hover:bg-white disabled:opacity-50"
+                className="w-full px-4 py-3.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] focus:border-transparent transition-all bg-white/50 hover:bg-white text-slate-900 placeholder:text-slate-400 disabled:opacity-50"
               />
             </div>
 
@@ -233,7 +233,7 @@ export default function SignUpPage() {
                 placeholder="SMA Negeri 1 Jakarta"
                 required
                 disabled={loading || success}
-                className="w-full px-4 py-3.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] focus:border-transparent transition-all bg-white/50 hover:bg-white disabled:opacity-50"
+                className="w-full px-4 py-3.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] focus:border-transparent transition-all bg-white/50 hover:bg-white text-slate-900 placeholder:text-slate-400 disabled:opacity-50"
               />
             </div>
 
@@ -251,7 +251,7 @@ export default function SignUpPage() {
                   placeholder="Minimal 8 karakter"
                   required
                   disabled={loading || success}
-                  className="w-full px-4 py-3.5 pr-12 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] focus:border-transparent transition-all bg-white/50 hover:bg-white disabled:opacity-50"
+                  className="w-full px-4 py-3.5 pr-12 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] focus:border-transparent transition-all bg-white/50 hover:bg-white text-slate-900 placeholder:text-slate-400 disabled:opacity-50"
                 />
                 <button
                   type="button"
@@ -289,7 +289,7 @@ export default function SignUpPage() {
                   placeholder="Ulangi password"
                   required
                   disabled={loading || success}
-                  className="w-full px-4 py-3.5 pr-12 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] focus:border-transparent transition-all bg-white/50 hover:bg-white disabled:opacity-50"
+                  className="w-full px-4 py-3.5 pr-12 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2D5BE3] focus:border-transparent transition-all bg-white/50 hover:bg-white text-slate-900 placeholder:text-slate-400 disabled:opacity-50"
                 />
                 <button
                   type="button"
